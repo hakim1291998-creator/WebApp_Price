@@ -1,0 +1,2800 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>کۆمپانیای ساحل العراق — سیستەمی ناوەندیی فرۆش و مەندووبان | v3.0</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Professional Kurdish & Monospace Fonts: Vazirmatn, Noto Sans Arabic, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Vazirmatn', 'Noto Sans Arabic', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            canvas: '#EAE7E0',
+            surface: {
+              DEFAULT: '#F6F4EF',
+              bright: '#FAF8F5',
+              muted: '#E5E2DC',
+            },
+            primary: {
+              DEFAULT: '#0A3D43',
+              hover: '#145057',
+              active: '#06282C',
+              subtle: '#E1EFF3',
+            },
+            border: {
+              DEFAULT: '#D6D2C9',
+              dark: '#BDB9B0',
+            },
+            ink: {
+              900: '#1C1B19',
+              700: '#4A4843',
+              500: '#78756E',
+              300: '#BDB9B0',
+              100: '#E5E2DC',
+              50: '#F5F3EE',
+            },
+            alert: {
+              successBg: '#E3F1E6',
+              successBorder: '#A5CFAF',
+              successText: '#1E522B',
+              infoBg: '#E1EFF3',
+              infoBorder: '#9EC5D1',
+              infoText: '#134959',
+              warnBg: '#F9F0D9',
+              warnBorder: '#DEC385',
+              warnText: '#6B4E09',
+              errorBg: '#F7E3E1',
+              errorBorder: '#D99E99',
+              errorText: '#6E1F1A',
+            }
+          },
+          boxShadow: {
+            'level-1': '0 2px 4px -1px rgba(28, 27, 25, 0.06), 0 1px 2px -1px rgba(28, 27, 25, 0.04)',
+            'level-2': '0 4px 6px -2px rgba(28, 27, 25, 0.08), 0 2px 4px -2px rgba(28, 27, 25, 0.04)',
+            'level-3': '0 8px 16px -4px rgba(28, 27, 25, 0.10), 0 4px 6px -2px rgba(28, 27, 25, 0.05)',
+            'level-4': '0 14px 28px -6px rgba(28, 27, 25, 0.14), 0 6px 10px -4px rgba(28, 27, 25, 0.06)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-canvas: #EAE7E0;
+      --grid-line: rgba(189, 185, 176, 0.35);
+      --primary: #0A3D43;
+    }
+
+    body {
+      font-family: 'Vazirmatn', 'Noto Sans Arabic', sans-serif;
+      background-color: var(--bg-canvas);
+      color: #1C1B19;
+      -webkit-tap-highlight-color: transparent;
+      font-feature-settings: "kern" 1, "liga" 1;
+      background-image: 
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(189, 185, 176, 0.18) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    /* Styleguide Top Architectural Ruler */
+    .ruler-bar {
+      height: 22px;
+      background-color: #E4E0D8;
+      border-bottom: 1px solid #D6D2C9;
+      background-image: repeating-linear-gradient(
+        to left,
+        #BDB9B0 0px,
+        #BDB9B0 1px,
+        transparent 1px,
+        transparent 16px
+      );
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: #78756E;
+    }
+
+    /* Focus Ring Token from Styleguide */
+    .ui-input {
+      background-color: #FAF8F5;
+      border: 1.5px solid #D6D2C9;
+      border-radius: 8px;
+      color: #1C1B19;
+      transition: all 0.15s ease;
+    }
+    .ui-input:focus {
+      outline: none;
+      background-color: #FFFFFF;
+      border-color: #0A3D43;
+      box-shadow: 0 0 0 3px rgba(10, 61, 67, 0.14);
+    }
+
+    /* Styleguide Buttons */
+    .btn-primary {
+      background-color: #0A3D43;
+      color: #FAF8F5;
+      border: 1px solid #06282C;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+    .btn-primary:hover {
+      background-color: #145057;
+    }
+    .btn-primary:active {
+      background-color: #06282C;
+      transform: translateY(1px);
+    }
+
+    .btn-secondary {
+      background-color: #FAF8F5;
+      color: #1C1B19;
+      border: 1px solid #BDB9B0;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+    .btn-secondary:hover {
+      background-color: #E5E2DC;
+    }
+    .btn-secondary:active {
+      background-color: #BDB9B0;
+    }
+
+    .btn-tertiary {
+      background-color: transparent;
+      color: #4A4843;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+    .btn-tertiary:hover {
+      background-color: #E5E2DC;
+      color: #1C1B19;
+    }
+
+    /* Styleguide Chips (Radius: Full 24px) */
+    .ui-chip {
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      border: 1px solid #D6D2C9;
+      background-color: #F6F4EF;
+      color: #4A4843;
+    }
+    .ui-chip-active {
+      background-color: #0A3D43;
+      color: #FAF8F5;
+      border-color: #0A3D43;
+    }
+
+    /* Underline Tabs from Styleguide */
+    .ui-tab {
+      position: relative;
+      padding-bottom: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #78756E;
+      transition: color 0.15s ease;
+    }
+    .ui-tab:hover {
+      color: #1C1B19;
+    }
+    .ui-tab-active {
+      color: #0A3D43;
+      font-weight: 800;
+    }
+    .ui-tab-active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: 0;
+      left: 0;
+      height: 2.5px;
+      background-color: #0A3D43;
+      border-radius: 2px;
+    }
+
+    /* Desktop Sidebar Active Link */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4A4843;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .sidebar-link:hover {
+      background-color: #E5E2DC;
+      color: #1C1B19;
+    }
+    .sidebar-link-active {
+      background-color: #0A3D43 !important;
+      color: #FAF8F5 !important;
+      border-color: #06282C;
+      box-shadow: 0 4px 6px -2px rgba(28, 27, 25, 0.12);
+    }
+
+    /* Custom Checkbox */
+    .ui-checkbox {
+      accent-color: #0A3D43;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #BDB9B0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white">
+
+  <!-- Top Architectural Ruler -->
+  <div class="ruler-bar w-full flex items-center justify-between px-4 lg:px-8 select-none overflow-hidden shrink-0">
+    <div class="flex items-center gap-10 lg:gap-16">
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span class="hidden md:inline">11</span><span class="hidden md:inline">12</span><span class="hidden xl:inline">13</span><span class="hidden xl:inline">14</span>
+    </div>
+    <div class="font-mono text-[10px] tracking-widest uppercase text-ink-700 font-semibold">
+      SAHEL AL-IRAQ • ENTERPRISE DESKTOP & MOBILE v3.5
+    </div>
+  </div>
+
+  <!-- Toast Notification Banner (Real-time Alert) -->
+  <div id="toastBanner" class="hidden fixed top-8 left-4 right-4 max-w-lg mx-auto z-50 bg-primary text-surface-bright border border-ink-900 rounded-[12px] p-3.5 shadow-level-4 flex items-center justify-between transition-all">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-[8px] bg-white/15 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-bell text-amber-300 animate-bounce"></i>
+      </div>
+      <div>
+        <h4 id="toastTitle" class="text-xs font-extrabold">ئاگاداری نوێی نرخ و ئۆفەر</h4>
+        <p id="toastBody" class="text-[11px] opacity-90 mt-0.5"></p>
+      </div>
+    </div>
+    <button onclick="hideToast()" class="text-white/70 hover:text-white px-2">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 1. LOGIN SCREEN (Responsive Mobile Card & Desktop Split)   -->
+  <!-- ========================================================= -->
+  <div id="screen-login" class="flex-1 flex flex-col justify-center items-center px-4 py-6 lg:py-12 max-w-md lg:max-w-5xl mx-auto w-full">
+    
+    <!-- Mobile-Only Header -->
+    <div class="w-full text-right mb-5 border-b border-border pb-4 lg:hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="ui-chip ui-chip-active font-mono text-[10px]">Version 3.5 | Enterprise</span>
+        <span class="font-mono text-xs text-ink-500">IMEI GUARD ACTIVE</span>
+      </div>
+      <h1 class="text-3xl font-black text-ink-900 tracking-tight leading-tight">
+        کۆمپانیای ساحل العراق
+      </h1>
+      <p class="text-xs font-medium text-ink-700 mt-1">
+        سیستەمی ناوەندیی نرخی بەرهەم، مارکێتەکان، ڕاپۆرت و ئۆفەرەکان
+      </p>
+    </div>
+
+    <!-- Responsive Split Container: 1 col on mobile, 12 cols on Desktop/Laptop -->
+    <div class="w-full grid grid-cols-1 lg:grid-cols-12 bg-surface border border-border rounded-[20px] shadow-level-4 overflow-hidden">
+      
+      <!-- Desktop Right Showcase Panel (Hidden on Mobile, 5 cols on Desktop) -->
+      <div class="hidden lg:flex lg:col-span-5 bg-primary text-surface-bright p-8 flex-col justify-between relative overflow-hidden">
+        <div class="space-y-5 relative z-10">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[11px] bg-white/15 px-3 py-1 rounded-full font-bold tracking-wider">PRODUCT UI v3.5</span>
+            <span class="font-mono text-[11px] text-emerald-300 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              ONLINE 24/7
+            </span>
+          </div>
+
+          <div class="pt-2">
+            <div class="w-12 h-12 rounded-[14px] bg-white/15 border border-white/20 flex items-center justify-center font-mono text-2xl font-black mb-4">
+              S
+            </div>
+            <h1 class="text-3xl font-black tracking-tight leading-snug">
+              کۆمپانیای ساحل العراق
+            </h1>
+            <p class="text-xs text-surface-muted/85 mt-2 leading-relaxed">
+              پلاتفۆرمی ناوەندیی بەڕێوەبردنی فرۆش، پشکنینی ٥ نرخی جیاوازی بەرهەم، چاودێریکردنی کاڵای مارکێتەکان و ڕاگەیاندنی خێرای ئۆفەرەکان بۆ مەندووبان و بەڕێوەبەران.
+            </p>
+          </div>
+
+          <div class="space-y-3 pt-4 border-t border-white/15 text-xs">
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-[8px] bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-layer-group text-amber-300"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold">شیکاری ٥ نرخی جیاواز + بڕ بە کارتۆن و دانە</h4>
+                <p class="text-[11px] text-surface-muted/75 mt-0.5">دەرکێشانی ڕاستەوخۆی کۆتا نرخ، نرخی پێشتر و هەرزانترین نرخ لەگەڵ بەروار.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-[8px] bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-shield-halved text-emerald-300"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold">پاراستنی هەژمار بە قفڵی ئامێر (IMEI Lock)</h4>
+                <p class="text-[11px] text-surface-muted/75 mt-0.5">ڕێگریکردن لە کردنەوەی هەژماری مەندووب لەسەر مۆبایل یان کۆمپیوتەری بێگانە.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-[8px] bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-bolt text-sky-300"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold">بەستراوە بە خشتەی فەرمی public.sales_data</h4>
+                <p class="text-[11px] text-surface-muted/75 mt-0.5">بەستراوە بە بنکەدراوەی PostgreSQL لەسەر Supabase بە خێرایی کەمتر لە چرکەیەک.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-white/15 flex items-center justify-between text-[11px] font-mono text-surface-muted/70 relative z-10">
+          <span>CLEAN SAAS MONOCHROME</span>
+          <span>ERBIL • KIRKUK • IRAQ</span>
+        </div>
+      </div>
+
+      <!-- Login Form Column (Full width on mobile, 7 cols on Desktop) -->
+      <div class="lg:col-span-7 p-5 sm:p-7 lg:p-9 flex flex-col justify-center">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-border/70">
+          <div>
+            <h2 class="text-base lg:text-lg font-extrabold text-ink-900">چوونەژوورەوەی ستاف و مەندووبان</h2>
+            <p class="text-[11px] lg:text-xs text-ink-500 mt-0.5">هەژمارەکەت بەستراوەتەوە بە ژمارەی ناسنامەی ئامێرەکەت (IMEI / Device ID)</p>
+          </div>
+          <div class="w-10 h-10 rounded-[12px] bg-primary text-surface-bright flex items-center justify-center shadow-level-1">
+            <i class="fa-solid fa-fingerprint text-base"></i>
+          </div>
+        </div>
+
+        <!-- Quick Filter Chips for Demo Login -->
+        <div class="mb-4">
+          <span class="block text-[11px] font-bold text-ink-500 mb-1.5">تاقیکردنەوەی خێرای هەژمارەکان (کلیک بکە):</span>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="fillDemoLogin('admin', 'admin123')" id="chip-admin" class="ui-chip ui-chip-active cursor-pointer">
+              <i class="fa-solid fa-user-shield text-[10px]"></i>
+              <span>بەڕێوەبەری گشتی (admin)</span>
+            </button>
+            <button type="button" onclick="fillDemoLogin('karwan', '1234')" id="chip-mandub" class="ui-chip hover:border-ink-700 cursor-pointer">
+              <i class="fa-solid fa-user-tag text-[10px]"></i>
+              <span>مەندووب: کاروان (karwan)</span>
+            </button>
+            <button type="button" onclick="fillDemoLogin('aco', '1234')" id="chip-aco" class="ui-chip hover:border-ink-700 cursor-pointer">
+              <i class="fa-solid fa-lock text-[10px]"></i>
+              <span>مەندووب (ئامێری جیاواز - بلۆککراو)</span>
+            </button>
+          </div>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-bold text-ink-900 mb-1">ناوی بەکارهێنەر (Username)</label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="loginUsername" 
+                  required
+                  value="admin"
+                  placeholder="ناوی بەکارهێنەر" 
+                  class="ui-input w-full pr-3.5 pl-9 py-2.5 text-sm font-mono font-semibold text-left"
+                  dir="ltr"
+                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-ink-500">
+                  <i class="fa-regular fa-user text-xs"></i>
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-ink-900 mb-1">تێپەڕەوشە (Password)</label>
+              <div class="relative">
+                <input 
+                  type="password" 
+                  id="loginPassword" 
+                  required
+                  value="admin123"
+                  placeholder="••••••••" 
+                  class="ui-input w-full pr-10 pl-3.5 py-2.5 text-sm font-mono text-left"
+                  dir="ltr"
+                >
+                <button 
+                  type="button" 
+                  onclick="togglePasswordVisibility()" 
+                  class="absolute inset-y-0 right-0 flex items-center pr-3 text-ink-500 hover:text-ink-900 focus:outline-none"
+                >
+                  <i id="passwordToggleIcon" class="fa-regular fa-eye text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Device ID / IMEI Binding Box -->
+          <div class="bg-surface-bright border border-border rounded-[10px] p-3">
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[11px] font-extrabold text-ink-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-laptop-medical text-primary"></i>
+                <span>ناسنامەی ئامێر / IMEI (مۆبایل یان کۆمپیوتەرەکەت):</span>
+              </label>
+              <button type="button" onclick="copyDeviceImei()" class="text-[10px] font-bold text-primary hover:underline flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i>
+                <span id="copyImeiBtnText">کۆپیکردن بۆ ئەدمین</span>
+              </button>
+            </div>
+            <input 
+              type="text" 
+              id="loginDeviceImei" 
+              readonly
+              class="w-full bg-surface-muted/70 border border-border rounded-[6px] px-2.5 py-1.5 text-xs font-mono font-bold text-primary text-left select-all"
+              dir="ltr"
+            >
+            <p class="text-[10px] text-ink-500 mt-1">
+              ئەم کۆدە تایبەتە بەم ئامێرەی تۆ. ئەگەر هەژمارەکەت لەسەر ئامێرێکی تر بکرێتەوە، سیستەم ڕێگری لێ دەکات.
+            </p>
+          </div>
+
+          <!-- Styleguide Error Alert -->
+          <div id="loginError" class="hidden rounded-[8px] bg-alert-errorBg border border-alert-errorBorder text-alert-errorText px-3.5 py-2.5 text-xs font-semibold flex items-start gap-2.5">
+            <i class="fa-solid fa-circle-exclamation text-sm shrink-0 mt-0.5"></i>
+            <span id="loginErrorText">هەڵە لە چوونەژوورەوە.</span>
+          </div>
+
+          <button 
+            type="submit" 
+            class="btn-primary w-full py-3 px-4 font-bold text-sm shadow-level-2 flex items-center justify-center gap-2"
+          >
+            <span>پشکنینی ئامێر و چوونەژوورەوە بۆ سیستەم</span>
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. MAIN APPLICATION SHELL (Responsive Mobile + Desktop)    -->
+  <!-- ========================================================= -->
+  <div id="screen-app" class="hidden flex-1 flex flex-col lg:flex-row max-w-[1440px] mx-auto w-full">
+    
+    <!-- ======================================================= -->
+    <!-- DESKTOP / LAPTOP PERMANENT RIGHT SIDEBAR (lg:flex)      -->
+    <!-- ======================================================= -->
+    <aside class="hidden lg:flex lg:w-72 xl:w-80 shrink-0 bg-surface border-l border-border flex-col justify-between p-5 select-none sticky top-[22px] h-[calc(100vh-22px)] overflow-y-auto">
+      <div class="space-y-5">
+        <!-- Brand Header -->
+        <div class="flex items-center gap-3 pb-4 border-b border-border">
+          <div class="w-11 h-11 rounded-[12px] bg-primary text-surface-bright flex items-center justify-center font-mono font-black text-lg shadow-level-2 shrink-0">
+            S
+          </div>
+          <div>
+            <h2 class="text-base font-black text-ink-900 leading-tight">کۆمپانیای ساحل العراق</h2>
+            <p class="text-[11px] text-ink-500 font-semibold mt-0.5">سیستەمی ناوەندیی فرۆش و نرخ</p>
+          </div>
+        </div>
+
+        <!-- User Profile & IMEI Box -->
+        <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 space-y-2 shadow-level-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-ink-500">بەکارهێنەری چالاک</span>
+            <span id="sidebarRoleBadge" class="ui-chip ui-chip-active !py-0.5 !px-2.5 !text-[10px]">ئەدمین</span>
+          </div>
+          <p id="sidebarUserName" class="text-xs font-extrabold text-ink-900 truncate"></p>
+          <div class="pt-1.5 border-t border-border/60 flex items-center justify-between text-[10px] font-mono text-ink-500">
+            <span>DEVICE LOCK:</span>
+            <span id="sidebarImeiCode" class="font-bold text-primary"></span>
+          </div>
+        </div>
+
+        <!-- Sidebar Navigation Links -->
+        <div class="space-y-1.5">
+          <span class="block text-[10px] font-mono uppercase tracking-wider text-ink-500 px-2 mb-1">بەشەکانی سیستەم (MODULES)</span>
+          
+          <button onclick="switchView('hub')" id="side-hub" class="sidebar-link sidebar-link-active">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-grip w-4 text-center"></i>
+              <span>داشبۆردی سەرەکی</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">00</span>
+          </button>
+
+          <button onclick="switchView('pricing')" id="side-pricing" data-perm="price_lookup" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-tags w-4 text-center"></i>
+              <span>نرخی بەرهەم (٥ نرخ)</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">01</span>
+          </button>
+
+          <button onclick="switchView('market_items')" id="side-market_items" data-perm="market_items" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-store w-4 text-center"></i>
+              <span>کاڵاکانی ناو مارکێت</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">02</span>
+          </button>
+
+          <button onclick="switchView('price_audit')" id="side-price_audit" data-perm="price_audit" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-magnifying-glass-location w-4 text-center"></i>
+              <span>ڕاپۆرتی مێژووی نرخ</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">03</span>
+          </button>
+
+          <button onclick="switchView('announcements')" id="side-announcements" data-perm="announcements" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-bullhorn w-4 text-center"></i>
+              <span>ڕاگەیاندنی نرخ و ئۆفەر</span>
+            </span>
+            <span class="bg-alert-warnBg text-alert-warnText border border-alert-warnBorder font-mono text-[10px] px-1.5 py-0.2 rounded-full">عرض</span>
+          </button>
+
+          <button onclick="switchView('contracts')" id="side-contracts" data-perm="contracts" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-file-contract w-4 text-center"></i>
+              <span>گرێبەست و پسوڵەکان</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">05</span>
+          </button>
+
+          <button onclick="switchView('admin_users')" id="side-admin_users" data-perm="admin_users" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-users-gear w-4 text-center"></i>
+              <span>بەکارهێنەران و داتابەیس</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">ADMIN</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Quick Actions in Sidebar -->
+      <div class="space-y-2 pt-4 border-t border-border">
+        <button onclick="openFullCatalogModal()" class="btn-secondary w-full py-2.5 px-3 text-xs font-extrabold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-table-list text-primary"></i>
+          <span>لیستی گشتیی نرخی کاڵاکان</span>
+        </button>
+        <button onclick="logout()" class="btn-tertiary w-full py-2 px-3 text-xs font-bold text-alert-errorText flex items-center justify-center gap-2">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>چوونەدەرەوە لە هەژمار</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ======================================================= -->
+    <!-- MAIN CONTENT COLUMN (Mobile Header + Desktop Topbar)     -->
+    <!-- ======================================================= -->
+    <div class="flex-1 flex flex-col min-w-0 pb-16 lg:pb-8">
+      
+      <!-- Sticky Header (Adapts for Mobile vs Desktop) -->
+      <header class="sticky top-0 z-30 bg-surface/95 backdrop-blur-md border-b border-border px-4 lg:px-8 pt-3 pb-0 lg:py-3.5 shadow-level-1">
+        <div class="flex items-center justify-between pb-3 lg:pb-0">
+          <!-- Mobile Brand / Desktop Current View Title -->
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex lg:hidden items-center justify-center font-mono font-bold text-base shadow-level-1">
+              S
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 id="desktopActiveViewTitle" class="text-sm sm:text-base lg:text-lg font-extrabold text-ink-900 leading-none">
+                  کۆمپانیای ساحل العراق — ناوەندی کۆنترۆڵ
+                </h2>
+                <span id="userBadgeRole" class="ui-chip ui-chip-active !py-0.5 !px-2.5 !text-[10px] lg:hidden">ئەدمین</span>
+              </div>
+              <p id="userDisplayName" class="text-[11px] lg:text-xs text-ink-500 font-medium mt-1">
+                بەخێربێیت بۆ سیستەمی زیرەکی نرخ و بەڕێوەبردنی فرۆش
+              </p>
+            </div>
+          </div>
+
+          <!-- Top Right Actions (Catalog Shortcut on Desktop + Notification Bell + Logout) -->
+          <div class="flex items-center gap-2">
+            <button onclick="openFullCatalogModal()" class="hidden md:flex btn-secondary px-3.5 py-2 text-xs font-extrabold items-center gap-1.5">
+              <i class="fa-solid fa-table-list text-primary"></i>
+              <span>ڕاپۆرتی تەواوی نرخی بەرهەمەکان</span>
+            </button>
+
+            <button onclick="openNotificationsModal()" class="btn-secondary relative px-3 py-2 text-xs font-bold flex items-center gap-1.5" title="ئاگادارکردنەوەکانی نرخ و ئۆفەر">
+              <i class="fa-regular fa-bell text-sm text-primary"></i>
+              <span class="hidden sm:inline text-xs">ئاگادارییەکان</span>
+              <span id="notifUnreadBadge" class="bg-alert-errorText text-white font-mono text-[10px] font-extrabold px-1.5 py-0.2 rounded-full">
+                2
+              </span>
+            </button>
+
+            <button onclick="logout()" title="دەرچوون" class="lg:hidden btn-secondary px-3 py-2 text-xs font-bold text-alert-errorText flex items-center gap-1">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span class="hidden sm:inline">دەرچوون</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile-Only Underline Tabs (Hidden on Desktop >=1024px since Sidebar is visible) -->
+        <div id="topTabsContainer" class="flex lg:hidden items-center gap-4 overflow-x-auto no-scrollbar border-t border-border/60 pt-2.5">
+          <button onclick="switchView('hub')" id="tab-hub" class="ui-tab ui-tab-active whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-grip text-xs"></i>
+            <span>سەرەکی</span>
+          </button>
+          <button onclick="switchView('pricing')" id="tab-pricing" data-perm="price_lookup" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-tags text-xs"></i>
+            <span>نرخی بەرهەم (٥ نرخ)</span>
+          </button>
+          <button onclick="switchView('market_items')" id="tab-market_items" data-perm="market_items" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-store text-xs"></i>
+            <span>کاڵاکانی مارکێت</span>
+          </button>
+          <button onclick="switchView('price_audit')" id="tab-price_audit" data-perm="price_audit" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-magnifying-glass-location text-xs"></i>
+            <span>ڕاپۆرتی مێژووی نرخ</span>
+          </button>
+          <button onclick="switchView('announcements')" id="tab-announcements" data-perm="announcements" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-bullhorn text-xs"></i>
+            <span>ڕاگەیاندنی نرخ و ئۆفەر</span>
+          </button>
+          <button onclick="switchView('contracts')" id="tab-contracts" data-perm="contracts" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-file-contract text-xs"></i>
+            <span>گرێبەست و پسوڵە</span>
+          </button>
+          <button onclick="switchView('admin_users')" id="tab-admin_users" data-perm="admin_users" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-users-gear text-xs"></i>
+            <span>بەکارهێنەران و داتابەیس</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN WORKSPACE CONTAINER -->
+      <main class="flex-1 p-4 lg:p-8 space-y-5">
+
+        <!-- =================================================== -->
+        <!-- VIEW 1: HUB / OVERVIEW (Responsive Mobile & Desktop) -->
+        <!-- =================================================== -->
+        <div id="view-hub" class="space-y-5">
+          
+          <!-- Top Status Bar & Desktop KPI Strip -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">بنکەدراوەی چالاک</span>
+                <span class="font-mono text-base font-black text-ink-900 mt-0.5 block">sales_data</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-primary/10 text-primary flex items-center justify-center">
+                <i class="fa-solid fa-database"></i>
+              </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">بارودۆخی پەیوەندی</span>
+                <span id="hubDbStatusText" class="font-mono text-xs font-black text-primary mt-0.5 block">ئامادەیە</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-primary/10 text-primary flex items-center justify-center">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">ناسنامەی ئامێر (IMEI)</span>
+                <span id="hubDeviceTag" class="font-mono text-xs font-extrabold text-primary mt-1 block truncate max-w-[130px]">VERIFIED</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-alert-successBg text-alert-successText flex items-center justify-center">
+                <i class="fa-solid fa-shield-check"></i>
+              </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">بەشە ڕێپێدراوەکان</span>
+                <span id="hubPermCountChip" class="text-xs font-extrabold text-ink-900 mt-1 block">مۆڵەتەکان چالاکن</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-ink-100 text-ink-700 flex items-center justify-center">
+                <i class="fa-solid fa-key"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest Special Offer Banner on Hub -->
+          <div id="hubLatestOfferBanner" class="rounded-[14px] bg-alert-infoBg border border-alert-infoBorder text-alert-infoText p-4 shadow-level-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-fire-flame-curved text-base"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs sm:text-sm font-extrabold">دوایین ڕاگەیاندنی نرخ و عرض خاص:</span>
+                  <span class="ui-chip ui-chip-active !py-0 !px-2 !text-[9px]">نوێ</span>
+                </div>
+                <p id="hubBannerText" class="text-xs sm:text-sm font-semibold mt-0.5">
+                  کۆد 808 (زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا) — عرض خاص: 46,500 دینار
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+              <button onclick="openFullCatalogModal()" class="btn-secondary px-3 py-2 text-xs font-bold">
+                خشتەی گشتیی نرخەکان
+              </button>
+              <button onclick="switchView('announcements')" class="btn-primary px-4 py-2 text-xs font-bold">
+                بینینی ئۆفەرەکان
+              </button>
+            </div>
+          </div>
+
+          <!-- Hub Dynamic Cards Grid (1 col mobile, 2 cols tablet, 3 cols desktop) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            
+            <!-- Module 1: 5-Price Lookup -->
+            <div data-card-perm="price_lookup" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">01 • PRICING</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">٥ نرخی جیاواز</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">نرخی بەرهەم (٥ نرخ + بڕ)</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    پشکنینی کۆدی کڕیار و بەرهەم لە خشتەی <code class="font-mono">sales_data</code> بۆ بینینی ٥ نرخی جیاواز، بەروار، و بڕی فرۆشراو بە کارتۆن و دانە.
+                  </p>
+                </div>
+                <div class="mt-5 flex gap-2">
+                  <button onclick="switchView('pricing'); setQuickSearch('164', '808')" class="btn-secondary flex-1 py-2.5 text-xs font-bold">نموونەی خێرا</button>
+                  <button onclick="switchView('pricing')" class="btn-primary flex-1 py-2.5 text-xs font-bold">کردنەوەی بەش</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Module 2: Products in Market -->
+            <div data-card-perm="market_items" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">02 • MARKET PORTFOLIO</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px]">بەستنەوەی خۆکار</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">کاڵاکانی ناو مارکێت</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    کۆد یان ناوی مارکێت بنووسە بۆ زانینی هەموو ئەو کاڵایانەی بۆی داخڵ کراوە و بە یەک کلیک نرخەکانی ببینە.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('market_items')" class="btn-primary w-full py-2.5 text-xs font-bold">پشکنینی مارکێتەکان</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Module 3: Price & Location History Report -->
+            <div data-card-perm="price_audit" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">03 • AUDIT REPORT</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px]">فلتەری نرخ و بەروار</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">ڕاپۆرتی مێژووی نرخی بەرهەم</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    نرخێکی دیاریکراو و بەروار بدە بە سیستەم بۆ زانینی ئەوەی ئەو بەرهەمە بەو نرخە بە کام شوێنانە فرۆشراوە.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('price_audit')" class="btn-primary w-full py-2.5 text-xs font-bold">کردنەوەی ڕاپۆرت</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Module 4: Price Announcements & Special Offers -->
+            <div data-card-perm="announcements" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">04 • OFFERS & ALERTS</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-alert-warnBg border-alert-warnBorder text-alert-warnText">عرض خاص</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و ئۆفەر</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    بڵاوکردنەوەی نرخی نوێ، عرض خاص بە مەرج و هۆکارەوە، لەگەڵ ناردنی نۆتیفیکەیشن و ڕاپۆرتی گشتی.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('announcements')" class="btn-primary w-full py-2.5 text-xs font-bold">بەشی نرخ و ئۆفەرەکان</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Module 5: Contracts & Receipts -->
+            <div data-card-perm="contracts" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">05 • DOCUMENTS</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px]">گرێبەست و پسوڵە</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">گرێبەستەکان و پسوڵە</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    ئەرشیفی فایلە فەرمییەکانی گرێبەست و گەڕان بەدوای ناوەڕۆکی پسوڵەکان بە ژمارەی پسوڵە لە <code class="font-mono">sales_data</code>.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('contracts')" class="btn-secondary w-full py-2.5 text-xs font-bold">کردنەوەی ئەرشیف</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Module 6: Admin User & Database Control -->
+            <div data-card-perm="admin_users" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-primary text-surface-bright px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold">06 • ADMIN & SUPABASE</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-white/20 text-white border-white/30">تایبەت بە ئەدمین</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">بەکارهێنەران، IMEI و داتابەیس</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    دروستکردنی یوسەر بە ناو، پاسۆرد، کۆدی جیهاز (IMEI)، چێک لیستی دەسەڵاتەکان و بەستنەوەی Supabase.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('admin_users')" class="btn-primary w-full py-2.5 text-xs font-bold">بەڕێوەبردنی سیستەم</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- =================================================== -->
+        <!-- VIEW 2: PRODUCT PRICE LOOKUP (Desktop 12-Col Split)   -->
+        <!-- =================================================== -->
+        <div id="view-pricing" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <!-- Right Column on Desktop (5 cols): Search Form & Presets -->
+            <div class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4 lg:sticky lg:top-24">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 class="text-base font-extrabold text-ink-900">فۆڕمی لێکۆڵینەوەی نرخ</h3>
+                  <p class="text-xs text-ink-500 mt-0.5">کۆدی کریار و بەرهەم بنووسە بۆ دەرکێشانی ٥ نرخ لە <code class="font-mono">sales_data</code></p>
+                </div>
+                <span class="ui-chip ui-chip-active font-mono text-[10px]">5-PRICES</span>
+              </div>
+
+              <!-- Input Fields -->
+              <div class="space-y-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆدی کریار (Customer Code)</label>
+                  <div class="relative">
+                    <input 
+                      type="text" 
+                      id="searchCustCode" 
+                      inputmode="numeric" 
+                      placeholder="نموونە: 164 یان 2270" 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-sm font-mono font-bold text-left"
+                      dir="ltr"
+                    >
+                    <i class="fa-solid fa-store absolute left-3 top-3 text-ink-500 text-xs"></i>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆدی بەرهەم (Product Code)</label>
+                  <div class="relative">
+                    <input 
+                      type="text" 
+                      id="searchProdCode" 
+                      inputmode="numeric" 
+                      placeholder="نموونە: 808 یان 1873" 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-sm font-mono font-bold text-left"
+                      dir="ltr"
+                    >
+                    <i class="fa-solid fa-box-open absolute left-3 top-3 text-ink-500 text-xs"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1">
+                <button onclick="executePriceLookup()" class="btn-primary flex-1 py-3 px-4 font-bold text-xs sm:text-sm shadow-level-1 flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                  <span>گەڕان و هێنانی ٥ نرخ</span>
+                </button>
+                <button onclick="clearPriceSearch()" class="btn-secondary py-3 px-3.5 text-xs font-bold">پاککردنەوە</button>
+              </div>
+
+              <!-- Quick Demo Chips -->
+              <div class="pt-3 border-t border-border">
+                <span class="block text-[11px] font-bold text-ink-500 mb-2">نموونەی ئامادەکراو لە خشتەی sales_data (کلیک بکە):</span>
+                <div class="flex flex-col gap-1.5">
+                  <button type="button" onclick="setQuickSearch('164', '808')" class="ui-chip hover:border-primary cursor-pointer font-mono justify-between w-full !rounded-[8px] !py-2">
+                    <span>عمادی/توبزاوە (164) • زەیتونی رەش کامل (808)</span>
+                    <span class="text-primary font-bold">٥ نرخ ←</span>
+                  </button>
+                  <button type="button" onclick="setQuickSearch('2270', '1873')" class="ui-chip hover:border-primary cursor-pointer font-mono justify-between w-full !rounded-[8px] !py-2">
+                    <span>کاک هەواپ/UK مارکێتی (2270) • گەنمەشامی قوتو (1873)</span>
+                    <span class="text-primary font-bold">نرخ ←</span>
+                  </button>
+                  <button type="button" onclick="setQuickSearch('9155', '1285')" class="ui-chip hover:border-primary cursor-pointer font-mono justify-between w-full !rounded-[8px] !py-2">
+                    <span>مارکێت سۆلاف (9155) • پەنیری 100گرام کیبی (1285)</span>
+                    <span class="text-primary font-bold">نرخ ←</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Left Column on Desktop (7 cols): Results & 5 Distinct Prices Table -->
+            <div class="lg:col-span-7 space-y-4">
+              <!-- Diagnostic Warning -->
+              <div id="priceNotFound" class="hidden rounded-[12px] bg-alert-warnBg border border-alert-warnBorder text-alert-warnText p-4 shadow-level-1">
+                <div class="flex items-start gap-3">
+                  <i class="fa-solid fa-triangle-exclamation text-base mt-0.5"></i>
+                  <div>
+                    <h4 id="priceNotFoundTitle" class="text-xs font-extrabold">ئاگاداری</h4>
+                    <p id="priceNotFoundDesc" class="text-xs mt-0.5"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5-Price Result Card -->
+              <div id="priceResultCard" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-3">
+                <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-sm"></i>
+                    <span class="text-sm font-extrabold">ئەنجامی شیکاری — ٥ نرخی جیاوازی بەرهەم و بڕەکەی</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span id="resTotalDistinctBadge" class="font-mono text-[11px] bg-white/15 px-2.5 py-0.5 rounded">5 نرخ</span>
+                    <button onclick="copyResultSummary()" class="bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-2.5 py-1 rounded flex items-center gap-1">
+                      <i class="fa-regular fa-copy"></i>
+                      <span id="copyBtnText">کۆپیکردن</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="p-5 space-y-4">
+                  <!-- Customer & Product Identity -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-border">
+                    <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex items-center justify-between">
+                      <div>
+                        <span class="text-[11px] font-bold text-ink-500 block">👤 کڕیار / مارکێت</span>
+                        <p id="resCustName" class="text-sm font-extrabold text-ink-900 mt-0.5"></p>
+                        <span id="resCustCode" class="font-mono text-xs font-semibold text-primary"></span>
+                      </div>
+                      <button onclick="openCustomerPortfolioFromPrice()" class="btn-secondary px-2.5 py-1.5 text-[11px] font-bold shrink-0">
+                        کاڵاکانی مارکێت
+                      </button>
+                    </div>
+
+                    <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex items-center justify-between">
+                      <div>
+                        <span class="text-[11px] font-bold text-ink-500 block">📦 بەرهەم</span>
+                        <p id="resProdName" class="text-sm font-extrabold text-ink-900 mt-0.5"></p>
+                        <span id="resProdCode" class="font-mono text-xs font-semibold text-primary"></span>
+                      </div>
+                      <span id="resPackInfo" class="ui-chip font-mono text-[10px] shrink-0">sales_data</span>
+                    </div>
+                  </div>
+
+                  <!-- Quick Summary Strip (Last, Previous, Lowest) -->
+                  <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-alert-infoBg border border-alert-infoBorder text-alert-infoText rounded-[10px] p-3 text-center">
+                      <span class="text-[11px] font-bold block">١. کۆتا نرخ</span>
+                      <span id="kpiLastPrice" class="font-mono text-xs sm:text-base font-black block mt-0.5"></span>
+                    </div>
+                    <div class="bg-surface-bright border border-border rounded-[10px] p-3 text-center">
+                      <span class="text-[11px] font-bold text-ink-500 block">٢. نرخی پێشتر</span>
+                      <span id="kpiPrevPrice" class="font-mono text-xs sm:text-base font-black text-ink-900 block mt-0.5"></span>
+                    </div>
+                    <div class="bg-alert-successBg border border-alert-successBorder text-alert-successText rounded-[10px] p-3 text-center">
+                      <span class="text-[11px] font-bold block">٣. هەرزانترین نرخ</span>
+                      <span id="kpiLowestPrice" class="font-mono text-xs sm:text-base font-black block mt-0.5"></span>
+                    </div>
+                  </div>
+
+                  <!-- 5 Distinct Prices Table / Cards -->
+                  <div>
+                    <h4 class="text-xs font-extrabold text-ink-900 mb-2.5 flex items-center gap-1.5">
+                      <i class="fa-solid fa-list-ol text-primary"></i>
+                      <span>خشتەی ٥ نرخی جیاوازی فرۆشراو لەگەڵ بەروار و بڕ (بە کارتۆن و دانە):</span>
+                    </h4>
+                    <div id="fivePricesContainer" class="space-y-2.5">
+                      <!-- Populated dynamically -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- =================================================== -->
+        <!-- VIEW 3: MARKET PORTFOLIO (Desktop Split View)         -->
+        <!-- =================================================== -->
+        <div id="view-market_items" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <!-- Search & Market Selector Sidebar (4 cols on desktop) -->
+            <div class="lg:col-span-4 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4 lg:sticky lg:top-24">
+              <div class="border-b border-border pb-3">
+                <h3 class="text-base font-extrabold text-ink-900">گەڕانی مارکێت و کڕیار</h3>
+                <p class="text-xs text-ink-500 mt-0.5">کۆد یان ناوی مارکێت بنووسە بۆ بینینی کاڵا داخڵکراوەکان لە <code class="font-mono">sales_data</code></p>
+              </div>
+
+              <div class="flex gap-2">
+                <div class="relative flex-1">
+                  <input 
+                    type="text" 
+                    id="marketSearchInput" 
+                    placeholder="کۆد یان ناوی مارکێت (164)..." 
+                    class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-semibold"
+                  >
+                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-ink-500 text-xs"></i>
+                </div>
+                <button onclick="renderMarketPortfolio()" class="btn-primary px-4 py-2 text-xs font-bold">گەڕان</button>
+              </div>
+
+              <div class="space-y-2 pt-2 border-t border-border">
+                <span class="text-[11px] font-bold text-ink-500 block">نموونەی مارکێتەکان لە داتابەیس:</span>
+                <button onclick="selectMarketPortfolio('164')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                  <span class="font-bold">164 | عمادی/توبزاوە</span>
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+                <button onclick="selectMarketPortfolio('2270')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                  <span class="font-bold">2270 | کاک هەواپ/UK مارکێتی</span>
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+                <button onclick="selectMarketPortfolio('9155')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                  <span class="font-bold">9155 | مارکێت سۆلاف کاک محمد احمد سعید</span>
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Market Products Grid (8 cols on desktop) -->
+            <div id="marketPortfolioResult" class="lg:col-span-8 space-y-3">
+              <!-- Populated dynamically -->
+            </div>
+
+          </div>
+        </div>
+
+        <!-- =================================================== -->
+        <!-- VIEW 4: PRICE HISTORY & LOCATION AUDIT REPORT       -->
+        <!-- =================================================== -->
+        <div id="view-price_audit" class="hidden space-y-4">
+          <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+            <div class="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
+              <div>
+                <h3 class="text-base font-extrabold text-ink-900">ڕاپۆرتی مێژووی نرخی بەرهەم و فلتەری شوێنەکان</h3>
+                <p class="text-xs text-ink-500 mt-0.5">بزانە بەرهەمێکی دیاریکراو بە چ نرخێک و لە چ بەروارێکدا بە کام مارکێت و شوێنانە فرۆشراوە لە <code class="font-mono">sales_data</code></p>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="applyAuditPreset('808', '', '', '')" class="ui-chip cursor-pointer font-mono">هەموو فرۆشەکانی کاڵای 808</button>
+                <button onclick="applyAuditPreset('1873', '', '', '')" class="ui-chip cursor-pointer font-mono">کاڵای 1873</button>
+                <button onclick="applyAuditPreset('1285', '', '', '')" class="ui-chip cursor-pointer font-mono">کاڵای 1285</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+              <div>
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">کۆدی بەرهەم</label>
+                <input type="text" id="auditProdCode" oninput="updateAuditProdNamePreview()" placeholder="نموونە: 808" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+                <span id="auditProdNameHint" class="text-[10px] text-primary font-bold block mt-1 truncate"></span>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">نرخی دیاریکراو (ئیختیاری)</label>
+                <input type="text" id="auditTargetPrice" placeholder="نموونە: 48000" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">لە بەرواری</label>
+                <input type="date" id="auditFromDate" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">تا بەرواری</label>
+                <input type="date" id="auditToDate" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono">
+              </div>
+
+              <div class="flex gap-2">
+                <button onclick="runPriceAuditReport()" class="btn-primary flex-1 py-2 text-xs font-bold flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-filter"></i>
+                  <span>فلتەرکردن</span>
+                </button>
+                <button onclick="resetAuditFilters()" class="btn-secondary px-3 py-2 text-xs font-bold">پاککردنەوە</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audit Results Container -->
+          <div id="auditReportContainer" class="space-y-3">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- =================================================== -->
+        <!-- VIEW 5: PRICE ANNOUNCEMENTS (Desktop Split View)      -->
+        <!-- =================================================== -->
+        <div id="view-announcements" class="hidden space-y-4">
+          
+          <!-- Top Action Bar with Full Catalog Report Button -->
+          <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h3 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و عرض خاص بۆ مەندووبەکان</h3>
+              <p class="text-xs text-ink-500 mt-0.5">نرخی فەرمی بەرهەمەکان، ئۆفەری تایبەت، مەرج و هۆکارەکان لەگەڵ ناردنی ئاگادارکردنەوە</p>
+            </div>
+            <button onclick="openFullCatalogModal()" class="btn-primary px-4 py-2.5 text-xs font-extrabold shadow-level-1 flex items-center gap-2">
+              <i class="fa-solid fa-table"></i>
+              <span>ڕاپۆرتی تەواوی نرخی بەرهەمەکان</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- Admin Publisher Form (5 cols on Desktop) -->
+            <div id="announcementPublisherCard" class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-[8px] bg-primary text-surface-bright flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-bullhorn"></i>
+                  </span>
+                  <h4 class="text-sm font-extrabold text-ink-900">بڵاوکردنەوەی نرخ و عرض خاص</h4>
+                </div>
+                <span class="ui-chip ui-chip-active text-[10px]">ناردنی نۆتیفیکەیشن</span>
+              </div>
+
+              <!-- Step 1: Product Code -> Auto Product Name -->
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">١. کۆدی بابەت بنووسە (خۆکار ناو لە sales_data دەدۆزێتەوە)</label>
+                  <input 
+                    type="text" 
+                    id="annProdCode" 
+                    oninput="autoLookupCatalogProduct()" 
+                    placeholder="نموونە: 808 یان 1873" 
+                    dir="ltr"
+                    class="ui-input w-full px-3.5 py-2 text-sm font-mono font-extrabold text-left"
+                  >
+                  <div class="flex gap-1.5 mt-1.5 flex-wrap">
+                    <button type="button" onclick="setAnnProduct('808')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">808</button>
+                    <button type="button" onclick="setAnnProduct('1873')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">1873</button>
+                    <button type="button" onclick="setAnnProduct('1285')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">1285</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">ناوی بەرهەم (ئۆتۆماتیکی لە داتابەیسەوە)</label>
+                  <input 
+                    type="text" 
+                    id="annProdName" 
+                    readonly 
+                    placeholder="کۆدی بابەت بنووسە..." 
+                    class="ui-input w-full px-3.5 py-2 text-xs font-extrabold bg-surface-muted/60 text-primary"
+                  >
+                </div>
+              </div>
+
+              <!-- Step 2: Dynamic Multi-Price Tiers -->
+              <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-extrabold text-ink-900">٢. دانانی نرخەکان و عرض خاص:</label>
+                  <button type="button" onclick="addPriceTierRow()" class="btn-secondary px-2.5 py-1 text-[11px] font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-plus text-primary"></i>
+                    <span>زیادکردنی نرخی تر</span>
+                  </button>
+                </div>
+
+                <div id="annPriceTiersList" class="space-y-2">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Step 3: Condition & Reason -->
+              <div class="space-y-2.5">
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٣. مەرجی فرۆشتن (Condition)</label>
+                  <input type="text" id="annCondition" placeholder="نموونە: تەنها بە نەقد یان بۆ ١٠ کارتۆن بەسەرەوە" class="ui-input w-full px-3 py-2 text-xs font-semibold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٤. هۆکار و تێبینی (Reason)</label>
+                  <input type="text" id="annReason" placeholder="نموونە: عرض خاص بۆ کێبڕکێی بازاڕ لەم هەفتەیەدا" class="ui-input w-full px-3 py-2 text-xs font-semibold">
+                </div>
+              </div>
+
+              <button onclick="publishAnnouncement()" class="btn-primary w-full py-3 text-xs font-extrabold shadow-level-2 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>ڕاگەیاندنی نرخ و ناردنی ئاگادارکردنەوە</span>
+              </button>
+            </div>
+
+            <!-- Published Announcements Feed (7 cols on Desktop) -->
+            <div class="lg:col-span-7 space-y-3">
+              <div id="announcementsFeed" class="space-y-3">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- =================================================== -->
+        <!-- VIEW 6: CONTRACTS & RECEIPTS (گرێبەست و پسوڵە)        -->
+        <!-- =================================================== -->
+        <div id="view-contracts" class="hidden space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <!-- Receipts Lookup -->
+            <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
+              <h3 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2">گەڕان بەدوای پسوڵەکان لە خشتەی sales_data</h3>
+              <div class="flex gap-2">
+                <input type="text" id="inputReceiptNo" placeholder="ژمارەی پسوڵە (89503)" dir="ltr" class="ui-input flex-1 px-3 py-2 text-xs font-mono text-left">
+                <button onclick="lookupReceipt()" class="btn-primary px-4 py-2 text-xs font-bold">گەڕان</button>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="triggerReceipt('89503')" class="ui-chip font-mono cursor-pointer">#89503</button>
+                <button onclick="triggerReceipt('89618')" class="ui-chip font-mono cursor-pointer">#89618</button>
+                <button onclick="triggerReceipt('89601')" class="ui-chip font-mono cursor-pointer">#89601</button>
+              </div>
+              <div id="receiptResult" class="hidden bg-surface-bright border border-border rounded-[10px] p-3 space-y-2">
+                <div class="flex items-center justify-between border-b border-border pb-2">
+                  <h5 class="text-xs font-extrabold text-primary">پسوڵەی #<span id="outReceiptNo" class="font-mono"></span></h5>
+                  <span id="outReceiptCust" class="text-[11px] font-bold text-ink-900"></span>
+                </div>
+                <div id="outReceiptItems" class="space-y-1.5 text-xs"></div>
+              </div>
+            </div>
+
+            <!-- Contracts List -->
+            <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
+              <h3 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2">فۆڵدەری گرێبەستە فەرمییەکان</h3>
+              <div class="space-y-2">
+                <div class="bg-surface-bright border border-border rounded-[10px] p-3 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-file-pdf text-primary"></i>
+                    <span class="text-xs font-bold">گرێبەستی عمادی/توبزاوە ٢٠٢٦.pdf</span>
+                  </div>
+                  <button onclick="alertModal('داگرتنی گرێبەست', 'فایلی گرێبەست دادەبەزێت...')" class="btn-secondary px-2.5 py-1 text-xs font-bold">داگرتن</button>
+                </div>
+                <div class="bg-surface-bright border border-border rounded-[10px] p-3 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-file-pdf text-primary"></i>
+                    <span class="text-xs font-bold">گرێبەستی مارکێت سۆلاف.pdf</span>
+                  </div>
+                  <button onclick="alertModal('داگرتنی گرێبەست', 'فایلی گرێبەست دادەبەزێت...')" class="btn-secondary px-2.5 py-1 text-xs font-bold">داگرتن</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================================== -->
+        <!-- VIEW 7: ADMIN USERS (IMEI + CHECKLIST) & SUPABASE DB -->
+        <!-- =================================================== -->
+        <div id="view-admin_users" class="hidden space-y-5">
+          
+          <!-- Sub-navigation inside Admin -->
+          <div class="flex flex-wrap gap-2">
+            <button onclick="switchAdminSubTab('users')" id="adminSubBtnUsers" class="btn-primary px-4 py-2.5 text-xs font-extrabold flex items-center gap-1.5">
+              <i class="fa-solid fa-user-check"></i>
+              <span>١. دروستکردنی بەکارهێنەر و IMEI و دەسەڵاتەکان</span>
+            </button>
+            <button onclick="switchAdminSubTab('db')" id="adminSubBtnDb" class="btn-secondary px-4 py-2.5 text-xs font-extrabold flex items-center gap-1.5">
+              <i class="fa-solid fa-database"></i>
+              <span>٢. بەستنەوەی داتابەیسی Supabase (تەنها ئەدمین)</span>
+            </button>
+          </div>
+
+          <!-- ADMIN SUB-TAB 1: USER CREATION + IMEI + CHECKLIST -->
+          <div id="adminSubViewUsers" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <div class="lg:col-span-6 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 class="text-base font-extrabold text-ink-900">دروستکردنی یوسەر و قفڵی IMEI</h3>
+                  <p class="text-xs text-ink-500 mt-0.5">پاشەکەوتکردن لە خشتەی <code class="font-mono text-primary">app_users</code> لە Supabase</p>
+                </div>
+                <span class="ui-chip ui-chip-active font-mono text-[10px]">IMEI + ROLES</span>
+              </div>
+
+              <form id="userForm" onsubmit="saveUserAccount(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-ink-900 mb-1">ناوی تەواوی مەندووب / ستاف</label>
+                    <input type="text" id="usrFullName" required placeholder="نموونە: کاروان محەمەد" class="ui-input w-full px-3 py-2 text-xs font-bold">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-ink-900 mb-1">ناوی بەکارهێنەر (Username)</label>
+                    <input type="text" id="usrUsername" required placeholder="نموونە: karwan" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-ink-900 mb-1">پاسۆرد (Password)</label>
+                    <input type="text" id="usrPassword" required placeholder="نموونە: 1234" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="text-xs font-bold text-ink-900">کۆدی جیهاز / IMEI</label>
+                      <button type="button" onclick="fillCurrentDeviceImeiToForm()" class="text-[10px] font-bold text-primary hover:underline">ئامێری ئێستا</button>
+                    </div>
+                    <input type="text" id="usrImei" required placeholder="IMEI یان * بۆ هەموو جیهازێک" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+                  </div>
+                </div>
+
+                <!-- Permissions Checklist -->
+                <div class="bg-surface-bright border border-border rounded-[12px] p-4">
+                  <div class="flex items-center justify-between mb-2.5">
+                    <label class="text-xs font-extrabold text-ink-900 flex items-center gap-1.5">
+                      <i class="fa-solid fa-list-check text-primary"></i>
+                      <span>چێک لیستی دەسەڵاتەکان:</span>
+                    </label>
+                    <div class="flex gap-2">
+                      <button type="button" onclick="toggleAllPerms(true)" class="text-[11px] font-bold text-primary hover:underline">هەمووی</button>
+                      <span class="text-ink-300">|</span>
+                      <button type="button" onclick="toggleAllPerms(false)" class="text-[11px] font-bold text-ink-500 hover:underline">هیچیان</button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="price_lookup" checked class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">١. نرخی بەرهەم (٥ نرخ)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="market_items" checked class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٢. کاڵاکانی ناو مارکێت</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="price_audit" class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٣. ڕاپۆرتی مێژووی نرخ</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="announcements" checked class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٤. ڕاگەیاندنی نرخ و ئۆفەر</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="contracts" class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٥. گرێبەست و پسوڵە</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="admin_users" class="ui-checkbox">
+                      <span class="text-xs font-bold text-alert-errorText">٦. بەڕێوەبەر و داتابەیس</span>
+                    </label>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-2.5 text-xs font-extrabold shadow-level-1 flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-user-plus"></i>
+                  <span>پاشەکەوتکردنی بەکارهێنەر لە خشتەی Supabase</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Users Table (6 cols on Desktop) -->
+            <div class="lg:col-span-6 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
+              <h4 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2.5">لیستی بەکارهێنەران و ئامێرە ڕێپێدراوەکان (<span id="usersCountLabel"></span>)</h4>
+              <div id="usersTableContainer" class="space-y-2.5">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ADMIN SUB-TAB 2: ADMIN-ONLY SUPABASE DATABASE CONFIG -->
+          <div id="adminSubViewDb" class="hidden space-y-4">
+            <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 class="text-base font-extrabold text-ink-900">بەستنەوەی نهێنی بە بنکەدراوەی Supabase (خشتەی public.sales_data)</h3>
+                  <p class="text-xs text-ink-500 mt-0.5">بەستەری پرۆژەکەت ئامادەیە؛ تەنها کلیلی <code class="font-mono font-bold">anon public</code> دابنێ بۆ خوێندنەوەی ڕاستەوخۆی <code class="font-mono font-bold">sales_data</code></p>
+                </div>
+                <span id="adminDbStatusBadge" class="ui-chip font-mono text-[10px]">LOCAL + SUPABASE READY</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">Supabase Project URL</label>
+                  <input type="text" id="cfgSupabaseUrl" value="https://rcigaaefhlerxbrbnnmj.supabase.co" placeholder="https://rcigaaefhlerxbrbnnmj.supabase.co" dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">Supabase Anon / Public Key</label>
+                  <input type="password" id="cfgSupabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5..." dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button onclick="saveSupabaseConfig()" class="btn-primary px-5 py-2.5 text-xs font-extrabold">پاشەکەوتکردن و تاقیکردنەوەی پەیوەندی بە sales_data</button>
+                <button onclick="syncAllToSupabase()" class="btn-secondary px-4 py-2.5 text-xs font-bold">هاوکاتکردنی یوسەر و ئۆفەرەکان</button>
+              </div>
+
+              <!-- Ready-to-Run SQL Schema for Supabase -->
+              <div class="pt-3 border-t border-border">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-extrabold text-ink-900">کۆدی SQL بۆ کردنەوەی مۆڵەتی خوێندنەوەی sales_data و دروستکردنی خشتەکانی یوسەر و ئۆفەر:</span>
+                  <button onclick="copySqlSchema()" class="btn-secondary px-2.5 py-1 text-[11px] font-bold">کۆپیکردنی SQL</button>
+                </div>
+                <pre id="sqlSchemaCode" dir="ltr" class="bg-ink-900 text-surface-bright p-3.5 rounded-[10px] font-mono text-[11px] overflow-x-auto leading-relaxed">-- 1. کردنەوەی مۆڵەتی خوێندنەوە و خێراکردنی خشتەی sales_data
+ALTER TABLE public.sales_data ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read sales_data" ON public.sales_data;
+CREATE POLICY "Allow public read sales_data" ON public.sales_data FOR SELECT USING (true);
+
+CREATE INDEX IF NOT EXISTS idx_sales_data_cust_prod 
+ON public.sales_data ("کۆدی کریار", "کۆدی بەرهەم", "بەرواری پسوڵە" DESC);
+
+-- 2. خشتەی بەکارهێنەران و IMEI و چێک لیستی دەسەڵاتەکان
+CREATE TABLE IF NOT EXISTS public.app_users (
+  id SERIAL PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  full_name TEXT NOT NULL,
+  password TEXT NOT NULL,
+  imei_device_id TEXT NOT NULL DEFAULT '*',
+  permissions JSONB NOT NULL DEFAULT '["price_lookup","market_items","announcements"]',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all app_users" ON public.app_users;
+CREATE POLICY "Allow all app_users" ON public.app_users FOR ALL USING (true) WITH CHECK (true);
+
+-- 3. خشتەی ڕاگەیاندنی نرخ و عرض خاص
+CREATE TABLE IF NOT EXISTS public.price_announcements (
+  id BIGINT PRIMARY KEY,
+  product_code TEXT NOT NULL,
+  product_name TEXT NOT NULL,
+  tiers JSONB NOT NULL,
+  condition_text TEXT,
+  reason_text TEXT,
+  created_by TEXT,
+  created_at TEXT
+);
+
+ALTER TABLE public.price_announcements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all price_announcements" ON public.price_announcements;
+CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR ALL USING (true) WITH CHECK (true);</pre>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: FULL MASTER CATALOG & PRICE REPORT               -->
+  <!-- ========================================================= -->
+  <div id="fullCatalogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
+    <div class="bg-surface border border-border rounded-[16px] max-w-3xl w-full max-h-[88vh] flex flex-col shadow-level-4 overflow-hidden">
+      <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-table-list"></i>
+          <h3 class="text-sm font-extrabold">ڕاپۆرتی تەواوی نرخی بەرهەمەکان لە خشتەی sales_data</h3>
+        </div>
+        <button onclick="closeFullCatalogModal()" class="text-white/80 hover:text-white">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="p-4 border-b border-border bg-surface-bright flex gap-2">
+        <input type="text" id="catalogFilterInput" oninput="renderFullCatalogTable()" placeholder="گەڕان بەدوای کۆدی بابەت یان ناوی بەرهەم..." class="ui-input flex-1 px-3.5 py-2 text-xs font-bold">
+      </div>
+
+      <div class="p-4 overflow-y-auto flex-1 space-y-2.5" id="fullCatalogTableBody">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: NOTIFICATIONS CENTER                             -->
+  <!-- ========================================================= -->
+  <div id="notificationsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
+    <div class="bg-surface border border-border rounded-[16px] max-w-md w-full max-h-[80vh] flex flex-col shadow-level-4 overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-border flex items-center justify-between bg-surface-bright">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-bell text-primary"></i>
+          <h3 class="text-sm font-extrabold text-ink-900">ناوەندی ئاگادارکردنەوەکانی نرخ و ئۆفەر</h3>
+        </div>
+        <button onclick="closeNotificationsModal()" class="text-ink-500 hover:text-ink-900">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="notificationsListContainer" class="p-4 overflow-y-auto space-y-2.5 flex-1">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: GENERAL MESSAGE MODAL                            -->
+  <!-- ========================================================= -->
+  <div id="generalModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/50 backdrop-blur-xs">
+    <div class="bg-surface border border-border rounded-[16px] max-w-xs w-full p-5 text-center shadow-level-4 space-y-3">
+      <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex items-center justify-center mx-auto text-base">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 id="modalTitle" class="text-sm font-extrabold text-ink-900">ئاگاداری</h3>
+      <p id="modalBody" class="text-xs text-ink-700 leading-relaxed"></p>
+      <button onclick="closeModal()" class="btn-primary w-full py-2.5 text-xs font-bold">داخستن</button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- APPLICATION LOGIC & SUPABASE `sales_data` ENGINE          -->
+  <!-- ========================================================= -->
+  <script>
+    // ---------------------------------------------------------
+    // 0. SUPABASE CREDENTIALS (Project URL pre-configured)
+    // ---------------------------------------------------------
+    const DEFAULT_SUPABASE_URL = 'https://rcigaaefhlerxbrbnnmj.supabase.co';
+    const DEFAULT_SUPABASE_ANON_KEY = ''; // sb_publishable_TYGtSJnjvbT2AtkfH519Jw_nsgbLkwS
+
+    // 1. Generate or Retrieve Persistent Hardware/Device IMEI Fingerprint
+    function getDeviceHardwareImei() {
+      let saved = localStorage.getItem('sahel_device_imei');
+      if (!saved) {
+        const rand = Math.floor(100000 + Math.random() * 900000);
+        saved = `IMEI-358920-${rand}`;
+        localStorage.setItem('sahel_device_imei', saved);
+      }
+      return saved;
+    }
+
+    const CURRENT_DEVICE_IMEI = getDeviceHardwareImei();
+    document.getElementById('loginDeviceImei').value = CURRENT_DEVICE_IMEI;
+
+    // 2. Master Product Catalog (Matches your actual sales_data products + fallback)
+    const masterCatalog = [
+      { code: "808", name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", pieces_per_carton: 12, base_price: 48000, category: "زەیتون" },
+      { code: "1873", name: "گەنمەشامی قوتو 425گرام24عدد/مارینا", pieces_per_carton: 24, base_price: 26500, category: "خۆراک" },
+      { code: "1285", name: "پەنیری 100گرام40عدد/کیبی", pieces_per_carton: 40, base_price: 34000, category: "شیرەمەنی" },
+      { code: "2617", name: "ڕۆنی زەیتوون ٥٠٠ مل پلە یەک", pieces_per_carton: 12, base_price: 48000, category: "ڕۆن و زەیت" },
+      { code: "1422", name: "شەربەتی فرێش ئەناناس ١ لیتر", pieces_per_carton: 12, base_price: 45000, category: "خواردنەوە" }
+    ];
+
+    // 3. Fallback Sales Dataset (Used only before Supabase Key is entered)
+    const salesDataset = [
+      { customer_code: "164", customer_name: "عمادی/توبزاوە", invoice_no: "89503", location: "توبزاوە", product_code: "808", product_name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", invoice_date: "2026-09-23", carton_price: 48000, qty_carton: 3, qty_piece: 0 },
+      { customer_code: "164", customer_name: "عمادی/توبزاوە", invoice_no: "88410", location: "توبزاوە", product_code: "808", product_name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", invoice_date: "2026-08-14", carton_price: 47500, qty_carton: 5, qty_piece: 6 },
+      { customer_code: "164", customer_name: "عمادی/توبزاوە", invoice_no: "87102", location: "توبزاوە", product_code: "808", product_name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", invoice_date: "2026-07-02", carton_price: 49000, qty_carton: 2, qty_piece: 0 },
+      { customer_code: "2270", customer_name: "کاک هەواپ/UK مارکێتی", invoice_no: "89618", location: "هەولێر", product_code: "1873", product_name: "گەنمەشامی قوتو 425گرام24عدد/مارینا", invoice_date: "2026-09-23", carton_price: 26500, qty_carton: 1, qty_piece: 12 },
+      { customer_code: "9155", customer_name: "مارکێت سۆلاف کاک محمد احمد سعید", invoice_no: "89601", location: "هەولێر", product_code: "1285", product_name: "پەنیری 100گرام40عدد/کیبی", invoice_date: "2026-09-23", carton_price: 34000, qty_carton: 0.25, qty_piece: 10 }
+    ];
+
+    // Helper: Map a raw row from Supabase `public.sales_data` (Kurdish column names) to normalized object
+    function mapSupabaseRow(row) {
+      const rawDate = String(row['بەرواری پسوڵە'] || '');
+      const cleanDate = rawDate.includes('T') ? rawDate.split('T')[0] : rawDate.split(' ')[0];
+      return {
+        customer_code: String(row['کۆدی کریار'] ?? '').trim(),
+        customer_name: String(row['ناوی کریار'] ?? '').trim(),
+        invoice_no: String(row['ژمارەی پسوڵە'] ?? '').replace(/\.0$/, ''),
+        invoice_date: cleanDate,
+        product_code: String(row['کۆدی بەرهەم'] ?? '').trim(),
+        product_name: String(row['ناوی بەرهەم'] ?? '').trim(),
+        qty_carton: Number(row['فرۆشی بەرهەم بە کارتۆن'] ?? 0),
+        qty_piece: Number(row['فرۆشی بەرهەم بە دانە'] ?? 0),
+        carton_price: Number(row['نرخی فرۆشی یەک کارتۆن'] ?? 0),
+        location: ''
+      };
+    }
+
+    // 4. Default Users with IMEI Binding & Permission Checklists
+    const defaultUsers = [
+      {
+        username: "admin",
+        full_name: "حەکیم لوقمان (بەڕێوەبەری گشتی)",
+        password: "admin123",
+        imei_device_id: "*",
+        permissions: ["price_lookup", "market_items", "price_audit", "announcements", "contracts", "admin_users"]
+      },
+      {
+        username: "karwan",
+        full_name: "کاروان محەمەد (مەندووبی فرۆش)",
+        password: "1234",
+        imei_device_id: CURRENT_DEVICE_IMEI,
+        permissions: ["price_lookup", "market_items", "announcements"]
+      },
+      {
+        username: "aco",
+        full_name: "ئاکۆ عەلی (مەندووبی کەرکووک)",
+        password: "1234",
+        imei_device_id: "IMEI-999999-LOCKED",
+        permissions: ["price_lookup", "market_items"]
+      }
+    ];
+
+    // 5. Default Announcements & Special Offers
+    const defaultAnnouncements = [
+      {
+        id: 101,
+        product_code: "808",
+        product_name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا",
+        tiers: [
+          { label: "نرخی ئاسایی (١ تا ٩ کارتۆن)", price: 48000, isSpecial: false },
+          { label: "عرض خاص (١٠ کارتۆن بەسەرەوە)", price: 46500, isSpecial: true }
+        ],
+        condition_text: "تەنها بە نەقد و بۆ ماوەی یەک هەفتە",
+        reason_text: "ئۆفەری تایبەتی کۆمپانیا بۆ زیادکردنی فرۆشی مانگانە",
+        created_at: "2026-11-12 09:30",
+        created_by: "حەکیم لوقمان"
+      }
+    ];
+
+    // State Management
+    const state = {
+      currentUser: null,
+      users: JSON.parse(localStorage.getItem('sahel_app_users')) || defaultUsers,
+      announcements: JSON.parse(localStorage.getItem('sahel_announcements')) || defaultAnnouncements,
+      unreadCount: 1,
+      supabaseClient: null,
+      lastFormattedSummary: '',
+      catalogCache: [...masterCatalog]
+    };
+
+    const karwanIdx = state.users.findIndex(u => u.username === 'karwan');
+    if (karwanIdx !== -1 && state.users[karwanIdx].imei_device_id.startsWith('IMEI-358920')) {
+      state.users[karwanIdx].imei_device_id = CURRENT_DEVICE_IMEI;
+    }
+
+    function normalizeCode(val) {
+      let str = String(val || '').trim();
+      const easternDigits = '٠١٢٣٤٥٦٧٨٩';
+      const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+      for (let i = 0; i < 10; i++) {
+        str = str.replace(new RegExp(easternDigits[i], 'g'), String(i));
+        str = str.replace(new RegExp(persianDigits[i], 'g'), String(i));
+      }
+      if (str.endsWith('.0')) str = str.slice(0, -2);
+      return str;
+    }
+
+    // Initialize Supabase silently and sync users/announcements if available
+    async function initSupabaseSilent() {
+      const url = localStorage.getItem('sahel_sb_url') || DEFAULT_SUPABASE_URL;
+      const key = localStorage.getItem('sahel_sb_key') || DEFAULT_SUPABASE_ANON_KEY;
+      if (url && key && window.supabase) {
+        try {
+          state.supabaseClient = window.supabase.createClient(url, key);
+          const badge = document.getElementById('adminDbStatusBadge');
+          const hubStatus = document.getElementById('hubDbStatusText');
+          if (badge) {
+            badge.textContent = 'SUPABASE CONNECTED ✓';
+            badge.classList.add('ui-chip-active');
+          }
+          if (hubStatus) {
+            hubStatus.textContent = 'بەستراوە (LIVE)';
+          }
+
+          // Load users from Supabase `app_users` if table exists
+          const { data: dbUsers } = await state.supabaseClient.from('app_users').select('*');
+          if (dbUsers && dbUsers.length > 0) {
+            state.users = dbUsers;
+            localStorage.setItem('sahel_app_users', JSON.stringify(dbUsers));
+          }
+
+          // Load announcements from Supabase `price_announcements` if table exists
+          const { data: dbAnns } = await state.supabaseClient.from('price_announcements').select('*').order('id', { ascending: false });
+          if (dbAnns && dbAnns.length > 0) {
+            state.announcements = dbAnns;
+            localStorage.setItem('sahel_announcements', JSON.stringify(dbAnns));
+            updateNotifBadgeUI();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+    initSupabaseSilent();
+
+    // =========================================================
+    // AUTHENTICATION & IMEI / DEVICE VERIFICATION
+    // =========================================================
+    function copyDeviceImei() {
+      const temp = document.createElement('textarea');
+      temp.value = CURRENT_DEVICE_IMEI;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+
+      const txt = document.getElementById('copyImeiBtnText');
+      txt.textContent = 'کۆپی کرا ✓';
+      setTimeout(() => { txt.textContent = 'کۆپیکردن بۆ ئەدمین'; }, 1800);
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('loginPassword');
+      const icon = document.getElementById('passwordToggleIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    function fillDemoLogin(user, pass) {
+      document.getElementById('loginUsername').value = user;
+      document.getElementById('loginPassword').value = pass;
+      document.getElementById('loginError').classList.add('hidden');
+      ['chip-admin', 'chip-mandub', 'chip-aco'].forEach(id => document.getElementById(id).classList.remove('ui-chip-active'));
+      if (user === 'admin') document.getElementById('chip-admin').classList.add('ui-chip-active');
+      if (user === 'karwan') document.getElementById('chip-mandub').classList.add('ui-chip-active');
+      if (user === 'aco') document.getElementById('chip-aco').classList.add('ui-chip-active');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value.trim();
+      const errBox = document.getElementById('loginError');
+      const errText = document.getElementById('loginErrorText');
+
+      // Check Supabase app_users first if connected
+      if (state.supabaseClient) {
+        try {
+          const { data: remoteUser } = await state.supabaseClient
+            .from('app_users')
+            .select('*')
+            .ilike('username', username)
+            .eq('password', password)
+            .maybeSingle();
+          if (remoteUser) {
+            const idx = state.users.findIndex(u => u.username.toLowerCase() === username);
+            if (idx !== -1) state.users[idx] = remoteUser;
+            else state.users.push(remoteUser);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      const foundUser = state.users.find(u => u.username.toLowerCase() === username && u.password === password);
+      if (!foundUser) {
+        errText.textContent = 'ناوی بەکارهێنەر یان تێپەڕەوشە نادروستە.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      // Check IMEI / Device Binding (Fixed for missing/empty DB column)
+      const allowedImei = String(foundUser.imei_device_id || foundUser.imei || '*').trim();
+      const isUnrestricted = !allowedImei || allowedImei === '*' || allowedImei.toUpperCase() === 'ALL' || allowedImei.toUpperCase() === 'ANY' || foundUser.username.toLowerCase() === 'admin';
+
+      if (!isUnrestricted && allowedImei !== CURRENT_DEVICE_IMEI) {
+        errText.innerHTML = `⛔ <b>ڕێگەپێنەدراو (IMEI Mismatch):</b> ئەم هەژمارە تەنها لەسەر ئامێری (<code class="font-mono">${allowedImei}</code>) کار دەکات و ناتوانرێت لەسەر مۆبایلی تر بکرێتەوە.`;
+        errBox.classList.remove('hidden');
+        return;
+      
+      }
+
+      state.currentUser = foundUser;
+      errBox.classList.add('hidden');
+      enterApplication();
+    }
+
+    function enterApplication() {
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('hidden');
+
+      document.getElementById('userDisplayName').textContent = `${state.currentUser.full_name} • (@${state.currentUser.username})`;
+      document.getElementById('hubDeviceTag').textContent = CURRENT_DEVICE_IMEI;
+
+      const isAdmin = state.currentUser.permissions.includes('admin_users');
+      const roleText = isAdmin ? 'بەڕێوەبەر' : 'مەندووب';
+      document.getElementById('userBadgeRole').textContent = roleText;
+      document.getElementById('hubPermCountChip').textContent = `${state.currentUser.permissions.length} بەش ڕێگەپێدراوە`;
+
+      const sbName = document.getElementById('sidebarUserName');
+      const sbRole = document.getElementById('sidebarRoleBadge');
+      const sbImei = document.getElementById('sidebarImeiCode');
+      if (sbName) sbName.textContent = state.currentUser.full_name;
+      if (sbRole) sbRole.textContent = roleText;
+      if (sbImei) sbImei.textContent = CURRENT_DEVICE_IMEI;
+
+      const pubCard = document.getElementById('announcementPublisherCard');
+      if (pubCard) {
+        pubCard.classList.toggle('hidden', !isAdmin);
+      }
+
+      applyPermissionsVisibility();
+      updateNotifBadgeUI();
+      setQuickSearch('164', '808');
+      switchView('hub');
+    }
+
+    function applyPermissionsVisibility() {
+      const perms = state.currentUser ? state.currentUser.permissions : [];
+      document.querySelectorAll('[data-perm]').forEach(el => {
+        const reqPerm = el.getAttribute('data-perm');
+        el.classList.toggle('hidden', !perms.includes(reqPerm));
+      });
+      document.querySelectorAll('[data-card-perm]').forEach(el => {
+        const reqPerm = el.getAttribute('data-card-perm');
+        el.classList.toggle('hidden', !perms.includes(reqPerm));
+      });
+    }
+
+    function logout() {
+      state.currentUser = null;
+      document.getElementById('screen-app').classList.add('hidden');
+      document.getElementById('screen-login').classList.remove('hidden');
+    }
+
+    function switchView(viewName) {
+      const allViews = ['hub', 'pricing', 'market_items', 'price_audit', 'announcements', 'contracts', 'admin_users'];
+      const viewTitles = {
+        hub: 'داشبۆردی سەرەکی و کورتەی زانیارییەکان',
+        pricing: 'لێکۆڵینەوەی نرخی بەرهەم (٥ نرخی جیاواز + بڕ بە کارتۆن و دانە)',
+        market_items: 'بەرهەمە داخڵکراوەکانی ناو مارکێت',
+        price_audit: 'ڕاپۆرتی مێژووی نرخی بەرهەم و فلتەری شوێنەکان',
+        announcements: 'ڕاگەیاندنی نرخەکان و عرض خاص بۆ مەندووبەکان',
+        contracts: 'ئەرشیفی گرێبەستەکان و گەڕانی پسوڵە',
+        admin_users: 'بەڕێوەبردنی بەکارهێنەران، قفڵی IMEI و داتابەیسی Supabase'
+      };
+
+      allViews.forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        if (viewEl) viewEl.classList.add('hidden');
+        const tabEl = document.getElementById(`tab-${v}`);
+        if (tabEl) tabEl.classList.remove('ui-tab-active');
+        const sideEl = document.getElementById(`side-${v}`);
+        if (sideEl) sideEl.classList.remove('sidebar-link-active');
+      });
+
+      const targetView = document.getElementById(`view-${viewName}`);
+      if (targetView) targetView.classList.remove('hidden');
+      const targetTab = document.getElementById(`tab-${viewName}`);
+      if (targetTab) targetTab.classList.add('ui-tab-active');
+      const targetSide = document.getElementById(`side-${viewName}`);
+      if (targetSide) targetSide.classList.add('sidebar-link-active');
+
+      const titleEl = document.getElementById('desktopActiveViewTitle');
+      if (titleEl && viewTitles[viewName]) {
+        titleEl.textContent = viewTitles[viewName];
+      }
+
+      if (viewName === 'market_items') renderMarketPortfolio();
+      if (viewName === 'price_audit') runPriceAuditReport();
+      if (viewName === 'announcements') {
+        initDefaultTierRows();
+        renderAnnouncementsFeed();
+      }
+      if (viewName === 'admin_users') {
+        renderUsersList();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================
+    // FEATURE 7: 5 DISTINCT PRICES + CARTON & PIECE QUANTITIES (FROM `sales_data`)
+    // =========================================================
+    function setQuickSearch(cust, prod) {
+      document.getElementById('searchCustCode').value = cust;
+      document.getElementById('searchProdCode').value = prod;
+      executePriceLookup();
+    }
+
+    function clearPriceSearch() {
+      document.getElementById('searchCustCode').value = '';
+      document.getElementById('searchProdCode').value = '';
+      document.getElementById('priceNotFound').classList.add('hidden');
+      document.getElementById('priceResultCard').classList.add('hidden');
+    }
+
+    async function executePriceLookup() {
+      const custCode = normalizeCode(document.getElementById('searchCustCode').value);
+      const prodCode = normalizeCode(document.getElementById('searchProdCode').value);
+      const notFound = document.getElementById('priceNotFound');
+      const resultCard = document.getElementById('priceResultCard');
+
+      notFound.classList.add('hidden');
+      resultCard.classList.add('hidden');
+
+      if (!custCode || !prodCode) {
+        notFound.classList.remove('hidden');
+        document.getElementById('priceNotFoundTitle').textContent = 'زانیاری ناتەواو';
+        document.getElementById('priceNotFoundDesc').textContent = 'تکایە هەردوو کۆدی کریار و کۆدی بەرهەم بنووسە.';
+        return;
+      }
+
+      let matches = [];
+
+      // Query directly from Supabase `public.sales_data` if connected
+      if (state.supabaseClient) {
+        try {
+          const { data, error } = await state.supabaseClient
+            .from('sales_data')
+            .select('*')
+            .eq('کۆدی کریار', custCode)
+            .eq('کۆدی بەرهەم', prodCode)
+            .gt('نرخی فرۆشی یەک کارتۆن', 0)
+            .order('بەرواری پسوڵە', { ascending: false })
+            .limit(100);
+
+          if (error) throw error;
+          if (data) {
+            matches = data.map(mapSupabaseRow);
+          }
+        } catch (err) {
+          console.error('Supabase query error:', err);
+        }
+      } else {
+        matches = salesDataset
+          .filter(r => normalizeCode(r.customer_code) === custCode && normalizeCode(r.product_code) === prodCode && r.carton_price > 0)
+          .sort((a, b) => new Date(b.invoice_date) - new Date(a.invoice_date));
+      }
+
+      if (matches.length === 0) {
+        notFound.classList.remove('hidden');
+        document.getElementById('priceNotFoundTitle').textContent = 'هیچ فرۆشێک نەدۆزرایەوە';
+        document.getElementById('priceNotFoundDesc').textContent = `هیچ پسوڵەیەکی فرۆش لە خشتەی sales_data بۆ کڕیاری (${custCode}) و بەرهەمی (${prodCode}) تۆمار نەکراوە.`;
+        return;
+      }
+
+      // Extract up to 5 Distinct Prices ordered from latest
+      const distinctPriceRecords = [];
+      const seenPrices = new Set();
+      for (const row of matches) {
+        if (!seenPrices.has(row.carton_price) && distinctPriceRecords.length < 5) {
+          seenPrices.add(row.carton_price);
+          distinctPriceRecords.push(row);
+        }
+      }
+
+      const first = matches[0];
+      const prev = matches.length > 1 ? matches[1] : null;
+      const lowest = matches.reduce((min, cur) => cur.carton_price < min.carton_price ? cur : min, matches[0]);
+
+      document.getElementById('resCustName').textContent = first.customer_name;
+      document.getElementById('resCustCode').textContent = `کۆدی کریار: ${custCode}`;
+      document.getElementById('resProdName').textContent = first.product_name;
+      document.getElementById('resProdCode').textContent = `کۆدی بەرهەم: ${prodCode}`;
+      document.getElementById('resPackInfo').textContent = `پسوڵە: #${first.invoice_no || '-'}`;
+      document.getElementById('resTotalDistinctBadge').textContent = `${distinctPriceRecords.length} نرخی جیاواز`;
+
+      document.getElementById('kpiLastPrice').textContent = `${first.carton_price.toLocaleString()} د.ع`;
+      document.getElementById('kpiPrevPrice').textContent = prev ? `${prev.carton_price.toLocaleString()} د.ع` : 'نییە';
+      document.getElementById('kpiLowestPrice').textContent = `${lowest.carton_price.toLocaleString()} د.ع`;
+
+      const container = document.getElementById('fivePricesContainer');
+      container.innerHTML = distinctPriceRecords.map((row, idx) => {
+        const isLatest = idx === 0;
+        const isLowest = row.carton_price === lowest.carton_price;
+        let badgeHtml = `<span class="ui-chip !py-0.5 !px-2 !text-[10px]">نرخی #${idx + 1}</span>`;
+        if (isLatest) badgeHtml = `<span class="ui-chip ui-chip-active !py-0.5 !px-2 !text-[10px]">١. کۆتا نرخی داخڵکراو</span>`;
+        else if (isLowest) badgeHtml = `<span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">هەرزانترین نرخ</span>`;
+
+        return `
+          <div class="bg-surface-bright border ${isLatest ? 'border-primary' : 'border-border'} rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-level-1">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-[8px] ${isLatest ? 'bg-primary text-white' : 'bg-ink-100 text-ink-900'} font-mono font-extrabold text-xs flex items-center justify-center shrink-0">
+                ${idx + 1}
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-mono text-sm font-extrabold text-ink-900">${row.carton_price.toLocaleString()} دینار</span>
+                  ${badgeHtml}
+                </div>
+                <span class="font-mono text-[11px] text-ink-500 block mt-0.5">
+                  <i class="fa-regular fa-calendar ml-1"></i>بەرواری پسوڵە: ${row.invoice_date} ${row.invoice_no ? `• پسوڵەی #${row.invoice_no}` : ''}
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 self-end sm:self-center">
+              <div class="bg-surface border border-border rounded-[8px] px-3 py-1.5 text-center">
+                <span class="text-[10px] text-ink-500 font-bold block">بڕ بە کارتۆن</span>
+                <span class="font-mono text-xs font-extrabold text-primary">${row.qty_carton} کارتۆن</span>
+              </div>
+              <div class="bg-surface border border-border rounded-[8px] px-3 py-1.5 text-center">
+                <span class="text-[10px] text-ink-500 font-bold block">بڕ بە دانە</span>
+                <span class="font-mono text-xs font-extrabold text-ink-900">${row.qty_piece} دانە</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      state.lastFormattedSummary =
+        `📊 زانیاری ٥ نرخی بەرهەم:\n` +
+        `👤 کڕیار: ${custCode} | ${first.customer_name}\n` +
+        `📦 بەرهەم: ${prodCode} | ${first.product_name}\n` +
+        distinctPriceRecords.map((r, i) => `${i + 1}. نرخ: ${r.carton_price.toLocaleString()} د.ع | بەروار: ${r.invoice_date} | بڕ: ${r.qty_carton} کارتۆن (${r.qty_piece} دانە)`).join('\n');
+
+      resultCard.classList.remove('hidden');
+    }
+
+    function openCustomerPortfolioFromPrice() {
+      const custCode = normalizeCode(document.getElementById('searchCustCode').value);
+      switchView('market_items');
+      document.getElementById('marketSearchInput').value = custCode;
+      renderMarketPortfolio();
+    }
+
+    function copyResultSummary() {
+      if (!state.lastFormattedSummary) return;
+      const temp = document.createElement('textarea');
+      temp.value = state.lastFormattedSummary;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      const btn = document.getElementById('copyBtnText');
+      btn.textContent = 'کۆپی کرا ✓';
+      setTimeout(() => { btn.textContent = 'کۆپیکردن'; }, 1800);
+    }
+
+    // =========================================================
+    // FEATURE 6: MARKET ITEMS PORTFOLIO & ONE-CLICK DRILLDOWN (FROM `sales_data`)
+    // =========================================================
+    function selectMarketPortfolio(code) {
+      document.getElementById('marketSearchInput').value = code;
+      renderMarketPortfolio();
+    }
+
+    async function renderMarketPortfolio() {
+      const query = normalizeCode(document.getElementById('marketSearchInput').value);
+      const container = document.getElementById('marketPortfolioResult');
+
+      container.innerHTML = `
+        <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-primary">
+          ⏳ خەریکی هێنانی کاڵاکانی مارکێتە لە خشتەی sales_data...
+        </div>
+      `;
+
+      let rows = [];
+      if (state.supabaseClient) {
+        try {
+          const targetQ = query || '164';
+          let sbQuery = state.supabaseClient.from('sales_data').select('*');
+          if (/^\d+$/.test(targetQ)) {
+            sbQuery = sbQuery.eq('کۆدی کریار', targetQ);
+          } else {
+            sbQuery = sbQuery.ilike('ناوی کریار', `%${targetQ}%`);
+          }
+          const { data, error } = await sbQuery.order('بەرواری پسوڵە', { ascending: false }).limit(300);
+          if (!error && data) {
+            rows = data.map(mapSupabaseRow);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        const qLower = query.toLowerCase();
+        rows = salesDataset.filter(r => {
+          if (!qLower) return r.customer_code === "164";
+          return r.customer_code.toLowerCase().includes(qLower) || r.customer_name.toLowerCase().includes(qLower);
+        });
+      }
+
+      if (rows.length === 0) {
+        container.innerHTML = `
+          <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-ink-500">
+            هیچ مارکێتێک یان کاڵایەکی داخڵکراو بەم کۆد یان ناوە لە sales_data نەدۆزرایەوە.
+          </div>
+        `;
+        return;
+      }
+
+      const custCode = rows[0].customer_code;
+      const custName = rows[0].customer_name;
+
+      // Group unique products sold to this market
+      const productMap = new Map();
+      rows
+        .filter(r => r.customer_code === custCode)
+        .sort((a, b) => new Date(b.invoice_date) - new Date(a.invoice_date))
+        .forEach(r => {
+          if (!productMap.has(r.product_code)) {
+            productMap.set(r.product_code, {
+              product_code: r.product_code,
+              product_name: r.product_name,
+              last_price: r.carton_price,
+              last_date: r.invoice_date,
+              last_cartons: r.qty_carton,
+              last_pieces: r.qty_piece,
+              invoice_count: 1
+            });
+          } else {
+            productMap.get(r.product_code).invoice_count += 1;
+          }
+        });
+
+      const products = Array.from(productMap.values());
+
+      container.innerHTML = `
+        <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-3">
+            <div>
+              <span class="text-[11px] font-bold text-ink-500">مارکێتی هەڵبژێردراو:</span>
+              <h4 class="text-base font-extrabold text-ink-900">${custName} — <span class="font-mono text-primary">کۆد: ${custCode}</span></h4>
+            </div>
+            <span class="ui-chip ui-chip-active">${products.length} کاڵای داخڵکراو</span>
+          </div>
+
+          <p class="text-xs font-bold text-primary bg-alert-infoBg border border-alert-infoBorder rounded-[8px] px-3 py-2">
+            <i class="fa-solid fa-hand-pointer ml-1"></i>
+            پەنجە لەسەر هەر بەرهەمێک دابگرە بۆ ئەوەی ڕاستەوخۆ کۆدی مارکێت و بەرهەمەکە وەربگرێت و هەر ٥ نرخەکەیت پێ بڵێت:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            ${products.map(p => `
+              <div onclick="drillDownMarketProduct('${custCode}', '${p.product_code}')" 
+                class="bg-surface-bright border border-border hover:border-primary rounded-[12px] p-4 cursor-pointer transition shadow-level-1 flex flex-col justify-between group">
+                <div>
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="font-mono text-xs font-extrabold bg-primary text-white px-2.5 py-0.5 rounded">کۆد: ${p.product_code}</span>
+                    <span class="text-[11px] font-mono text-ink-500">${p.invoice_count} جار کڕدراوە</span>
+                  </div>
+                  <h5 class="text-sm font-extrabold text-ink-900 group-hover:text-primary transition">${p.product_name}</h5>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between">
+                  <div>
+                    <span class="text-[10px] text-ink-500 block">کۆتا نرخی داخڵکراو (${p.last_date})</span>
+                    <span class="font-mono text-xs font-extrabold text-primary">${p.last_price.toLocaleString()} دینار</span>
+                  </div>
+                  <div class="text-left">
+                    <span class="text-[10px] text-ink-500 block">کۆتا بڕ</span>
+                    <span class="font-mono text-[11px] font-bold text-ink-900">${p.last_cartons} کارتۆن (${p.last_pieces} دانە)</span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function drillDownMarketProduct(custCode, prodCode) {
+      switchView('pricing');
+      setQuickSearch(custCode, prodCode);
+    }
+
+    // =========================================================
+    // FEATURE 4: PRICE HISTORY & LOCATION AUDIT REPORT (FROM `sales_data`)
+    // =========================================================
+    async function updateAuditProdNamePreview() {
+      const code = normalizeCode(document.getElementById('auditProdCode').value);
+      const hintEl = document.getElementById('auditProdNameHint');
+      if (!code) {
+        hintEl.textContent = '';
+        return;
+      }
+      if (state.supabaseClient) {
+        const { data } = await state.supabaseClient.from('sales_data').select('ناوی بەرهەم').eq('کۆدی بەرهەم', code).limit(1);
+        if (data && data.length > 0) {
+          hintEl.textContent = `✓ ${data[0]['ناوی بەرهەم']}`;
+          return;
+        }
+      }
+      const found = state.catalogCache.find(p => p.code === code);
+      hintEl.textContent = found ? `✓ ${found.name}` : '';
+    }
+
+    function applyAuditPreset(prod, price, fromDate, toDate) {
+      document.getElementById('auditProdCode').value = prod;
+      document.getElementById('auditTargetPrice').value = price;
+      document.getElementById('auditFromDate').value = fromDate;
+      document.getElementById('auditToDate').value = toDate;
+      updateAuditProdNamePreview();
+      runPriceAuditReport();
+    }
+
+    function resetAuditFilters() {
+      document.getElementById('auditProdCode').value = '';
+      document.getElementById('auditTargetPrice').value = '';
+      document.getElementById('auditFromDate').value = '';
+      document.getElementById('auditToDate').value = '';
+      document.getElementById('auditProdNameHint').textContent = '';
+      runPriceAuditReport();
+    }
+
+    async function runPriceAuditReport() {
+      const prodCode = normalizeCode(document.getElementById('auditProdCode').value);
+      const priceVal = normalizeCode(document.getElementById('auditTargetPrice').value).replace(/,/g, '');
+      const fromDate = document.getElementById('auditFromDate').value;
+      const toDate = document.getElementById('auditToDate').value;
+      const container = document.getElementById('auditReportContainer');
+
+      container.innerHTML = `
+        <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-primary">
+          ⏳ خەریکی فلتەرکردنی مێژووی فرۆشە لە خشتەی sales_data...
+        </div>
+      `;
+
+      let results = [];
+      if (state.supabaseClient) {
+        try {
+          let q = state.supabaseClient.from('sales_data').select('*');
+          if (prodCode) q = q.eq('کۆدی بەرهەم', prodCode);
+          if (priceVal) q = q.eq('نرخی فرۆشی یەک کارتۆن', Number(priceVal));
+          if (fromDate) q = q.gte('بەرواری پسوڵە', fromDate);
+          if (toDate) q = q.lte('بەرواری پسوڵە', toDate + ' 23:59:59');
+          const { data, error } = await q.order('بەرواری پسوڵە', { ascending: false }).limit(150);
+          if (!error && data) {
+            results = data.map(mapSupabaseRow);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        results = salesDataset.filter(r => {
+          if (prodCode && normalizeCode(r.product_code) !== prodCode) return false;
+          if (priceVal && Number(r.carton_price) !== Number(priceVal)) return false;
+          if (fromDate && new Date(r.invoice_date) < new Date(fromDate)) return false;
+          if (toDate && new Date(r.invoice_date) > new Date(toDate)) return false;
+          return true;
+        }).sort((a, b) => new Date(b.invoice_date) - new Date(a.invoice_date));
+      }
+
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-ink-500">
+            هیچ فرۆشێک بەم فلتەرە دیاریکراوانە لە sales_data نەدۆزرایەوە.
+          </div>
+        `;
+        return;
+      }
+
+      const totalCartons = results.reduce((acc, r) => acc + r.qty_carton, 0);
+      const uniqueMarkets = new Set(results.map(r => r.customer_code)).size;
+
+      container.innerHTML = `
+        <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-3">
+            <h4 class="text-sm font-extrabold text-ink-900">ئەنجامی شوێن و مارکێتە فرۆشراوەکان (${results.length} پسوڵە لە ${uniqueMarkets} مارکێت)</h4>
+            <span class="ui-chip ui-chip-active font-mono">کۆی گشتی: ${totalCartons} کارتۆن</span>
+          </div>
+
+          <div class="space-y-2.5">
+            ${results.map(r => `
+              <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono text-xs font-extrabold text-primary">[کۆد: ${r.customer_code}]</span>
+                    <span class="text-sm font-extrabold text-ink-900">${r.customer_name}</span>
+                    ${r.invoice_no ? `<span class="ui-chip !py-0 !px-2 !text-[10px] font-mono">پسوڵە #${r.invoice_no}</span>` : ''}
+                  </div>
+                  <p class="text-xs text-ink-700 mt-1">
+                    📦 کاڵا: <b>${r.product_name}</b> (<span class="font-mono">${r.product_code}</span>) • 📅 بەروار: <span class="font-mono font-bold">${r.invoice_date}</span>
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="bg-alert-infoBg border border-alert-infoBorder text-alert-infoText px-3 py-1.5 rounded-[8px] text-center">
+                    <span class="text-[10px] font-bold block">نرخی فرۆشراو</span>
+                    <span class="font-mono text-xs font-extrabold">${r.carton_price.toLocaleString()} د.ع</span>
+                  </div>
+                  <div class="bg-surface border border-border px-3 py-1.5 rounded-[8px] text-center">
+                    <span class="text-[10px] text-ink-500 font-bold block">بڕ</span>
+                    <span class="font-mono text-xs font-bold">${r.qty_carton} کارتۆن (${r.qty_piece} دانە)</span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================
+    // FEATURE 5: ANNOUNCEMENTS, SPECIAL OFFERS & AUTO PRODUCT LOOKUP FROM `sales_data`
+    // =========================================================
+    function setAnnProduct(code) {
+      document.getElementById('annProdCode').value = code;
+      autoLookupCatalogProduct();
+    }
+
+    async function autoLookupCatalogProduct() {
+      const code = normalizeCode(document.getElementById('annProdCode').value);
+      const nameInput = document.getElementById('annProdName');
+      if (!code) {
+        nameInput.value = '';
+        return;
+      }
+
+      if (state.supabaseClient) {
+        try {
+          const { data } = await state.supabaseClient
+            .from('sales_data')
+            .select('ناوی بەرهەم')
+            .eq('کۆدی بەرهەم', code)
+            .limit(1);
+          if (data && data.length > 0 && data[0]['ناوی بەرهەم']) {
+            nameInput.value = data[0]['ناوی بەرهەم'];
+            return;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      const found = state.catalogCache.find(p => p.code === code);
+      if (found) {
+        nameInput.value = found.name;
+      } else {
+        nameInput.value = 'کۆدی نەناسراو لە داتابەیس';
+      }
+    }
+
+    function initDefaultTierRows() {
+      const list = document.getElementById('annPriceTiersList');
+      if (list && list.children.length === 0) {
+        addPriceTierRow('نرخی فرۆشی ئاسایی (١-٩ کارتۆن)', '48000', false);
+        addPriceTierRow('عرض خاص (١٠ کارتۆن بەسەرەوە)', '46500', true);
+      }
+    }
+
+    function addPriceTierRow(defaultLabel = '', defaultPrice = '', isSpecial = false) {
+      const list = document.getElementById('annPriceTiersList');
+      const row = document.createElement('div');
+      row.className = 'grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-surface p-2 rounded-[8px] border border-border';
+      row.innerHTML = `
+        <div class="sm:col-span-5">
+          <input type="text" placeholder="جۆری نرخ (نموونە: نرخی کۆ یان عرض خاص)" value="${defaultLabel}" class="tier-label ui-input w-full px-2.5 py-1.5 text-xs font-bold">
+        </div>
+        <div class="sm:col-span-4">
+          <input type="number" placeholder="نرخ بە دینار (45000)" value="${defaultPrice}" dir="ltr" class="tier-price ui-input w-full px-2.5 py-1.5 text-xs font-mono font-bold text-left">
+        </div>
+        <div class="sm:col-span-2 flex items-center gap-1.5">
+          <input type="checkbox" ${isSpecial ? 'checked' : ''} class="tier-special ui-checkbox">
+          <span class="text-[11px] font-extrabold text-alert-warnText">عرض خاص</span>
+        </div>
+        <div class="sm:col-span-1 text-left">
+          <button type="button" onclick="this.closest('.grid').remove()" class="text-alert-errorText hover:bg-alert-errorBg p-1.5 rounded">
+            <i class="fa-solid fa-trash-can text-xs"></i>
+          </button>
+        </div>
+      `;
+      list.appendChild(row);
+    }
+
+    async function publishAnnouncement() {
+      const code = normalizeCode(document.getElementById('annProdCode').value);
+      const prodNameVal = document.getElementById('annProdName').value.trim();
+      if (!code || !prodNameVal || prodNameVal.includes('نەناسراو')) {
+        alertModal('کۆدی بابەت هەڵەیە', 'تکایە سەرەتا کۆدێکی دروستی بەرهەم بنووسە کە لە sales_data بوونی هەبێت.');
+        return;
+      }
+
+      const tierNodes = document.querySelectorAll('#annPriceTiersList > div');
+      const tiers = [];
+      tierNodes.forEach(node => {
+        const lbl = node.querySelector('.tier-label').value.trim() || 'نرخی دیاریکراو';
+        const prc = Number(node.querySelector('.tier-price').value);
+        const spc = node.querySelector('.tier-special').checked;
+        if (prc > 0) tiers.push({ label: lbl, price: prc, isSpecial: spc });
+      });
+
+      if (tiers.length === 0) {
+        alertModal('نرخ داخڵ نەکراوە', 'تکایە لانیکەم یەک نرخ بۆ بەرهەمەکە بنووسە.');
+        return;
+      }
+
+      const condition = document.getElementById('annCondition').value.trim() || 'بەپێی ڕێنمایی کۆمپانیا';
+      const reason = document.getElementById('annReason').value.trim() || 'نوێکردنەوەی نرخی بازاڕ';
+
+      const newAnn = {
+        id: Date.now(),
+        product_code: code,
+        product_name: prodNameVal,
+        tiers,
+        condition_text: condition,
+        reason_text: reason,
+        created_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
+        created_by: state.currentUser ? state.currentUser.full_name : 'ئەدمین'
+      };
+
+      state.announcements.unshift(newAnn);
+      localStorage.setItem('sahel_announcements', JSON.stringify(state.announcements));
+
+      if (state.supabaseClient) {
+        try {
+          await state.supabaseClient.from('price_announcements').insert([newAnn]);
+        } catch (e) { console.error(e); }
+      }
+
+      state.unreadCount += 1;
+      updateNotifBadgeUI();
+      renderAnnouncementsFeed();
+      triggerToast(`ڕاگەیاندنی نوێ: ${prodNameVal}`, `${tiers[0].label}: ${tiers[0].price.toLocaleString()} دینار`);
+    }
+
+    function renderAnnouncementsFeed() {
+      const feed = document.getElementById('announcementsFeed');
+      if (!feed) return;
+      feed.innerHTML = state.announcements.map(a => `
+        <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-2 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-extrabold bg-primary text-white px-2.5 py-0.5 rounded">کۆد: ${a.product_code}</span>
+              <h5 class="text-sm font-extrabold text-ink-900">${a.product_name}</h5>
+            </div>
+            <span class="font-mono text-[11px] text-ink-500">${a.created_at} • ${a.created_by}</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            ${a.tiers.map(t => `
+              <div class="${t.isSpecial ? 'bg-alert-warnBg border-alert-warnBorder text-alert-warnText' : 'bg-surface-bright border-border text-ink-900'} border rounded-[10px] p-3 flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-extrabold block">${t.label}</span>
+                  ${t.isSpecial ? '<span class="text-[10px] font-extrabold uppercase">★ عرض خاص</span>' : ''}
+                </div>
+                <span class="font-mono text-sm font-extrabold">${Number(t.price).toLocaleString()} د.ع</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-surface-bright p-3 rounded-[10px] border border-border">
+            <div><span class="font-bold text-ink-500">📌 مەرج:</span> <span class="font-semibold text-ink-900">${a.condition_text}</span></div>
+            <div><span class="font-bold text-ink-500">💡 هۆکار:</span> <span class="font-semibold text-ink-900">${a.reason_text}</span></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateNotifBadgeUI() {
+      const badge = document.getElementById('notifUnreadBadge');
+      if (badge) {
+        badge.textContent = state.unreadCount;
+        badge.classList.toggle('hidden', state.unreadCount === 0);
+      }
+      if (state.announcements.length > 0) {
+        const latest = state.announcements[0];
+        const t0 = latest.tiers[0];
+        document.getElementById('hubBannerText').textContent = `کۆد ${latest.product_code} (${latest.product_name}) — ${t0.label}: ${Number(t0.price).toLocaleString()} دینار`;
+      }
+    }
+
+    function triggerToast(title, body) {
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastBody').textContent = body;
+      const banner = document.getElementById('toastBanner');
+      banner.classList.remove('hidden');
+      setTimeout(() => { banner.classList.add('hidden'); }, 5000);
+    }
+
+    function hideToast() {
+      document.getElementById('toastBanner').classList.add('hidden');
+    }
+
+    function openNotificationsModal() {
+      state.unreadCount = 0;
+      updateNotifBadgeUI();
+      const container = document.getElementById('notificationsListContainer');
+      container.innerHTML = state.announcements.map(a => `
+        <div class="bg-surface-bright border border-border rounded-[12px] p-3 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-primary">کۆد ${a.product_code} | ${a.product_name}</span>
+            <span class="font-mono text-[10px] text-ink-500">${a.created_at}</span>
+          </div>
+          <div class="text-xs font-bold text-ink-900">
+            ${a.tiers.map(t => `${t.label}: ${Number(t.price).toLocaleString()} د.ع`).join(' • ')}
+          </div>
+          <p class="text-[11px] text-ink-500">مەرج: ${a.condition_text} | هۆکار: ${a.reason_text}</p>
+        </div>
+      `).join('');
+      document.getElementById('notificationsModal').classList.remove('hidden');
+    }
+
+    function closeNotificationsModal() {
+      document.getElementById('notificationsModal').classList.add('hidden');
+    }
+
+    // Full Catalog Modal (Loads distinct products from `sales_data` when connected)
+    async function openFullCatalogModal() {
+      document.getElementById('fullCatalogModal').classList.remove('hidden');
+      const body = document.getElementById('fullCatalogTableBody');
+
+      if (state.supabaseClient) {
+        body.innerHTML = `<div class="p-6 text-center text-xs font-bold text-primary">⏳ خەریکی ئامادەکردنی لیستی بەرهەمەکانم لە خشتەی sales_data...</div>`;
+        try {
+          const { data } = await state.supabaseClient
+            .from('sales_data')
+            .select('کۆدی بەرهەم, ناوی بەرهەم, نرخی فرۆشی یەک کارتۆن, بەرواری پسوڵە')
+            .gt('نرخی فرۆشی یەک کارتۆن', 0)
+            .order('بەرواری پسوڵە', { ascending: false })
+            .limit(400);
+
+          if (data && data.length > 0) {
+            const prodMap = new Map();
+            data.forEach(r => {
+              const c = String(r['کۆدی بەرهەم'] || '').trim();
+              if (c && !prodMap.has(c)) {
+                prodMap.set(c, {
+                  code: c,
+                  name: String(r['ناوی بەرهەم'] || '').trim(),
+                  base_price: Number(r['نرخی فرۆشی یەک کارتۆن'] || 0),
+                  category: 'sales_data'
+                });
+              }
+            });
+            state.catalogCache = Array.from(prodMap.values());
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      renderFullCatalogTable();
+    }
+
+    function closeFullCatalogModal() {
+      document.getElementById('fullCatalogModal').classList.add('hidden');
+    }
+
+    function renderFullCatalogTable() {
+      const q = normalizeCode(document.getElementById('catalogFilterInput').value).toLowerCase();
+      const body = document.getElementById('fullCatalogTableBody');
+
+      const filtered = state.catalogCache.filter(p => !q || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q));
+      body.innerHTML = filtered.map(p => {
+        const latestAnn = state.announcements.find(a => a.product_code === p.code);
+        return `
+          <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-extrabold bg-primary text-white px-2 py-0.5 rounded">${p.code}</span>
+                <h5 class="text-sm font-extrabold text-ink-900">${p.name}</h5>
+              </div>
+            </div>
+            <div class="text-left">
+              <span class="text-[10px] text-ink-500 font-bold block">کۆتا نرخی تۆمارکراو</span>
+              <span class="font-mono text-sm font-extrabold text-primary">${Number(p.base_price).toLocaleString()} دینار</span>
+              ${latestAnn ? `<span class="block text-[10px] font-bold text-alert-warnText">★ ئۆفەری چالاکی هەیە</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================
+    // FEATURE 1, 2, 3: ADMIN USER MANAGEMENT + IMEI + SUPABASE
+    // =========================================================
+    function switchAdminSubTab(sub) {
+      const isUsers = sub === 'users';
+      document.getElementById('adminSubViewUsers').classList.toggle('hidden', !isUsers);
+      document.getElementById('adminSubViewDb').classList.toggle('hidden', isUsers);
+
+      document.getElementById('adminSubBtnUsers').className = isUsers ? 'btn-primary px-4 py-2 text-xs font-extrabold flex items-center gap-1.5' : 'btn-secondary px-4 py-2 text-xs font-extrabold flex items-center gap-1.5';
+      document.getElementById('adminSubBtnDb').className = !isUsers ? 'btn-primary px-4 py-2 text-xs font-extrabold flex items-center gap-1.5' : 'btn-secondary px-4 py-2 text-xs font-extrabold flex items-center gap-1.5';
+
+      if (!isUsers) {
+        document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('sahel_sb_url') || DEFAULT_SUPABASE_URL;
+        document.getElementById('cfgSupabaseKey').value = localStorage.getItem('sahel_sb_key') || DEFAULT_SUPABASE_ANON_KEY;
+      }
+    }
+
+    function fillCurrentDeviceImeiToForm() {
+      document.getElementById('usrImei').value = CURRENT_DEVICE_IMEI;
+    }
+
+    function toggleAllPerms(checked) {
+      document.querySelectorAll('input[name="usrPerm"]').forEach(cb => cb.checked = checked);
+    }
+
+    async function saveUserAccount(e) {
+      e.preventDefault();
+      const full_name = document.getElementById('usrFullName').value.trim();
+      const username = document.getElementById('usrUsername').value.trim().toLowerCase();
+      const password = document.getElementById('usrPassword').value.trim();
+      const imei_device_id = document.getElementById('usrImei').value.trim();
+
+      const permissions = Array.from(document.querySelectorAll('input[name="usrPerm"]:checked')).map(cb => cb.value);
+      if (permissions.length === 0) {
+        alertModal('کێشەی دەسەڵات', 'تکایە لانیکەم یەک بەش لە چێک لیستەکەدا بۆ ئەم بەکارهێنەرە دیاری بکە.');
+        return;
+      }
+
+      const existingIdx = state.users.findIndex(u => u.username.toLowerCase() === username);
+      const userObj = { username, full_name, password, imei_device_id, permissions };
+
+      if (existingIdx !== -1) {
+        state.users[existingIdx] = userObj;
+      } else {
+        state.users.push(userObj);
+      }
+
+      localStorage.setItem('sahel_app_users', JSON.stringify(state.users));
+
+      if (state.supabaseClient) {
+        try {
+          await state.supabaseClient.from('app_users').upsert([userObj], { onConflict: 'username' });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      renderUsersList();
+      document.getElementById('userForm').reset();
+      alertModal('بەکارهێنەر پاشەکەوت کرا', `هەژماری (${username}) بە کۆدی ئامێری (${imei_device_id}) و ${permissions.length} دەسەڵاتەوە تۆمار کرا.`);
+    }
+
+    function renderUsersList() {
+      const container = document.getElementById('usersTableContainer');
+      document.getElementById('usersCountLabel').textContent = `${state.users.length} هەژمار`;
+
+      const permLabels = {
+        price_lookup: 'نرخی بەرهەم',
+        market_items: 'کاڵای مارکێت',
+        price_audit: 'ڕاپۆرتی مێژوو',
+        announcements: 'ڕاگەیاندنی نرخ',
+        contracts: 'گرێبەستەکان',
+        admin_users: 'ئەدمین/داتابەیس'
+      };
+
+      container.innerHTML = state.users.map(u => `
+        <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-sm font-extrabold text-ink-900">${u.full_name}</span>
+              <span class="font-mono text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">@${u.username}</span>
+              <span class="font-mono text-[11px] bg-ink-100 px-2 py-0.5 rounded">Pass: ${u.password}</span>
+              <span class="font-mono text-[11px] bg-alert-infoBg text-alert-infoText px-2 py-0.5 rounded">IMEI: ${u.imei_device_id}</span>
+            </div>
+            <div class="flex flex-wrap gap-1 pt-1">
+              ${(u.permissions || []).map(p => `<span class="ui-chip !py-0 !px-2 !text-[10px]">${permLabels[p] || p}</span>`).join('')}
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0">
+            <button onclick="loadUserIntoForm('${u.username}')" class="btn-secondary px-2.5 py-1.5 text-xs font-bold">دەستکاری</button>
+            ${u.username !== 'admin' ? `<button onclick="deleteUserAccount('${u.username}')" class="btn-secondary px-2.5 py-1.5 text-xs font-bold text-alert-errorText">سڕینەوە</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadUserIntoForm(username) {
+      const u = state.users.find(x => x.username === username);
+      if (!u) return;
+      document.getElementById('usrFullName').value = u.full_name;
+      document.getElementById('usrUsername').value = u.username;
+      document.getElementById('usrPassword').value = u.password;
+      document.getElementById('usrImei').value = u.imei_device_id;
+      document.querySelectorAll('input[name="usrPerm"]').forEach(cb => {
+        cb.checked = (u.permissions || []).includes(cb.value);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteUserAccount(username) {
+      state.users = state.users.filter(u => u.username !== username);
+      localStorage.setItem('sahel_app_users', JSON.stringify(state.users));
+      if (state.supabaseClient) {
+        try {
+          await state.supabaseClient.from('app_users').delete().eq('username', username);
+        } catch (err) { console.error(err); }
+      }
+      renderUsersList();
+    }
+
+    async function saveSupabaseConfig() {
+      const url = document.getElementById('cfgSupabaseUrl').value.trim();
+      const key = document.getElementById('cfgSupabaseKey').value.trim();
+      localStorage.setItem('sahel_sb_url', url);
+      localStorage.setItem('sahel_sb_key', key);
+      await initSupabaseSilent();
+
+      if (state.supabaseClient) {
+        const { data, error } = await state.supabaseClient.from('sales_data').select('کۆدی کریار').limit(1);
+        if (error) {
+          alertModal('کێشە لە خوێندنەوەی sales_data', `پەیوەندی دروست بوو بەڵام خشتەی sales_data نەخوێندرایەوە (دڵنیابە لە کردنەوەی RLS Policy بە کۆدی SQLی خوارەوە): ${error.message}`);
+        } else {
+          alertModal('بەستنەوە سەرکەوتوو بوو ✓', 'وێب ئەپەکە بە سەرکەوتوویی بەسترایەوە بە خشتەی public.sales_data لە Supabase!');
+        }
+      }
+    }
+
+    async function syncAllToSupabase() {
+      if (!state.supabaseClient) {
+        alertModal('ئاگاداری', 'تکایە سەرەتا لینکی پرۆژە و کلیلی Supabase دابنێ و پاشەکەوتی بکە.');
+        return;
+      }
+      try {
+        await state.supabaseClient.from('app_users').upsert(state.users, { onConflict: 'username' });
+        alertModal('هاوکاتکردن سەرکەوتوو بوو', 'تەواوی خشتەی بەکارهێنەران و دەسەڵاتەکان لەگەڵ Supabase هاوکات کران.');
+      } catch (e) {
+        alertModal('کێشە لە هاوکاتکردن', e.message);
+      }
+    }
+
+    function copySqlSchema() {
+      const sql = document.getElementById('sqlSchemaCode').textContent;
+      const temp = document.createElement('textarea');
+      temp.value = sql;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      alertModal('کۆپی کرا', 'کۆدی SQL کۆپی کرا؛ لەناو SQL Editor لە داشبۆردی Supabase دایبنێ و Run بکە.');
+    }
+
+    // Receipts Lookup from `sales_data` by `ژمارەی پسوڵە`
+    function triggerReceipt(no) {
+      document.getElementById('inputReceiptNo').value = no;
+      lookupReceipt();
+    }
+
+    async function lookupReceipt() {
+      const val = normalizeCode(document.getElementById('inputReceiptNo').value);
+      if (!val) return;
+      document.getElementById('outReceiptNo').textContent = val;
+      const resBox = document.getElementById('receiptResult');
+      const custSpan = document.getElementById('outReceiptCust');
+      const itemsDiv = document.getElementById('outReceiptItems');
+      resBox.classList.remove('hidden');
+      itemsDiv.innerHTML = `<span class="text-primary font-bold">⏳ خەریکی گەڕانم...</span>`;
+
+      let rows = [];
+      if (state.supabaseClient) {
+        try {
+          const { data } = await state.supabaseClient.from('sales_data').select('*').eq('ژمارەی پسوڵە', Number(val));
+          if (data) rows = data.map(mapSupabaseRow);
+        } catch (err) { console.error(err); }
+      } else {
+        rows = salesDataset.filter(r => String(r.invoice_no) === val);
+      }
+
+      if (rows.length === 0) {
+        custSpan.textContent = '';
+        itemsDiv.innerHTML = `<span class="text-alert-errorText font-bold">هیچ پسوڵەیەک بەم ژمارەیە لە sales_data نەدۆزرایەوە.</span>`;
+        return;
+      }
+
+      custSpan.textContent = `${rows[0].customer_code} | ${rows[0].customer_name} (${rows[0].invoice_date})`;
+      itemsDiv.innerHTML = rows.map(r => `
+        <div class="p-2 rounded bg-surface border border-border flex items-center justify-between">
+          <div>
+            <span class="font-mono font-bold text-primary">[${r.product_code}]</span>
+            <span class="font-bold">${r.product_name}</span>
+          </div>
+          <div class="font-mono text-left">
+            <span class="font-extrabold text-primary">${r.carton_price.toLocaleString()} د.ع</span>
+            <span class="text-[10px] text-ink-500 block">${r.qty_carton} کارتۆن | ${r.qty_piece} دانە</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // General Modal
+    function alertModal(title, body) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').textContent = body;
+      document.getElementById('generalModal').classList.remove('hidden');
+    }
+    function closeModal() {
+      document.getElementById('generalModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
