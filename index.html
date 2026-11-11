@@ -2608,7 +2608,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const full_name = document.getElementById('usrFullName').value.trim();
       const username = document.getElementById('usrUsername').value.trim().toLowerCase();
       const password = document.getElementById('usrPassword').value.trim();
-      const imei_device_id = document.getElementById('usrImei').value.trim();
+      const imei_device_id = document.getElementById('usrImei').value.trim() || '*';
 
       const permissions = Array.from(document.querySelectorAll('input[name="usrPerm"]:checked')).map(cb => cb.value);
       if (permissions.length === 0) {
@@ -2616,9 +2616,25 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      const existingIdx = state.users.findIndex(u => u.username.toLowerCase() === username);
       const userObj = { username, full_name, password, imei_device_id, permissions };
 
+      // ١. پشکنین و ناردنی ڕاستەوخۆ بۆ Supabase
+      if (!state.supabaseClient) {
+        alertModal('داتابەیس نەبەستراوە!', 'تکایە سەرەتا لە تابی (٢. بەستنەوەی داتابەیسی Supabase) کلیلی Anon Key دابنێ و پاشەکەوتی بکە.');
+        return;
+      }
+
+      const { error } = await state.supabaseClient
+        .from('app_users')
+        .upsert([userObj], { onConflict: 'username' });
+
+      if (error) {
+        alertModal('هەڵە لە خەزنکردنی Supabase', `یوسەرەکە نەچووە ناو داتابەیس بەهۆی ئەم هەڵەیەوە:\n${error.message}`);
+        return;
+      }
+
+      // ٢. ئەگەر لە Supabase سەرکەوتوو بوو، لەناو بەرنامەکەش نوێی بکەرەوە
+      const existingIdx = state.users.findIndex(u => u.username.toLowerCase() === username);
       if (existingIdx !== -1) {
         state.users[existingIdx] = userObj;
       } else {
@@ -2626,18 +2642,9 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
 
       localStorage.setItem('sahel_app_users', JSON.stringify(state.users));
-
-      if (state.supabaseClient) {
-        try {
-          await state.supabaseClient.from('app_users').upsert([userObj], { onConflict: 'username' });
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
       renderUsersList();
       document.getElementById('userForm').reset();
-      alertModal('بەکارهێنەر پاشەکەوت کرا', `هەژماری (${username}) بە کۆدی ئامێری (${imei_device_id}) و ${permissions.length} دەسەڵاتەوە تۆمار کرا.`);
+      alertModal('بە سەرکەوتوویی تۆمار کرا ✓', `هەژماری (${username}) ڕاستەوخۆ لەناو خشتەی app_users لە Supabase پاشەکەوت کرا.`);
     }
 
     function renderUsersList() {
