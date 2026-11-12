@@ -244,6 +244,22 @@
       cursor: pointer;
     }
 
+    /* Autocomplete Suggestion Box */
+    .autocomplete-Menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      z-index: 40;
+      margin-top: 4px;
+      max-height: 220px;
+      overflow-y: auto;
+      background-color: #FAF8F5;
+      border: 1.5px solid #0A3D43;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px -5px rgba(28, 27, 25, 0.18);
+    }
+
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -254,7 +270,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white" onclick="closeAllAutocompletes(event)">
 
   <!-- Top Architectural Ruler -->
   <div class="ruler-bar w-full flex items-center justify-between px-4 lg:px-8 select-none overflow-hidden shrink-0">
@@ -452,6 +468,7 @@
 
           <button 
             type="submit" 
+            id="loginSubmitBtn"
             class="btn-primary w-full py-3 px-4 font-bold text-sm shadow-level-2 flex items-center justify-center gap-2"
           >
             <span>پشکنینی ئامێر و چوونەژوورەوە بۆ سیستەم</span>
@@ -732,7 +749,7 @@
                 <div>
                   <h4 class="text-base font-extrabold text-ink-900">نرخی بەرهەم (٥ نرخ + بڕ)</h4>
                   <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
-                    پشکنینی کۆدی کڕیار و بەرهەم لە خشتەی <code class="font-mono">sales_data</code> بۆ بینینی ٥ نرخی جیاواز، بەروار، و بڕی فرۆشراو بە کارتۆن و دانە.
+                    پشکنینی کۆد یان ناوی مارکێت و بەرهەم لە خشتەی <code class="font-mono">sales_data</code> بۆ بینینی ٥ نرخی جیاواز، بەروار، و بڕی فرۆشراو بە کارتۆن و دانە.
                   </p>
                 </div>
                 <div class="mt-5 flex gap-2">
@@ -769,7 +786,7 @@
                 <div>
                   <h4 class="text-base font-extrabold text-ink-900">ڕاپۆرتی مێژووی نرخی بەرهەم</h4>
                   <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
-                    نرخێکی دیاریکراو و بەروار بدە بە سیستەم بۆ زانینی ئەوەی ئەو بەرهەمە بەو نرخە بە کام شوێنانە فرۆشراوە.
+                    نرخێکی دیاریکراو و بەروار بدە بە سیستەم یان هەموو نرخە جیاوازەکان لە زۆرەوە بۆ کەم بە لاپەڕەبەندی ببینە.
                   </p>
                 </div>
                 <div class="mt-5">
@@ -843,40 +860,48 @@
               <div class="flex items-center justify-between border-b border-border pb-3">
                 <div>
                   <h3 class="text-base font-extrabold text-ink-900">فۆڕمی لێکۆڵینەوەی نرخ</h3>
-                  <p class="text-xs text-ink-500 mt-0.5">کۆدی کریار و بەرهەم بنووسە بۆ دەرکێشانی ٥ نرخ لە <code class="font-mono">sales_data</code></p>
+                  <p class="text-xs text-ink-500 mt-0.5">کۆد یان ناوی مارکێت و بەرهەم بنووسە بۆ دەرکێشانی ٥ نرخ</p>
                 </div>
                 <span class="ui-chip ui-chip-active font-mono text-[10px]">5-PRICES</span>
               </div>
 
               <div class="space-y-3.5">
-                <div>
-                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆدی کریار (Customer Code)</label>
+                <!-- Customer Code or Exact Name with Autocomplete -->
+                <div class="relative">
+                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆد یان ناوی کریار / مارکێت</label>
                   <div class="relative">
                     <input 
                       type="text" 
                       id="searchCustCode" 
-                      inputmode="numeric" 
-                      placeholder="نموونە: 164 یان 2270" 
-                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-sm font-mono font-bold text-left"
-                      dir="ltr"
+                      autocomplete="off"
+                      oninput="handleCustomerAutocomplete(this.value, 'priceCustSuggestBox', 'pricing')"
+                      onfocus="handleCustomerAutocomplete(this.value, 'priceCustSuggestBox', 'pricing')"
+                      placeholder="کۆد (164) یان ناوی مارکێت بنووسە..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-bold"
                     >
                     <i class="fa-solid fa-store absolute left-3 top-3 text-ink-500 text-xs"></i>
                   </div>
+                  <span id="selectedPriceCustomerHint" class="text-[11px] font-extrabold text-primary block mt-1"></span>
+                  <div id="priceCustSuggestBox" class="autocomplete-Menu hidden"></div>
                 </div>
 
-                <div>
-                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆدی بەرهەم (Product Code)</label>
+                <!-- Product Code or Name with Autocomplete -->
+                <div class="relative">
+                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆد یان ناوی بەرهەم</label>
                   <div class="relative">
                     <input 
                       type="text" 
                       id="searchProdCode" 
-                      inputmode="numeric" 
-                      placeholder="نموونە: 808 یان 1873" 
-                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-sm font-mono font-bold text-left"
-                      dir="ltr"
+                      autocomplete="off"
+                      oninput="handleProductAutocomplete(this.value, 'priceProdSuggestBox', 'pricing')"
+                      onfocus="handleProductAutocomplete(this.value, 'priceProdSuggestBox', 'pricing')"
+                      placeholder="کۆدی بەرهەم (808) یان ناوی کاڵا..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-bold"
                     >
                     <i class="fa-solid fa-box-open absolute left-3 top-3 text-ink-500 text-xs"></i>
                   </div>
+                  <span id="selectedPriceProductHint" class="text-[11px] font-extrabold text-primary block mt-1"></span>
+                  <div id="priceProdSuggestBox" class="autocomplete-Menu hidden"></div>
                 </div>
               </div>
 
@@ -992,33 +1017,40 @@
             <div class="lg:col-span-4 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4 lg:sticky lg:top-24">
               <div class="border-b border-border pb-3">
                 <h3 class="text-base font-extrabold text-ink-900">گەڕانی مارکێت و کڕیار</h3>
-                <p class="text-xs text-ink-500 mt-0.5">کۆد یان ناوی مارکێت بنووسە بۆ بینینی کاڵا داخڵکراوەکان لە <code class="font-mono">sales_data</code></p>
+                <p class="text-xs text-ink-500 mt-0.5">کۆد یان ناوی مارکێت بنووسە و لە لیستەکەدا هەڵیبژێرە</p>
               </div>
 
-              <div class="flex gap-2">
-                <div class="relative flex-1">
-                  <input 
-                    type="text" 
-                    id="marketSearchInput" 
-                    placeholder="کۆد یان ناوی مارکێت (164)..." 
-                    class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-semibold"
-                  >
-                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-ink-500 text-xs"></i>
+              <div class="relative">
+                <div class="flex gap-2">
+                  <div class="relative flex-1">
+                    <input 
+                      type="text" 
+                      id="marketSearchInput" 
+                      autocomplete="off"
+                      oninput="handleCustomerAutocomplete(this.value, 'marketCustSuggestBox', 'market')"
+                      onfocus="handleCustomerAutocomplete(this.value, 'marketCustSuggestBox', 'market')"
+                      placeholder="کۆد یان ناوی مارکێت (164)..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-semibold"
+                    >
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-ink-500 text-xs"></i>
+                  </div>
+                  <button onclick="renderMarketPortfolio()" class="btn-primary px-4 py-2 text-xs font-bold">گەڕان</button>
                 </div>
-                <button onclick="renderMarketPortfolio()" class="btn-primary px-4 py-2 text-xs font-bold">گەڕان</button>
+                <span id="selectedMarketCustomerHint" class="text-[11px] font-extrabold text-primary block mt-1"></span>
+                <div id="marketCustSuggestBox" class="autocomplete-Menu hidden"></div>
               </div>
 
               <div class="space-y-2 pt-2 border-t border-border">
                 <span class="text-[11px] font-bold text-ink-500 block">نموونەی مارکێتەکان لە داتابەیس:</span>
-                <button onclick="selectMarketPortfolio('164')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                <button onclick="selectMarketPortfolio('164', 'عمادی/توبزاوە')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
                   <span class="font-bold">164 | عمادی/توبزاوە</span>
                   <i class="fa-solid fa-chevron-left text-[10px]"></i>
                 </button>
-                <button onclick="selectMarketPortfolio('2270')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                <button onclick="selectMarketPortfolio('2270', 'کاک هەواپ/UK مارکێتی')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
                   <span class="font-bold">2270 | کاک هەواپ/UK مارکێتی</span>
                   <i class="fa-solid fa-chevron-left text-[10px]"></i>
                 </button>
-                <button onclick="selectMarketPortfolio('9155')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                <button onclick="selectMarketPortfolio('9155', 'مارکێت سۆلاف کاک محمد احمد سعید')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
                   <span class="font-bold">9155 | مارکێت سۆلاف کاک محمد احمد سعید</span>
                   <i class="fa-solid fa-chevron-left text-[10px]"></i>
                 </button>
@@ -1030,13 +1062,13 @@
           </div>
         </div>
 
-        <!-- VIEW 4: PRICE HISTORY & LOCATION AUDIT REPORT -->
+        <!-- VIEW 4: PRICE HISTORY & LOCATION AUDIT REPORT (WITH PAGINATION) -->
         <div id="view-price_audit" class="hidden space-y-4">
           <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
             <div class="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
               <div>
                 <h3 class="text-base font-extrabold text-ink-900">ڕاپۆرتی مێژووی نرخی بەرهەم و فلتەری شوێنەکان</h3>
-                <p class="text-xs text-ink-500 mt-0.5">بزانە بەرهەمێکی دیاریکراو بە چ نرخێک و لە چ بەروارێکدا بە کام مارکێت و شوێنانە فرۆشراوە لە <code class="font-mono">sales_data</code></p>
+                <p class="text-xs text-ink-500 mt-0.5">بزانە بەرهەمێکی دیاریکراو بە چ نرخێک و لە چ بەروارێکدا بە کام مارکێتانە فرۆشراوە لەگەڵ هەموو نرخە جیاوازەکان</p>
               </div>
               <div class="flex flex-wrap gap-1.5">
                 <button onclick="applyAuditPreset('808', '', '', '')" class="ui-chip cursor-pointer font-mono">هەموو فرۆشەکانی کاڵای 808</button>
@@ -1046,10 +1078,19 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
-              <div>
-                <label class="block text-[11px] font-bold text-ink-900 mb-1">کۆدی بەرهەم</label>
-                <input type="text" id="auditProdCode" oninput="updateAuditProdNamePreview()" placeholder="نموونە: 808" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+              <div class="relative">
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">کۆد یان ناوی بەرهەم</label>
+                <input 
+                  type="text" 
+                  id="auditProdCode" 
+                  autocomplete="off"
+                  oninput="handleProductAutocomplete(this.value, 'auditProdSuggestBox', 'audit')" 
+                  onfocus="handleProductAutocomplete(this.value, 'auditProdSuggestBox', 'audit')"
+                  placeholder="نموونە: 808" 
+                  class="ui-input w-full px-3 py-2 text-xs font-bold"
+                >
                 <span id="auditProdNameHint" class="text-[10px] text-primary font-bold block mt-1 truncate"></span>
+                <div id="auditProdSuggestBox" class="autocomplete-Menu hidden"></div>
               </div>
 
               <div>
@@ -1068,11 +1109,11 @@
               </div>
 
               <div class="sm:col-span-2 flex flex-wrap gap-2">
-                <button onclick="runPriceAuditReport()" class="btn-primary flex-1 py-2 px-3 text-xs font-bold flex items-center justify-center gap-1.5">
+                <button onclick="runPriceAuditReport(1)" class="btn-primary flex-1 py-2 px-3 text-xs font-bold flex items-center justify-center gap-1.5">
                   <i class="fa-solid fa-filter"></i>
                   <span>فلتەرکردن</span>
                 </button>
-                <button onclick="runDistinctPricesHighToLow()" class="btn-secondary flex-1 py-2 px-3 text-xs font-extrabold text-primary border-primary flex items-center justify-center gap-1.5" title="هێنانی هەموو نرخە جیاوازەکانی ئەم بەرهەمە لە زۆرەوە بۆ کەم">
+                <button onclick="runDistinctPricesHighToLow(1)" class="btn-secondary flex-1 py-2 px-3 text-xs font-extrabold text-primary border-primary flex items-center justify-center gap-1.5" title="هێنانی تەواوی نرخە جیاوازەکانی ئەم بەرهەمە لە زۆرەوە بۆ کەم">
                   <i class="fa-solid fa-arrow-down-wide-short"></i>
                   <span>نرخە جیاوازەکان (زۆر بۆ کەم)</span>
                 </button>
@@ -1111,16 +1152,18 @@
               </div>
 
               <div class="space-y-3">
-                <div>
+                <div class="relative">
                   <label class="block text-xs font-bold text-ink-900 mb-1">١. کۆدی بابەت بنووسە (خۆکار ناو لە sales_data دەدۆزێتەوە)</label>
                   <input 
                     type="text" 
                     id="annProdCode" 
-                    oninput="autoLookupCatalogProduct()" 
+                    autocomplete="off"
+                    oninput="autoLookupCatalogProduct(); handleProductAutocomplete(this.value, 'annProdSuggestBox', 'ann')" 
                     placeholder="نموونە: 808 یان 1873" 
                     dir="ltr"
                     class="ui-input w-full px-3.5 py-2 text-sm font-mono font-extrabold text-left"
                   >
+                  <div id="annProdSuggestBox" class="autocomplete-Menu hidden"></div>
                   <div class="flex gap-1.5 mt-1.5 flex-wrap">
                     <button type="button" onclick="setAnnProduct('808')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">808</button>
                     <button type="button" onclick="setAnnProduct('1873')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">1873</button>
@@ -1449,7 +1492,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
   </div>
 
   <!-- ========================================================= -->
-  <!-- APPLICATION LOGIC & DUAL-SCHEMA SUPABASE `sales_data`     -->
+  <!-- APPLICATION LOGIC & ANTI-GLITCH SUPABASE ENGINE           -->
   <!-- ========================================================= -->
   <script>
     // 0. SUPABASE CREDENTIALS
@@ -1484,6 +1527,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     function mapSupabaseRow(row) {
       const rawDate = String(row.invoice_date ?? row['بەرواری پسوڵە'] ?? '');
       const cleanDate = rawDate.includes('T') ? rawDate.split('T')[0] : rawDate.split(' ')[0];
+      const rawPrice = Number(row.carton_price ?? row['نرخی فرۆشی یەک کارتۆن'] ?? 0);
       return {
         customer_code: String(row.customer_code ?? row['کۆدی کریار'] ?? '').trim().replace(/\.0$/, ''),
         customer_name: String(row.customer_name ?? row['ناوی کریار'] ?? '').trim(),
@@ -1493,7 +1537,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         product_name: String(row.product_name ?? row['ناوی بەرهەم'] ?? '').trim(),
         qty_carton: Number(row.qty_carton ?? row['فرۆشی بەرهەم بە کارتۆن'] ?? 0),
         qty_piece: Number(row.qty_piece ?? row['فرۆشی بەرهەم بە دانە'] ?? 0),
-        carton_price: Number(row.carton_price ?? row['نرخی فرۆشی یەک کارتۆن'] ?? 0),
+        carton_price: Math.round(rawPrice),
         location: ''
       };
     }
@@ -1512,13 +1556,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         password: "1234",
         imei_device_id: CURRENT_DEVICE_IMEI,
         permissions: ["price_lookup", "market_items", "announcements"]
-      },
-      {
-        username: "aco",
-        full_name: "ئاکۆ عەلی (مەندووبی کەرکووک)",
-        password: "1234",
-        imei_device_id: "IMEI-999999-LOCKED",
-        permissions: ["price_lookup", "market_items"]
       }
     ];
 
@@ -1544,9 +1581,21 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       announcements: JSON.parse(localStorage.getItem('sahel_announcements')) || defaultAnnouncements,
       unreadCount: 1,
       supabaseClient: null,
+      dbInitPromise: null,
+      schemaReady: false,
       schemaLang: 'en',
       lastFormattedSummary: '',
-      catalogCache: [...masterCatalog]
+      catalogCache: [...masterCatalog],
+      customersDirectory: new Map(), // code -> exact customer_name
+      productsDirectory: new Map(),  // code -> exact product_name
+      // Pagination states for View 4 (Price Audit)
+      auditMode: 'invoices', // 'invoices' or 'distinct'
+      auditAllInvoices: [],
+      auditAllDistinct: [],
+      auditCurrentPage: 1,
+      auditPageSize: 15,
+      auditActiveProdName: '',
+      auditActiveProdCode: ''
     };
 
     function normalizeCode(val) {
@@ -1576,47 +1625,281 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       return state.schemaLang === 'ku' ? kuMap[enName] : enName;
     }
 
-    async function initSupabaseSilent() {
-      const url = localStorage.getItem('sahel_sb_url') || DEFAULT_SUPABASE_URL;
-      const key = localStorage.getItem('sahel_sb_key') || DEFAULT_SUPABASE_ANON_KEY;
-      if (url && key && window.supabase) {
-        try {
-          state.supabaseClient = window.supabase.createClient(url, key);
+    // =========================================================
+    // ANTI-GLITCH DB INITIALIZATION & DIRECTORY PRE-LOADER
+    // =========================================================
+    async function ensureDbReady() {
+      if (state.schemaReady && state.supabaseClient) return true;
+      if (state.dbInitPromise) {
+        await state.dbInitPromise;
+        return !!state.supabaseClient;
+      }
+      state.dbInitPromise = (async () => {
+        const url = localStorage.getItem('sahel_sb_url') || DEFAULT_SUPABASE_URL;
+        const key = localStorage.getItem('sahel_sb_key') || DEFAULT_SUPABASE_ANON_KEY;
+        if (url && key && window.supabase) {
+          try {
+            state.supabaseClient = window.supabase.createClient(url, key);
+            const { data: sampleRows, error: sampleErr } = await state.supabaseClient.from('sales_data').select('*').limit(1);
+            if (!sampleErr && sampleRows && sampleRows.length > 0) {
+              state.schemaLang = ('customer_code' in sampleRows[0]) ? 'en' : 'ku';
+            }
+            state.schemaReady = true;
 
-          const { data: sampleRows, error: sampleErr } = await state.supabaseClient.from('sales_data').select('*').limit(1);
-          if (!sampleErr && sampleRows && sampleRows.length > 0) {
-            state.schemaLang = ('customer_code' in sampleRows[0]) ? 'en' : 'ku';
-          }
+            const badge = document.getElementById('adminDbStatusBadge');
+            const hubStatus = document.getElementById('hubDbStatusText');
+            if (badge) {
+              badge.textContent = `SUPABASE CONNECTED (${state.schemaLang.toUpperCase()}) ✓`;
+              badge.classList.add('ui-chip-active');
+            }
+            if (hubStatus) {
+              hubStatus.textContent = 'بەستراوە (LIVE)';
+            }
 
-          const badge = document.getElementById('adminDbStatusBadge');
-          const hubStatus = document.getElementById('hubDbStatusText');
-          if (badge) {
-            badge.textContent = `SUPABASE CONNECTED (${state.schemaLang.toUpperCase()}) ✓`;
-            badge.classList.add('ui-chip-active');
-          }
-          if (hubStatus) {
-            hubStatus.textContent = 'بەستراوە (LIVE)';
-          }
+            // Load users & announcements
+            const { data: dbUsers } = await state.supabaseClient.from('app_users').select('*');
+            if (dbUsers && dbUsers.length > 0) {
+              state.users = dbUsers;
+              localStorage.setItem('sahel_app_users', JSON.stringify(dbUsers));
+            }
+            const { data: dbAnns } = await state.supabaseClient.from('price_announcements').select('*').order('id', { ascending: false });
+            if (dbAnns && dbAnns.length > 0) {
+              state.announcements = dbAnns;
+              localStorage.setItem('sahel_announcements', JSON.stringify(dbAnns));
+              updateNotifBadgeUI();
+            }
 
-          const { data: dbUsers } = await state.supabaseClient.from('app_users').select('*');
-          if (dbUsers && dbUsers.length > 0) {
-            state.users = dbUsers;
-            localStorage.setItem('sahel_app_users', JSON.stringify(dbUsers));
+            // Warm up Customer & Product Autocomplete Directory in background
+            preloadAutocompleteDirectories();
+          } catch (e) {
+            console.error('DB Init error:', e);
           }
-
-          const { data: dbAnns } = await state.supabaseClient.from('price_announcements').select('*').order('id', { ascending: false });
-          if (dbAnns && dbAnns.length > 0) {
-            state.announcements = dbAnns;
-            localStorage.setItem('sahel_announcements', JSON.stringify(dbAnns));
-            updateNotifBadgeUI();
-          }
-        } catch (e) {
-          console.error(e);
         }
+      })();
+      await state.dbInitPromise;
+      return !!state.supabaseClient;
+    }
+
+    async function preloadAutocompleteDirectories() {
+      if (!state.supabaseClient) return;
+      try {
+        const cCodeCol = col('customer_code');
+        const cNameCol = col('customer_name');
+        const pCodeCol = col('product_code');
+        const pNameCol = col('product_name');
+
+        const { data } = await state.supabaseClient
+          .from('sales_data')
+          .select(`${cCodeCol}, ${cNameCol}, ${pCodeCol}, ${pNameCol}`)
+          .limit(2500);
+
+        if (data) {
+          data.forEach(r => {
+            const cCode = String(r[cCodeCol] ?? '').trim().replace(/\.0$/, '');
+            const cName = String(r[cNameCol] ?? '').trim();
+            if (cCode && cName && !state.customersDirectory.has(cCode)) {
+              state.customersDirectory.set(cCode, cName);
+            }
+            const pCode = String(r[pCodeCol] ?? '').trim().replace(/\.0$/, '');
+            const pName = String(r[pNameCol] ?? '').trim();
+            if (pCode && pName && !state.productsDirectory.has(pCode)) {
+              state.productsDirectory.set(pCode, pName);
+            }
+          });
+        }
+      } catch (e) {
+        console.error(e);
       }
     }
-    initSupabaseSilent();
 
+    // Start DB initialization immediately on page load
+    ensureDbReady();
+
+    // =========================================================
+    // AUTOCOMPLETE DROPDOWN FOR CUSTOMERS & PRODUCTS (EXACT SYSTEM NAMES)
+    // =========================================================
+    let autocompleteTimer = null;
+
+    function closeAllAutocompletes(e) {
+      if (e && e.target && (e.target.tagName === 'INPUT' || e.target.closest('.autocomplete-Menu'))) return;
+      ['priceCustSuggestBox', 'priceProdSuggestBox', 'marketCustSuggestBox', 'auditProdSuggestBox', 'annProdSuggestBox'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+    }
+
+    async function handleCustomerAutocomplete(rawVal, boxId, contextType) {
+      clearTimeout(autocompleteTimer);
+      const q = normalizeCode(rawVal);
+      const box = document.getElementById(boxId);
+      if (!box) return;
+
+      if (!q) {
+        box.classList.add('hidden');
+        return;
+      }
+
+      autocompleteTimer = setTimeout(async () => {
+        await ensureDbReady();
+        const matches = new Map();
+
+        // 1. Search local directory cache first
+        state.customersDirectory.forEach((name, code) => {
+          if (code.includes(q) || name.toLowerCase().includes(q.toLowerCase())) {
+            matches.set(code, name);
+          }
+        });
+
+        // 2. Live query from Supabase if fewer than 10 matches in cache
+        if (state.supabaseClient && matches.size < 10) {
+          try {
+            const cCodeCol = col('customer_code');
+            const cNameCol = col('customer_name');
+            let sbQ = state.supabaseClient.from('sales_data').select(`${cCodeCol}, ${cNameCol}`);
+            if (/^\d+$/.test(q)) {
+              sbQ = sbQ.ilike(cCodeCol, `${q}%`);
+            } else {
+              sbQ = sbQ.ilike(cNameCol, `%${q}%`);
+            }
+            const { data } = await sbQ.limit(80);
+            if (data) {
+              data.forEach(r => {
+                const c = String(r[cCodeCol] ?? '').trim().replace(/\.0$/, '');
+                const n = String(r[cNameCol] ?? '').trim();
+                if (c && n) {
+                  state.customersDirectory.set(c, n);
+                  matches.set(c, n);
+                }
+              });
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
+        const list = Array.from(matches.entries()).slice(0, 15);
+        if (list.length === 0) {
+          box.innerHTML = `<div class="p-3 text-xs text-ink-500 font-bold text-center">هیچ مارکێتێک بەم ناوە یان کۆدە نەدۆزرایەوە</div>`;
+          box.classList.remove('hidden');
+          return;
+        }
+
+        box.innerHTML = list.map(([code, name]) => {
+          const safeName = name.replace(/'/g, "\\'");
+          return `
+            <div onclick="selectCustomerOption('${code}', '${safeName}', '${boxId}', '${contextType}')" 
+              class="px-3.5 py-2.5 border-b border-border/60 hover:bg-primary hover:text-white cursor-pointer transition flex items-center justify-between text-xs">
+              <span class="font-extrabold truncate">${name}</span>
+              <span class="font-mono font-bold px-2 py-0.5 rounded bg-ink-100 text-ink-900 shrink-0 mr-2">کۆد: ${code}</span>
+            </div>
+          `;
+        }).join('');
+        box.classList.remove('hidden');
+      }, 180);
+    }
+
+    function selectCustomerOption(code, exactName, boxId, contextType) {
+      const box = document.getElementById(boxId);
+      if (box) box.classList.add('hidden');
+
+      if (contextType === 'pricing') {
+        document.getElementById('searchCustCode').value = exactName;
+        document.getElementById('searchCustCode').dataset.resolvedCode = code;
+        document.getElementById('selectedPriceCustomerHint').textContent = `✓ هەڵبژێردرا: [${code}] ${exactName}`;
+      } else if (contextType === 'market') {
+        document.getElementById('marketSearchInput').value = exactName;
+        document.getElementById('marketSearchInput').dataset.resolvedCode = code;
+        document.getElementById('selectedMarketCustomerHint').textContent = `✓ هەڵبژێردرا: [${code}] ${exactName}`;
+        renderMarketPortfolio();
+      }
+    }
+
+    async function handleProductAutocomplete(rawVal, boxId, contextType) {
+      clearTimeout(autocompleteTimer);
+      const q = normalizeCode(rawVal);
+      const box = document.getElementById(boxId);
+      if (!box) return;
+
+      if (!q) {
+        box.classList.add('hidden');
+        return;
+      }
+
+      autocompleteTimer = setTimeout(async () => {
+        await ensureDbReady();
+        const matches = new Map();
+
+        state.productsDirectory.forEach((name, code) => {
+          if (code.includes(q) || name.toLowerCase().includes(q.toLowerCase())) {
+            matches.set(code, name);
+          }
+        });
+
+        if (state.supabaseClient && matches.size < 10) {
+          try {
+            const pCodeCol = col('product_code');
+            const pNameCol = col('product_name');
+            let sbQ = state.supabaseClient.from('sales_data').select(`${pCodeCol}, ${pNameCol}`);
+            if (/^\d+$/.test(q)) {
+              sbQ = sbQ.ilike(pCodeCol, `${q}%`);
+            } else {
+              sbQ = sbQ.ilike(pNameCol, `%${q}%`);
+            }
+            const { data } = await sbQ.limit(80);
+            if (data) {
+              data.forEach(r => {
+                const c = String(r[pCodeCol] ?? '').trim().replace(/\.0$/, '');
+                const n = String(r[pNameCol] ?? '').trim();
+                if (c && n) {
+                  state.productsDirectory.set(c, n);
+                  matches.set(c, n);
+                }
+              });
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
+        const list = Array.from(matches.entries()).slice(0, 15);
+        if (list.length === 0) {
+          box.classList.add('hidden');
+          return;
+        }
+
+        box.innerHTML = list.map(([code, name]) => {
+          const safeName = name.replace(/'/g, "\\'");
+          return `
+            <div onclick="selectProductOption('${code}', '${safeName}', '${boxId}', '${contextType}')" 
+              class="px-3.5 py-2.5 border-b border-border/60 hover:bg-primary hover:text-white cursor-pointer transition flex items-center justify-between text-xs">
+              <span class="font-extrabold truncate">${name}</span>
+              <span class="font-mono font-bold px-2 py-0.5 rounded bg-ink-100 text-ink-900 shrink-0 mr-2">کۆد: ${code}</span>
+            </div>
+          `;
+        }).join('');
+        box.classList.remove('hidden');
+      }, 180);
+    }
+
+    function selectProductOption(code, exactName, boxId, contextType) {
+      const box = document.getElementById(boxId);
+      if (box) box.classList.add('hidden');
+
+      if (contextType === 'pricing') {
+        document.getElementById('searchProdCode').value = code;
+        document.getElementById('selectedPriceProductHint').textContent = `✓ [${code}] ${exactName}`;
+      } else if (contextType === 'audit') {
+        document.getElementById('auditProdCode').value = code;
+        document.getElementById('auditProdNameHint').textContent = `✓ ${exactName}`;
+      } else if (contextType === 'ann') {
+        document.getElementById('annProdCode').value = code;
+        document.getElementById('annProdName').value = exactName;
+      }
+    }
+
+    // =========================================================
+    // AUTHENTICATION & IMEI / DEVICE VERIFICATION
+    // =========================================================
     function copyDeviceImei() {
       const val = document.getElementById('loginDeviceImei').value.trim() || CURRENT_DEVICE_IMEI;
       const temp = document.createElement('textarea');
@@ -1650,10 +1933,10 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const enteredImei = document.getElementById('loginDeviceImei').value.trim();
       const errBox = document.getElementById('loginError');
       const errText = document.getElementById('loginErrorText');
+      const submitBtn = document.getElementById('loginSubmitBtn');
 
-      if (!state.supabaseClient) {
-        await initSupabaseSilent();
-      }
+      submitBtn.disabled = true;
+      await ensureDbReady();
 
       if (state.supabaseClient) {
         try {
@@ -1672,6 +1955,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           console.error(err);
         }
       }
+      submitBtn.disabled = false;
 
       const foundUser = state.users.find(u => u.username.toLowerCase() === username && u.password === password);
       if (!foundUser) {
@@ -1689,7 +1973,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // پاشەکەوتکردنی کۆدی IMEI لەسەر وێبگەڕی مەندووبەکە بۆ ئەوەی هەموو جارێک نەینووسێتەوە
       if (enteredImei) {
         CURRENT_DEVICE_IMEI = enteredImei;
         localStorage.setItem('sahel_device_imei', enteredImei);
@@ -1700,7 +1983,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       enterApplication();
     }
 
-    function enterApplication() {
+    async function enterApplication() {
       document.getElementById('screen-login').classList.add('hidden');
       document.getElementById('screen-app').classList.remove('hidden');
 
@@ -1726,8 +2009,9 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       applyPermissionsVisibility();
       updateNotifBadgeUI();
-      setQuickSearch('164', '808');
       switchView('hub');
+      await ensureDbReady();
+      setQuickSearch('164', '808');
     }
 
     function applyPermissionsVisibility() {
@@ -1782,7 +2066,9 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
 
       if (viewName === 'market_items') renderMarketPortfolio();
-      if (viewName === 'price_audit') runPriceAuditReport();
+      if (viewName === 'price_audit' && state.auditAllInvoices.length === 0 && state.auditAllDistinct.length === 0) {
+        runPriceAuditReport(1);
+      }
       if (viewName === 'announcements') {
         initDefaultTierRows();
         renderAnnouncementsFeed();
@@ -1794,52 +2080,99 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 7: 5 DISTINCT PRICES + CARTON & PIECE QUANTITIES
+    // FEATURE 7: 5 DISTINCT PRICES (SEARCH BY CODE OR EXACT MARKET NAME)
     // =========================================================
+    let priceLookupReqId = 0;
+
     function setQuickSearch(cust, prod) {
-      document.getElementById('searchCustCode').value = cust;
+      const custInput = document.getElementById('searchCustCode');
+      custInput.value = cust;
+      delete custInput.dataset.resolvedCode;
+      document.getElementById('selectedPriceCustomerHint').textContent = '';
       document.getElementById('searchProdCode').value = prod;
+      document.getElementById('selectedPriceProductHint').textContent = '';
       executePriceLookup();
     }
 
     function clearPriceSearch() {
-      document.getElementById('searchCustCode').value = '';
+      const custInput = document.getElementById('searchCustCode');
+      custInput.value = '';
+      delete custInput.dataset.resolvedCode;
+      document.getElementById('selectedPriceCustomerHint').textContent = '';
       document.getElementById('searchProdCode').value = '';
+      document.getElementById('selectedPriceProductHint').textContent = '';
       document.getElementById('priceNotFound').classList.add('hidden');
       document.getElementById('priceResultCard').classList.add('hidden');
     }
 
     async function executePriceLookup() {
-      const custCode = normalizeCode(document.getElementById('searchCustCode').value);
-      const prodCode = normalizeCode(document.getElementById('searchProdCode').value);
+      const myReqId = ++priceLookupReqId;
+      await ensureDbReady();
+      if (myReqId !== priceLookupReqId) return;
+
+      const custInputEl = document.getElementById('searchCustCode');
+      const rawCustInput = normalizeCode(custInputEl.value);
+      const resolvedCustCode = custInputEl.dataset.resolvedCode || '';
+      const rawProdInput = normalizeCode(document.getElementById('searchProdCode').value);
+
       const notFound = document.getElementById('priceNotFound');
       const resultCard = document.getElementById('priceResultCard');
 
       notFound.classList.add('hidden');
-      resultCard.classList.add('hidden');
 
-      if (!custCode || !prodCode) {
+      if (!rawCustInput || !rawProdInput) {
+        resultCard.classList.add('hidden');
         notFound.classList.remove('hidden');
         document.getElementById('priceNotFoundTitle').textContent = 'زانیاری ناتەواو';
-        document.getElementById('priceNotFoundDesc').textContent = 'تکایە هەردوو کۆدی کریار و کۆدی بەرهەم بنووسە.';
+        document.getElementById('priceNotFoundDesc').textContent = 'تکایە هەردوو کۆد یان ناوی مارکێت و کۆدی بەرهەم بنووسە.';
         return;
       }
+
+      document.getElementById('fivePricesContainer').innerHTML = `
+        <div class="p-6 text-center text-xs font-bold text-primary">
+          ⏳ خەریکی پشکنینی داتای فرۆش و جیاکردنەوەی ٥ نرخەکەیە...
+        </div>
+      `;
+      resultCard.classList.remove('hidden');
 
       let matches = [];
 
       if (state.supabaseClient) {
         try {
-          const { data, error } = await state.supabaseClient
-            .from('sales_data')
-            .select('*')
-            .eq(col('customer_code'), custCode)
-            .eq(col('product_code'), prodCode)
-            .gt(col('carton_price'), 0)
-            .order(col('invoice_date'), { ascending: false })
-            .limit(100);
+          let q = state.supabaseClient.from('sales_data').select('*').gt(col('carton_price'), 0);
 
-          if (error) throw error;
-          if (data) {
+          // Customer filter: by code if numeric/resolved, or exact/ilike name
+          if (resolvedCustCode && rawCustInput.includes(state.customersDirectory.get(resolvedCustCode) || '')) {
+            q = q.eq(col('customer_code'), resolvedCustCode);
+          } else if (/^\d+$/.test(rawCustInput)) {
+            q = q.eq(col('customer_code'), rawCustInput);
+          } else {
+            q = q.eq(col('customer_name'), rawCustInput);
+          }
+
+          // Product filter: by code or name
+          if (/^\d+$/.test(rawProdInput)) {
+            q = q.eq(col('product_code'), rawProdInput);
+          } else {
+            q = q.ilike(col('product_name'), `%${rawProdInput}%`);
+          }
+
+          let { data, error } = await q.order(col('invoice_date'), { ascending: false }).limit(500);
+
+          // Fallback to ilike on customer_name if exact match returned empty
+          if ((!data || data.length === 0) && !/^\d+$/.test(rawCustInput)) {
+            let q2 = state.supabaseClient.from('sales_data').select('*').gt(col('carton_price'), 0).ilike(col('customer_name'), `%${rawCustInput}%`);
+            if (/^\d+$/.test(rawProdInput)) {
+              q2 = q2.eq(col('product_code'), rawProdInput);
+            } else {
+              q2 = q2.ilike(col('product_name'), `%${rawProdInput}%`);
+            }
+            const res2 = await q2.order(col('invoice_date'), { ascending: false }).limit(500);
+            data = res2.data;
+          }
+
+          if (myReqId !== priceLookupReqId) return;
+          if (!error && data) {
             matches = data.map(mapSupabaseRow);
           }
         } catch (err) {
@@ -1847,34 +2180,36 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         }
       } else {
         matches = salesDataset
-          .filter(r => normalizeCode(r.customer_code) === custCode && normalizeCode(r.product_code) === prodCode && r.carton_price > 0)
+          .filter(r => (normalizeCode(r.customer_code) === rawCustInput || r.customer_name.includes(rawCustInput)) && (normalizeCode(r.product_code) === rawProdInput || r.product_name.includes(rawProdInput)) && r.carton_price > 0)
           .sort((a, b) => new Date(b.invoice_date) - new Date(a.invoice_date));
       }
 
       if (matches.length === 0) {
+        resultCard.classList.add('hidden');
         notFound.classList.remove('hidden');
         document.getElementById('priceNotFoundTitle').textContent = 'هیچ فرۆشێک نەدۆزرایەوە';
-        document.getElementById('priceNotFoundDesc').textContent = `هیچ پسوڵەیەکی فرۆش لە خشتەی sales_data بۆ کڕیاری (${custCode}) و بەرهەمی (${prodCode}) تۆمار نەکراوە.`;
+        document.getElementById('priceNotFoundDesc').textContent = `هیچ پسوڵەیەکی فرۆش لە خشتەی sales_data بۆ (${rawCustInput}) و بەرهەمی (${rawProdInput}) تۆمار نەکراوە.`;
         return;
       }
 
       const distinctPriceRecords = [];
       const seenPrices = new Set();
       for (const row of matches) {
-        if (!seenPrices.has(row.carton_price) && distinctPriceRecords.length < 5) {
-          seenPrices.add(row.carton_price);
+        const cleanP = Math.round(Number(row.carton_price));
+        if (cleanP > 0 && !seenPrices.has(cleanP) && distinctPriceRecords.length < 5) {
+          seenPrices.add(cleanP);
           distinctPriceRecords.push(row);
         }
       }
 
       const first = matches[0];
-      const prev = matches.length > 1 ? matches[1] : null;
+      const prev = distinctPriceRecords.length > 1 ? distinctPriceRecords[1] : null;
       const lowest = matches.reduce((min, cur) => cur.carton_price < min.carton_price ? cur : min, matches[0]);
 
       document.getElementById('resCustName').textContent = first.customer_name;
-      document.getElementById('resCustCode').textContent = `کۆدی کریار: ${custCode}`;
+      document.getElementById('resCustCode').textContent = `کۆدی کریار: ${first.customer_code}`;
       document.getElementById('resProdName').textContent = first.product_name;
-      document.getElementById('resProdCode').textContent = `کۆدی بەرهەم: ${prodCode}`;
+      document.getElementById('resProdCode').textContent = `کۆدی بەرهەم: ${first.product_code}`;
       document.getElementById('resPackInfo').textContent = `پسوڵە: #${first.invoice_no || '-'}`;
       document.getElementById('resTotalDistinctBadge').textContent = `${distinctPriceRecords.length} نرخی جیاواز`;
 
@@ -1923,17 +2258,17 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       state.lastFormattedSummary =
         `📊 زانیاری ٥ نرخی بەرهەم:\n` +
-        `👤 کڕیار: ${custCode} | ${first.customer_name}\n` +
-        `📦 بەرهەم: ${prodCode} | ${first.product_name}\n` +
+        `👤 کڕیار: ${first.customer_code} | ${first.customer_name}\n` +
+        `📦 بەرهەم: ${first.product_code} | ${first.product_name}\n` +
         distinctPriceRecords.map((r, i) => `${i + 1}. نرخ: ${r.carton_price.toLocaleString()} د.ع | بەروار: ${r.invoice_date} | بڕ: ${r.qty_carton} کارتۆن (${r.qty_piece} دانە)`).join('\n');
 
       resultCard.classList.remove('hidden');
     }
 
     function openCustomerPortfolioFromPrice() {
-      const custCode = normalizeCode(document.getElementById('searchCustCode').value);
+      const custText = document.getElementById('resCustCode').textContent.replace('کۆدی کریار:', '').trim();
       switchView('market_items');
-      document.getElementById('marketSearchInput').value = custCode;
+      document.getElementById('marketSearchInput').value = custText;
       renderMarketPortfolio();
     }
 
@@ -1953,13 +2288,24 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     // =========================================================
     // FEATURE 6: MARKET ITEMS PORTFOLIO & ONE-CLICK DRILLDOWN
     // =========================================================
-    function selectMarketPortfolio(code) {
-      document.getElementById('marketSearchInput').value = code;
+    let marketReqId = 0;
+
+    function selectMarketPortfolio(code, exactName) {
+      const input = document.getElementById('marketSearchInput');
+      input.value = exactName || code;
+      input.dataset.resolvedCode = code;
+      document.getElementById('selectedMarketCustomerHint').textContent = `✓ هەڵبژێردرا: [${code}] ${exactName || ''}`;
       renderMarketPortfolio();
     }
 
     async function renderMarketPortfolio() {
-      const query = normalizeCode(document.getElementById('marketSearchInput').value);
+      const myReq = ++marketReqId;
+      await ensureDbReady();
+      if (myReq !== marketReqId) return;
+
+      const inputEl = document.getElementById('marketSearchInput');
+      const query = normalizeCode(inputEl.value);
+      const resolvedCode = inputEl.dataset.resolvedCode || '';
       const container = document.getElementById('marketPortfolioResult');
 
       container.innerHTML = `
@@ -1972,14 +2318,28 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       if (state.supabaseClient) {
         try {
           let sbQuery = state.supabaseClient.from('sales_data').select('*');
-          if (query) {
+          if (resolvedCode && query.includes(state.customersDirectory.get(resolvedCode) || '')) {
+            sbQuery = sbQuery.eq(col('customer_code'), resolvedCode);
+          } else if (query) {
             if (/^\d+$/.test(query)) {
               sbQuery = sbQuery.eq(col('customer_code'), query);
             } else {
-              sbQuery = sbQuery.ilike(col('customer_name'), `%${query}%`);
+              sbQuery = sbQuery.eq(col('customer_name'), query);
             }
           }
-          const { data, error } = await sbQuery.order(col('invoice_date'), { ascending: false }).limit(300);
+          let { data, error } = await sbQuery.order(col('invoice_date'), { ascending: false }).limit(600);
+
+          if ((!data || data.length === 0) && query && !/^\d+$/.test(query)) {
+            const res2 = await state.supabaseClient
+              .from('sales_data')
+              .select('*')
+              .ilike(col('customer_name'), `%${query}%`)
+              .order(col('invoice_date'), { ascending: false })
+              .limit(600);
+            data = res2.data;
+          }
+
+          if (myReq !== marketReqId) return;
           if (!error && data) {
             rows = data.map(mapSupabaseRow);
           }
@@ -2077,25 +2437,47 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 4: PRICE HISTORY & DISTINCT PRICES (HIGH TO LOW)
+    // FEATURE 4: COMPLETE DISTINCT PRICES ENGINE + PAGINATION
     // =========================================================
-    async function updateAuditProdNamePreview() {
-      const code = normalizeCode(document.getElementById('auditProdCode').value);
-      const hintEl = document.getElementById('auditProdNameHint');
-      if (!code) {
-        hintEl.textContent = '';
-        return;
-      }
-      if (state.supabaseClient) {
-        const { data } = await state.supabaseClient.from('sales_data').select('*').eq(col('product_code'), code).limit(1);
-        if (data && data.length > 0) {
-          const mapped = mapSupabaseRow(data[0]);
-          hintEl.textContent = `✓ ${mapped.product_name}`;
-          return;
+    let auditReqId = 0;
+
+    // Fetch ALL rows for a product in chunks of 1000 so no distinct price is ever missed
+    async function fetchAllProductSalesRows(prodCode, fromDate, toDate, specificPrice) {
+      let allMapped = [];
+      let fromIdx = 0;
+      const step = 1000;
+
+      while (fromIdx < 15000) {
+        let q = state.supabaseClient
+          .from('sales_data')
+          .select('*')
+          .gt(col('carton_price'), 0);
+
+        if (prodCode) {
+          if (/^\d+$/.test(prodCode)) {
+            q = q.eq(col('product_code'), prodCode);
+          } else {
+            q = q.ilike(col('product_name'), `%${prodCode}%`);
+          }
         }
+        if (specificPrice) {
+          q = q.eq(col('carton_price'), Number(specificPrice));
+        }
+        if (fromDate) q = q.gte(col('invoice_date'), fromDate);
+        if (toDate) q = q.lte(col('invoice_date'), toDate + ' 23:59:59');
+
+        const { data, error } = await q
+          .order(col('invoice_date'), { ascending: false })
+          .range(fromIdx, fromIdx + step - 1);
+
+        if (error || !data || data.length === 0) break;
+        allMapped.push(...data.map(mapSupabaseRow));
+
+        // If no specific product filter was given, 1000 latest rows is sufficient for preview
+        if (!prodCode || data.length < step) break;
+        fromIdx += step;
       }
-      const found = state.catalogCache.find(p => p.code === code);
-      hintEl.textContent = found ? `✓ ${found.name}` : '';
+      return allMapped;
     }
 
     function applyAuditPreset(prod, price, fromDate, toDate) {
@@ -2103,8 +2485,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       document.getElementById('auditTargetPrice').value = price;
       document.getElementById('auditFromDate').value = fromDate;
       document.getElementById('auditToDate').value = toDate;
-      updateAuditProdNamePreview();
-      runPriceAuditReport();
+      runPriceAuditReport(1);
     }
 
     function resetAuditFilters() {
@@ -2113,43 +2494,87 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       document.getElementById('auditFromDate').value = '';
       document.getElementById('auditToDate').value = '';
       document.getElementById('auditProdNameHint').textContent = '';
-      runPriceAuditReport();
+      runPriceAuditReport(1);
     }
 
-    // فەنکشنی نوێ: هێنانی هەموو نرخە جیاوازەکانی بەرهەمەکە لە زۆرەوە بۆ کەم
-    async function runDistinctPricesHighToLow() {
+    function buildPaginationControlsHtml(currentPage, totalItems, pageSize, onPageClickFnName) {
+      const totalPages = Math.ceil(totalItems / pageSize);
+      if (totalPages <= 1) return '';
+
+      const startItem = (currentPage - 1) * pageSize + 1;
+      const endItem = Math.min(currentPage * pageSize, totalItems);
+
+      let pagesHtml = '';
+      const maxButtons = 5;
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage < maxButtons - 1) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      for (let p = startPage; p <= endPage; p++) {
+        pagesHtml += `
+          <button onclick="${onPageClickFnName}(${p})" 
+            class="${p === currentPage ? 'btn-primary' : 'btn-secondary'} w-8 h-8 rounded-[8px] font-mono text-xs font-extrabold flex items-center justify-center">
+            ${p}
+          </button>
+        `;
+      }
+
+      return `
+        <div class="pt-4 mt-3 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span class="text-xs text-ink-500 font-bold">
+            پیشاندانی <b class="font-mono text-ink-900">${startItem}</b> تا <b class="font-mono text-ink-900">${endItem}</b> لە کۆی <b class="font-mono text-primary">${totalItems}</b> ئەنجام (لاپەڕەی ${currentPage} لە ${totalPages})
+          </span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="${onPageClickFnName}(${Math.max(1, currentPage - 1)})" ${currentPage === 1 ? 'disabled' : ''} 
+              class="btn-secondary px-3 h-8 rounded-[8px] text-xs font-bold disabled:opacity-40">
+              پێشتر
+            </button>
+            ${pagesHtml}
+            <button onclick="${onPageClickFnName}(${Math.min(totalPages, currentPage + 1)})" ${currentPage === totalPages ? 'disabled' : ''} 
+              class="btn-secondary px-3 h-8 rounded-[8px] text-xs font-bold disabled:opacity-40">
+              دواتر
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // ١. هێنانی تەواوی نرخە جیاوازەکانی بەرهەمەکە لە زۆرەوە بۆ کەم بە بێ لەدەستچوون + لاپەڕەبەندی
+    async function runDistinctPricesHighToLow(page = 1) {
+      const myReq = ++auditReqId;
+      await ensureDbReady();
+      if (myReq !== auditReqId) return;
+
       const prodCode = normalizeCode(document.getElementById('auditProdCode').value);
       const fromDate = document.getElementById('auditFromDate').value;
       const toDate = document.getElementById('auditToDate').value;
       const container = document.getElementById('auditReportContainer');
 
       if (!prodCode) {
-        alertModal('کۆدی بەرهەم پێویستە', 'تکایە سەرەتا کۆدی بەرهەم لە خانەی یەکەمدا بنووسە بۆ بینینی هەموو نرخە جیاوازەکانی لە زۆرەوە بۆ کەم.');
+        alertModal('کۆدی بەرهەم پێویستە', 'تکایە سەرەتا کۆد یان ناوی بەرهەم لە خانەی یەکەمدا بنووسە بۆ بینینی هەموو نرخە جیاوازەکانی لە زۆرەوە بۆ کەم.');
         return;
       }
 
       container.innerHTML = `
         <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-primary">
-          ⏳ خەریکی دەرکێشانی هەموو نرخە جیاوازەکانی بەرهەمی (${prodCode})ـم لە زۆرەوە بۆ کەم...
+          ⏳ خەریکی خوێندنەوەی تەواوی پسوڵەکان و دەرکێشانی هەموو نرخە جیاوازەکانی (${prodCode})ـم لە زۆرەوە بۆ کەم...
         </div>
       `;
 
       let results = [];
       if (state.supabaseClient) {
         try {
-          let q = state.supabaseClient.from('sales_data').select('*').eq(col('product_code'), prodCode).gt(col('carton_price'), 0);
-          if (fromDate) q = q.gte(col('invoice_date'), fromDate);
-          if (toDate) q = q.lte(col('invoice_date'), toDate + ' 23:59:59');
-          const { data, error } = await q.order(col('carton_price'), { ascending: false }).limit(1000);
-          if (!error && data) {
-            results = data.map(mapSupabaseRow);
-          }
+          results = await fetchAllProductSalesRows(prodCode, fromDate, toDate, '');
         } catch (err) {
           console.error(err);
         }
       } else {
         results = salesDataset.filter(r => normalizeCode(r.product_code) === prodCode && r.carton_price > 0);
       }
+
+      if (myReq !== auditReqId) return;
 
       if (results.length === 0) {
         container.innerHTML = `
@@ -2160,10 +2585,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // کۆکردنەوەی نرخە جیاوازەکان و ڕیزکردنیان لە زۆرەوە بۆ کەم
+      // Group ALL distinct prices accurately
       const priceGroups = new Map();
       results.forEach(r => {
-        const p = Number(r.carton_price);
+        const p = Math.round(Number(r.carton_price || 0));
+        if (p <= 0) return;
         if (!priceGroups.has(p)) {
           priceGroups.set(p, {
             price: p,
@@ -2187,57 +2613,82 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         }
       });
 
-      const sortedDistinct = Array.from(priceGroups.values()).sort((a, b) => b.price - a.price);
-      const prodName = results[0].product_name;
+      state.auditMode = 'distinct';
+      state.auditAllDistinct = Array.from(priceGroups.values()).sort((a, b) => b.price - a.price);
+      state.auditActiveProdName = results[0].product_name;
+      state.auditActiveProdCode = results[0].product_code;
+      renderDistinctPricesPage(page);
+    }
+
+    function renderDistinctPricesPage(page) {
+      state.auditCurrentPage = page;
+      const container = document.getElementById('auditReportContainer');
+      const list = state.auditAllDistinct;
+      const pageSize = state.auditPageSize;
+      const startIdx = (page - 1) * pageSize;
+      const pageItems = list.slice(startIdx, startIdx + pageSize);
+
+      const fromDate = document.getElementById('auditFromDate').value;
+      const toDate = document.getElementById('auditToDate').value;
 
       container.innerHTML = `
         <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
           <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-3">
             <div>
-              <h4 class="text-sm font-extrabold text-ink-900">هەموو نرخە جیاوازەکانی بەرهەمی: <span class="text-primary">${prodName} (${prodCode})</span></h4>
-              <p class="text-[11px] text-ink-500 mt-0.5">ڕیزکراوە لە گرانترین نرخەوە بۆ هەرزانترین نرخ (کلیک لە هەر نرخێک بکە بۆ بینینی مارکێتەکان)</p>
+              <h4 class="text-sm font-extrabold text-ink-900">هەموو نرخە جیاوازەکانی بەرهەمی: <span class="text-primary">${state.auditActiveProdName} (${state.auditActiveProdCode})</span></h4>
+              <p class="text-[11px] text-ink-500 mt-0.5">بە تەواوی لە گرانترین نرخەوە بۆ هەرزانترین نرخ ڕیزکراوە (کلیک لە هەر نرخێک بکە بۆ بینینی مارکێتەکان)</p>
             </div>
-            <span class="ui-chip ui-chip-active font-mono">${sortedDistinct.length} نرخی جیاواز</span>
+            <span class="ui-chip ui-chip-active font-mono">${list.length} نرخی جیاواز دۆزرایەوە</span>
           </div>
 
           <div class="space-y-2.5">
-            ${sortedDistinct.map((g, idx) => `
-              <div onclick="applyAuditPreset('${prodCode}', '${g.price}', '${fromDate}', '${toDate}')" 
-                class="bg-surface-bright border ${idx === 0 ? 'border-primary' : 'border-border'} hover:border-primary rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer transition shadow-level-1">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-[8px] ${idx === 0 ? 'bg-primary text-white' : 'bg-ink-100 text-ink-900'} font-mono font-extrabold text-xs flex items-center justify-center shrink-0">
-                    ${idx + 1}
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <span class="font-mono text-sm font-extrabold text-primary">${g.price.toLocaleString()} دینار</span>
-                      ${idx === 0 ? '<span class="ui-chip ui-chip-active !py-0 !px-2 !text-[10px]">بەرزترین نرخ</span>' : ''}
-                      ${idx === sortedDistinct.length - 1 && sortedDistinct.length > 1 ? '<span class="ui-chip !py-0 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">نزمترین نرخ</span>' : ''}
+            ${pageItems.map((g, i) => {
+              const globalIdx = startIdx + i;
+              return `
+                <div onclick="applyAuditPreset('${state.auditActiveProdCode}', '${g.price}', '${fromDate}', '${toDate}')" 
+                  class="bg-surface-bright border ${globalIdx === 0 ? 'border-primary' : 'border-border'} hover:border-primary rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer transition shadow-level-1">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-[8px] ${globalIdx === 0 ? 'bg-primary text-white' : 'bg-ink-100 text-ink-900'} font-mono font-extrabold text-xs flex items-center justify-center shrink-0">
+                      ${globalIdx + 1}
                     </div>
-                    <p class="text-[11px] text-ink-500 mt-0.5">
-                      📅 دوایین بەروار بەم نرخە: <span class="font-mono font-bold text-ink-900">${g.latest_date}</span> • کڕیار: <b>${g.sample_customer}</b>
-                    </p>
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-mono text-sm font-extrabold text-primary">${g.price.toLocaleString()} دینار</span>
+                        ${globalIdx === 0 ? '<span class="ui-chip ui-chip-active !py-0 !px-2 !text-[10px]">بەرزترین نرخ</span>' : ''}
+                        ${globalIdx === list.length - 1 && list.length > 1 ? '<span class="ui-chip !py-0 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">نزمترین نرخ</span>' : ''}
+                      </div>
+                      <p class="text-[11px] text-ink-500 mt-0.5">
+                        📅 دوایین بەروار بەم نرخە: <span class="font-mono font-bold text-ink-900">${g.latest_date}</span> • کڕیار: <b>${g.sample_customer}</b>
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <div class="flex items-center gap-2 self-end sm:self-center">
-                  <div class="bg-alert-infoBg border border-alert-infoBorder text-alert-infoText px-3 py-1.5 rounded-[8px] text-center">
-                    <span class="text-[10px] font-bold block">ژمارەی فرۆش</span>
-                    <span class="font-mono text-xs font-extrabold">${g.count} پسوڵە (${g.markets.size} مارکێت)</span>
-                  </div>
-                  <div class="bg-surface border border-border px-3 py-1.5 rounded-[8px] text-center">
-                    <span class="text-[10px] text-ink-500 font-bold block">کۆی بڕ</span>
-                    <span class="font-mono text-xs font-bold text-ink-900">${Number(g.total_cartons.toFixed(2))} کارتۆن</span>
+                  <div class="flex items-center gap-2 self-end sm:self-center">
+                    <div class="bg-alert-infoBg border border-alert-infoBorder text-alert-infoText px-3 py-1.5 rounded-[8px] text-center">
+                      <span class="text-[10px] font-bold block">ژمارەی فرۆش</span>
+                      <span class="font-mono text-xs font-extrabold">${g.count} پسوڵە (${g.markets.size} مارکێت)</span>
+                    </div>
+                    <div class="bg-surface border border-border px-3 py-1.5 rounded-[8px] text-center">
+                      <span class="text-[10px] text-ink-500 font-bold block">کۆی بڕ</span>
+                      <span class="font-mono text-xs font-bold text-ink-900">${Number(g.total_cartons.toFixed(2))} کارتۆن</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
+
+          ${buildPaginationControlsHtml(page, list.length, pageSize, 'renderDistinctPricesPage')}
         </div>
       `;
     }
 
-    async function runPriceAuditReport() {
+    // ٢. فلتەرکردنی مێژووی فرۆش و مارکێتەکان بە لاپەڕەبەندی (Pagination)
+    async function runPriceAuditReport(page = 1) {
+      const myReq = ++auditReqId;
+      await ensureDbReady();
+      if (myReq !== auditReqId) return;
+
       const prodCode = normalizeCode(document.getElementById('auditProdCode').value);
       const priceVal = normalizeCode(document.getElementById('auditTargetPrice').value).replace(/,/g, '');
       const fromDate = document.getElementById('auditFromDate').value;
@@ -2253,15 +2704,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       let results = [];
       if (state.supabaseClient) {
         try {
-          let q = state.supabaseClient.from('sales_data').select('*');
-          if (prodCode) q = q.eq(col('product_code'), prodCode);
-          if (priceVal) q = q.eq(col('carton_price'), Number(priceVal));
-          if (fromDate) q = q.gte(col('invoice_date'), fromDate);
-          if (toDate) q = q.lte(col('invoice_date'), toDate + ' 23:59:59');
-          const { data, error } = await q.order(col('invoice_date'), { ascending: false }).limit(150);
-          if (!error && data) {
-            results = data.map(mapSupabaseRow);
-          }
+          results = await fetchAllProductSalesRows(prodCode, fromDate, toDate, priceVal);
         } catch (err) {
           console.error(err);
         }
@@ -2275,6 +2718,8 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         }).sort((a, b) => new Date(b.invoice_date) - new Date(a.invoice_date));
       }
 
+      if (myReq !== auditReqId) return;
+
       if (results.length === 0) {
         container.innerHTML = `
           <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-ink-500">
@@ -2283,6 +2728,19 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         `;
         return;
       }
+
+      state.auditMode = 'invoices';
+      state.auditAllInvoices = results;
+      renderAuditInvoicesPage(page);
+    }
+
+    function renderAuditInvoicesPage(page) {
+      state.auditCurrentPage = page;
+      const container = document.getElementById('auditReportContainer');
+      const results = state.auditAllInvoices;
+      const pageSize = state.auditPageSize;
+      const startIdx = (page - 1) * pageSize;
+      const pageItems = results.slice(startIdx, startIdx + pageSize);
 
       const totalCartons = results.reduce((acc, r) => acc + r.qty_carton, 0);
       const uniqueMarkets = new Set(results.map(r => r.customer_code)).size;
@@ -2295,7 +2753,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           </div>
 
           <div class="space-y-2.5">
-            ${results.map(r => `
+            ${pageItems.map(r => `
               <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <div class="flex items-center gap-2">
@@ -2320,6 +2778,8 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
               </div>
             `).join('')}
           </div>
+
+          ${buildPaginationControlsHtml(page, results.length, pageSize, 'renderAuditInvoicesPage')}
         </div>
       `;
     }
@@ -2333,10 +2793,16 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     async function autoLookupCatalogProduct() {
+      await ensureDbReady();
       const code = normalizeCode(document.getElementById('annProdCode').value);
       const nameInput = document.getElementById('annProdName');
       if (!code) {
         nameInput.value = '';
+        return;
+      }
+
+      if (state.productsDirectory.has(code)) {
+        nameInput.value = state.productsDirectory.get(code);
         return;
       }
 
@@ -2350,6 +2816,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           if (data && data.length > 0) {
             const mapped = mapSupabaseRow(data[0]);
             if (mapped.product_name) {
+              state.productsDirectory.set(code, mapped.product_name);
               nameInput.value = mapped.product_name;
               return;
             }
@@ -2400,6 +2867,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     async function publishAnnouncement() {
+      await ensureDbReady();
       const code = normalizeCode(document.getElementById('annProdCode').value);
       const prodNameVal = document.getElementById('annProdName').value.trim();
       if (!code || !prodNameVal || prodNameVal.includes('نەناسراو')) {
@@ -2534,6 +3002,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     async function openFullCatalogModal() {
       document.getElementById('fullCatalogModal').classList.remove('hidden');
       const body = document.getElementById('fullCatalogTableBody');
+      await ensureDbReady();
 
       if (state.supabaseClient) {
         body.innerHTML = `<div class="p-6 text-center text-xs font-bold text-primary">⏳ خەریکی ئامادەکردنی لیستی بەرهەمەکانم لە خشتەی sales_data...</div>`;
@@ -2543,7 +3012,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
             .select('*')
             .gt(col('carton_price'), 0)
             .order(col('invoice_date'), { ascending: false })
-            .limit(400);
+            .limit(800);
 
           if (data && data.length > 0) {
             const prodMap = new Map();
@@ -2623,6 +3092,8 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
     async function saveUserAccount(e) {
       e.preventDefault();
+      await ensureDbReady();
+
       const full_name = document.getElementById('usrFullName').value.trim();
       const username = document.getElementById('usrUsername').value.trim().toLowerCase();
       const password = document.getElementById('usrPassword').value.trim();
@@ -2635,10 +3106,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
 
       const userObj = { username, full_name, password, imei_device_id, permissions };
-
-      if (!state.supabaseClient) {
-        await initSupabaseSilent();
-      }
 
       if (!state.supabaseClient) {
         alertModal('داتابەیس نەبەستراوە!', 'تکایە سەرەتا لە تابی (٢. بەستنەوەی داتابەیسی Supabase) کلیلی Anon Key دابنێ و پاشەکەوتی بکە.');
@@ -2730,7 +3197,9 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const key = document.getElementById('cfgSupabaseKey').value.trim();
       localStorage.setItem('sahel_sb_url', url);
       localStorage.setItem('sahel_sb_key', key);
-      await initSupabaseSilent();
+      state.schemaReady = false;
+      state.dbInitPromise = null;
+      await ensureDbReady();
 
       if (state.supabaseClient) {
         const { data, error } = await state.supabaseClient.from('sales_data').select('*').limit(1);
@@ -2743,6 +3212,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     async function syncAllToSupabase() {
+      await ensureDbReady();
       if (!state.supabaseClient) {
         alertModal('ئاگاداری', 'تکایە سەرەتا لینکی پرۆژە و کلیلی Supabase دابنێ و پاشەکەوتی بکە.');
         return;
@@ -2772,6 +3242,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     async function lookupReceipt() {
+      await ensureDbReady();
       const val = normalizeCode(document.getElementById('inputReceiptNo').value);
       if (!val) return;
       document.getElementById('outReceiptNo').textContent = val;
