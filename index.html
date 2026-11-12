@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>کۆمپانیای ساحل العراق — سیستەمی ناوەندیی فرۆش و مەندووبان | v3.0</title>
+  <title>کۆمپانیای ساحل العراق — سیستەمی ناوەندیی فرۆش و مەندووبان | v3.5</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -97,7 +97,6 @@
       background-size: 64px 64px;
     }
 
-    /* Styleguide Top Architectural Ruler */
     .ruler-bar {
       height: 22px;
       background-color: #E4E0D8;
@@ -114,7 +113,6 @@
       color: #78756E;
     }
 
-    /* Focus Ring Token from Styleguide */
     .ui-input {
       background-color: #FAF8F5;
       border: 1.5px solid #D6D2C9;
@@ -129,7 +127,6 @@
       box-shadow: 0 0 0 3px rgba(10, 61, 67, 0.14);
     }
 
-    /* Styleguide Buttons */
     .btn-primary {
       background-color: #0A3D43;
       color: #FAF8F5;
@@ -170,7 +167,6 @@
       color: #1C1B19;
     }
 
-    /* Styleguide Chips (Radius: Full 24px) */
     .ui-chip {
       border-radius: 9999px;
       font-size: 11px;
@@ -190,7 +186,6 @@
       border-color: #0A3D43;
     }
 
-    /* Underline Tabs from Styleguide */
     .ui-tab {
       position: relative;
       padding-bottom: 10px;
@@ -217,7 +212,6 @@
       border-radius: 2px;
     }
 
-    /* Desktop Sidebar Active Link */
     .sidebar-link {
       display: flex;
       align-items: center;
@@ -242,7 +236,6 @@
       box-shadow: 0 4px 6px -2px rgba(28, 27, 25, 0.12);
     }
 
-    /* Custom Checkbox */
     .ui-checkbox {
       accent-color: #0A3D43;
       width: 16px;
@@ -308,10 +301,10 @@
       </p>
     </div>
 
-    <!-- Responsive Split Container: 1 col on mobile, 12 cols on Desktop/Laptop -->
+    <!-- Responsive Split Container -->
     <div class="w-full grid grid-cols-1 lg:grid-cols-12 bg-surface border border-border rounded-[20px] shadow-level-4 overflow-hidden">
       
-      <!-- Desktop Right Showcase Panel (Hidden on Mobile, 5 cols on Desktop) -->
+      <!-- Desktop Right Showcase Panel -->
       <div class="hidden lg:flex lg:col-span-5 bg-primary text-surface-bright p-8 flex-col justify-between relative overflow-hidden">
         <div class="space-y-5 relative z-10">
           <div class="flex items-center justify-between">
@@ -373,7 +366,7 @@
         </div>
       </div>
 
-      <!-- Login Form Column (Full width on mobile, 7 cols on Desktop) -->
+      <!-- Login Form Column -->
       <div class="lg:col-span-7 p-5 sm:p-7 lg:p-9 flex flex-col justify-center">
         <div class="flex items-center justify-between mb-4 pb-3 border-b border-border/70">
           <div>
@@ -495,9 +488,7 @@
   <!-- ========================================================= -->
   <div id="screen-app" class="hidden flex-1 flex flex-col lg:flex-row max-w-[1440px] mx-auto w-full">
     
-    <!-- ======================================================= -->
-    <!-- DESKTOP / LAPTOP PERMANENT RIGHT SIDEBAR (lg:flex)      -->
-    <!-- ======================================================= -->
+    <!-- DESKTOP / LAPTOP PERMANENT RIGHT SIDEBAR -->
     <aside class="hidden lg:flex lg:w-72 xl:w-80 shrink-0 bg-surface border-l border-border flex-col justify-between p-5 select-none sticky top-[22px] h-[calc(100vh-22px)] overflow-y-auto">
       <div class="space-y-5">
         <!-- Brand Header -->
@@ -599,15 +590,12 @@
       </div>
     </aside>
 
-    <!-- ======================================================= -->
-    <!-- MAIN CONTENT COLUMN (Mobile Header + Desktop Topbar)     -->
-    <!-- ======================================================= -->
+    <!-- MAIN CONTENT COLUMN -->
     <div class="flex-1 flex flex-col min-w-0 pb-16 lg:pb-8">
       
-      <!-- Sticky Header (Adapts for Mobile vs Desktop) -->
+      <!-- Sticky Header -->
       <header class="sticky top-0 z-30 bg-surface/95 backdrop-blur-md border-b border-border px-4 lg:px-8 pt-3 pb-0 lg:py-3.5 shadow-level-1">
         <div class="flex items-center justify-between pb-3 lg:pb-0">
-          <!-- Mobile Brand / Desktop Current View Title -->
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex lg:hidden items-center justify-center font-mono font-bold text-base shadow-level-1">
               S
@@ -625,7 +613,6 @@
             </div>
           </div>
 
-          <!-- Top Right Actions (Catalog Shortcut on Desktop + Notification Bell + Logout) -->
           <div class="flex items-center gap-2">
             <button onclick="openFullCatalogModal()" class="hidden md:flex btn-secondary px-3.5 py-2 text-xs font-extrabold items-center gap-1.5">
               <i class="fa-solid fa-table-list text-primary"></i>
@@ -636,7 +623,7 @@
               <i class="fa-regular fa-bell text-sm text-primary"></i>
               <span class="hidden sm:inline text-xs">ئاگادارییەکان</span>
               <span id="notifUnreadBadge" class="bg-alert-errorText text-white font-mono text-[10px] font-extrabold px-1.5 py-0.2 rounded-full">
-                2
+                1
               </span>
             </button>
 
@@ -647,7 +634,7 @@
           </div>
         </div>
 
-        <!-- Mobile-Only Underline Tabs (Hidden on Desktop >=1024px since Sidebar is visible) -->
+        <!-- Mobile-Only Underline Tabs -->
         <div id="topTabsContainer" class="flex lg:hidden items-center gap-4 overflow-x-auto no-scrollbar border-t border-border/60 pt-2.5">
           <button onclick="switchView('hub')" id="tab-hub" class="ui-tab ui-tab-active whitespace-nowrap flex items-center gap-1.5">
             <i class="fa-solid fa-grip text-xs"></i>
@@ -683,12 +670,9 @@
       <!-- MAIN WORKSPACE CONTAINER -->
       <main class="flex-1 p-4 lg:p-8 space-y-5">
 
-        <!-- =================================================== -->
-        <!-- VIEW 1: HUB / OVERVIEW (Responsive Mobile & Desktop) -->
-        <!-- =================================================== -->
+        <!-- VIEW 1: HUB / OVERVIEW -->
         <div id="view-hub" class="space-y-5">
           
-          <!-- Top Status Bar & Desktop KPI Strip -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
               <div>
@@ -703,7 +687,7 @@
             <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
               <div>
                 <span class="text-[11px] font-bold text-ink-500 block">بارودۆخی پەیوەندی</span>
-                <span id="hubDbStatusText" class="font-mono text-xs font-black text-primary mt-0.5 block">ئامادەیە</span>
+                <span id="hubDbStatusText" class="font-mono text-xs font-black text-primary mt-0.5 block">پەیوەست دەکرێت...</span>
               </div>
               <div class="w-9 h-9 rounded-[8px] bg-primary/10 text-primary flex items-center justify-center">
                 <i class="fa-solid fa-bolt"></i>
@@ -731,7 +715,6 @@
             </div>
           </div>
 
-          <!-- Latest Special Offer Banner on Hub -->
           <div id="hubLatestOfferBanner" class="rounded-[14px] bg-alert-infoBg border border-alert-infoBorder text-alert-infoText p-4 shadow-level-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div class="flex items-center gap-3.5">
               <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex items-center justify-center shrink-0">
@@ -757,10 +740,9 @@
             </div>
           </div>
 
-          <!-- Hub Dynamic Cards Grid (1 col mobile, 2 cols tablet, 3 cols desktop) -->
+          <!-- Hub Dynamic Cards Grid -->
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             
-            <!-- Module 1: 5-Price Lookup -->
             <div data-card-perm="price_lookup" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
                 <span class="font-mono text-[11px] font-bold text-ink-700">01 • PRICING</span>
@@ -780,7 +762,6 @@
               </div>
             </div>
 
-            <!-- Module 2: Products in Market -->
             <div data-card-perm="market_items" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
                 <span class="font-mono text-[11px] font-bold text-ink-700">02 • MARKET PORTFOLIO</span>
@@ -799,7 +780,6 @@
               </div>
             </div>
 
-            <!-- Module 3: Price & Location History Report -->
             <div data-card-perm="price_audit" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
                 <span class="font-mono text-[11px] font-bold text-ink-700">03 • AUDIT REPORT</span>
@@ -818,7 +798,6 @@
               </div>
             </div>
 
-            <!-- Module 4: Price Announcements & Special Offers -->
             <div data-card-perm="announcements" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
                 <span class="font-mono text-[11px] font-bold text-ink-700">04 • OFFERS & ALERTS</span>
@@ -837,7 +816,6 @@
               </div>
             </div>
 
-            <!-- Module 5: Contracts & Receipts -->
             <div data-card-perm="contracts" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
                 <span class="font-mono text-[11px] font-bold text-ink-700">05 • DOCUMENTS</span>
@@ -856,7 +834,6 @@
               </div>
             </div>
 
-            <!-- Module 6: Admin User & Database Control -->
             <div data-card-perm="admin_users" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-primary text-surface-bright px-4 flex items-center justify-between">
                 <span class="font-mono text-[11px] font-bold">06 • ADMIN & SUPABASE</span>
@@ -878,13 +855,10 @@
           </div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- VIEW 2: PRODUCT PRICE LOOKUP (Desktop 12-Col Split)   -->
-        <!-- =================================================== -->
+        <!-- VIEW 2: PRODUCT PRICE LOOKUP -->
         <div id="view-pricing" class="hidden">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            <!-- Right Column on Desktop (5 cols): Search Form & Presets -->
             <div class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4 lg:sticky lg:top-24">
               <div class="flex items-center justify-between border-b border-border pb-3">
                 <div>
@@ -894,7 +868,6 @@
                 <span class="ui-chip ui-chip-active font-mono text-[10px]">5-PRICES</span>
               </div>
 
-              <!-- Input Fields -->
               <div class="space-y-3.5">
                 <div>
                   <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆدی کریار (Customer Code)</label>
@@ -935,7 +908,6 @@
                 <button onclick="clearPriceSearch()" class="btn-secondary py-3 px-3.5 text-xs font-bold">پاککردنەوە</button>
               </div>
 
-              <!-- Quick Demo Chips -->
               <div class="pt-3 border-t border-border">
                 <span class="block text-[11px] font-bold text-ink-500 mb-2">نموونەی ئامادەکراو لە خشتەی sales_data (کلیک بکە):</span>
                 <div class="flex flex-col gap-1.5">
@@ -955,9 +927,7 @@
               </div>
             </div>
 
-            <!-- Left Column on Desktop (7 cols): Results & 5 Distinct Prices Table -->
             <div class="lg:col-span-7 space-y-4">
-              <!-- Diagnostic Warning -->
               <div id="priceNotFound" class="hidden rounded-[12px] bg-alert-warnBg border border-alert-warnBorder text-alert-warnText p-4 shadow-level-1">
                 <div class="flex items-start gap-3">
                   <i class="fa-solid fa-triangle-exclamation text-base mt-0.5"></i>
@@ -968,7 +938,6 @@
                 </div>
               </div>
 
-              <!-- 5-Price Result Card -->
               <div id="priceResultCard" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-3">
                 <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between flex-wrap gap-2">
                   <div class="flex items-center gap-2">
@@ -985,7 +954,6 @@
                 </div>
 
                 <div class="p-5 space-y-4">
-                  <!-- Customer & Product Identity -->
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-border">
                     <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex items-center justify-between">
                       <div>
@@ -1008,7 +976,6 @@
                     </div>
                   </div>
 
-                  <!-- Quick Summary Strip (Last, Previous, Lowest) -->
                   <div class="grid grid-cols-3 gap-3">
                     <div class="bg-alert-infoBg border border-alert-infoBorder text-alert-infoText rounded-[10px] p-3 text-center">
                       <span class="text-[11px] font-bold block">١. کۆتا نرخ</span>
@@ -1024,15 +991,12 @@
                     </div>
                   </div>
 
-                  <!-- 5 Distinct Prices Table / Cards -->
                   <div>
                     <h4 class="text-xs font-extrabold text-ink-900 mb-2.5 flex items-center gap-1.5">
                       <i class="fa-solid fa-list-ol text-primary"></i>
                       <span>خشتەی ٥ نرخی جیاوازی فرۆشراو لەگەڵ بەروار و بڕ (بە کارتۆن و دانە):</span>
                     </h4>
-                    <div id="fivePricesContainer" class="space-y-2.5">
-                      <!-- Populated dynamically -->
-                    </div>
+                    <div id="fivePricesContainer" class="space-y-2.5"></div>
                   </div>
                 </div>
               </div>
@@ -1041,13 +1005,10 @@
           </div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- VIEW 3: MARKET PORTFOLIO (Desktop Split View)         -->
-        <!-- =================================================== -->
+        <!-- VIEW 3: MARKET PORTFOLIO -->
         <div id="view-market_items" class="hidden">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            <!-- Search & Market Selector Sidebar (4 cols on desktop) -->
             <div class="lg:col-span-4 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4 lg:sticky lg:top-24">
               <div class="border-b border-border pb-3">
                 <h3 class="text-base font-extrabold text-ink-900">گەڕانی مارکێت و کڕیار</h3>
@@ -1084,17 +1045,12 @@
               </div>
             </div>
 
-            <!-- Market Products Grid (8 cols on desktop) -->
-            <div id="marketPortfolioResult" class="lg:col-span-8 space-y-3">
-              <!-- Populated dynamically -->
-            </div>
+            <div id="marketPortfolioResult" class="lg:col-span-8 space-y-3"></div>
 
           </div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- VIEW 4: PRICE HISTORY & LOCATION AUDIT REPORT       -->
-        <!-- =================================================== -->
+        <!-- VIEW 4: PRICE HISTORY & LOCATION AUDIT REPORT -->
         <div id="view-price_audit" class="hidden space-y-4">
           <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
             <div class="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
@@ -1141,18 +1097,12 @@
             </div>
           </div>
 
-          <!-- Audit Results Container -->
-          <div id="auditReportContainer" class="space-y-3">
-            <!-- Populated dynamically -->
-          </div>
+          <div id="auditReportContainer" class="space-y-3"></div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- VIEW 5: PRICE ANNOUNCEMENTS (Desktop Split View)      -->
-        <!-- =================================================== -->
+        <!-- VIEW 5: PRICE ANNOUNCEMENTS -->
         <div id="view-announcements" class="hidden space-y-4">
           
-          <!-- Top Action Bar with Full Catalog Report Button -->
           <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 flex items-center justify-between flex-wrap gap-3">
             <div>
               <h3 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و عرض خاص بۆ مەندووبەکان</h3>
@@ -1165,7 +1115,6 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-            <!-- Admin Publisher Form (5 cols on Desktop) -->
             <div id="announcementPublisherCard" class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
               <div class="flex items-center justify-between border-b border-border pb-3">
                 <div class="flex items-center gap-2">
@@ -1177,7 +1126,6 @@
                 <span class="ui-chip ui-chip-active text-[10px]">ناردنی نۆتیفیکەیشن</span>
               </div>
 
-              <!-- Step 1: Product Code -> Auto Product Name -->
               <div class="space-y-3">
                 <div>
                   <label class="block text-xs font-bold text-ink-900 mb-1">١. کۆدی بابەت بنووسە (خۆکار ناو لە sales_data دەدۆزێتەوە)</label>
@@ -1208,7 +1156,6 @@
                 </div>
               </div>
 
-              <!-- Step 2: Dynamic Multi-Price Tiers -->
               <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 space-y-2.5">
                 <div class="flex items-center justify-between">
                   <label class="text-xs font-extrabold text-ink-900">٢. دانانی نرخەکان و عرض خاص:</label>
@@ -1218,12 +1165,9 @@
                   </button>
                 </div>
 
-                <div id="annPriceTiersList" class="space-y-2">
-                  <!-- Populated dynamically -->
-                </div>
+                <div id="annPriceTiersList" class="space-y-2"></div>
               </div>
 
-              <!-- Step 3: Condition & Reason -->
               <div class="space-y-2.5">
                 <div>
                   <label class="block text-xs font-bold text-ink-900 mb-1">٣. مەرجی فرۆشتن (Condition)</label>
@@ -1241,22 +1185,16 @@
               </button>
             </div>
 
-            <!-- Published Announcements Feed (7 cols on Desktop) -->
             <div class="lg:col-span-7 space-y-3">
-              <div id="announcementsFeed" class="space-y-3">
-                <!-- Populated dynamically -->
-              </div>
+              <div id="announcementsFeed" class="space-y-3"></div>
             </div>
           </div>
 
         </div>
 
-        <!-- =================================================== -->
-        <!-- VIEW 6: CONTRACTS & RECEIPTS (گرێبەست و پسوڵە)        -->
-        <!-- =================================================== -->
+        <!-- VIEW 6: CONTRACTS & RECEIPTS -->
         <div id="view-contracts" class="hidden space-y-4">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <!-- Receipts Lookup -->
             <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
               <h3 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2">گەڕان بەدوای پسوڵەکان لە خشتەی sales_data</h3>
               <div class="flex gap-2">
@@ -1277,7 +1215,6 @@
               </div>
             </div>
 
-            <!-- Contracts List -->
             <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
               <h3 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2">فۆڵدەری گرێبەستە فەرمییەکان</h3>
               <div class="space-y-2">
@@ -1300,12 +1237,9 @@
           </div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- VIEW 7: ADMIN USERS (IMEI + CHECKLIST) & SUPABASE DB -->
-        <!-- =================================================== -->
+        <!-- VIEW 7: ADMIN USERS & SUPABASE DB -->
         <div id="view-admin_users" class="hidden space-y-5">
           
-          <!-- Sub-navigation inside Admin -->
           <div class="flex flex-wrap gap-2">
             <button onclick="switchAdminSubTab('users')" id="adminSubBtnUsers" class="btn-primary px-4 py-2.5 text-xs font-extrabold flex items-center gap-1.5">
               <i class="fa-solid fa-user-check"></i>
@@ -1317,7 +1251,6 @@
             </button>
           </div>
 
-          <!-- ADMIN SUB-TAB 1: USER CREATION + IMEI + CHECKLIST -->
           <div id="adminSubViewUsers" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             <div class="lg:col-span-6 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
               <div class="flex items-center justify-between border-b border-border pb-3">
@@ -1351,7 +1284,6 @@
                   </div>
                 </div>
 
-                <!-- Permissions Checklist -->
                 <div class="bg-surface-bright border border-border rounded-[12px] p-4">
                   <div class="flex items-center justify-between mb-2.5">
                     <label class="text-xs font-extrabold text-ink-900 flex items-center gap-1.5">
@@ -1400,22 +1332,18 @@
               </form>
             </div>
 
-            <!-- Users Table (6 cols on Desktop) -->
             <div class="lg:col-span-6 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
               <h4 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2.5">لیستی بەکارهێنەران و ئامێرە ڕێپێدراوەکان (<span id="usersCountLabel"></span>)</h4>
-              <div id="usersTableContainer" class="space-y-2.5">
-                <!-- Populated dynamically -->
-              </div>
+              <div id="usersTableContainer" class="space-y-2.5"></div>
             </div>
           </div>
 
-          <!-- ADMIN SUB-TAB 2: ADMIN-ONLY SUPABASE DATABASE CONFIG -->
           <div id="adminSubViewDb" class="hidden space-y-4">
             <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
               <div class="flex items-center justify-between border-b border-border pb-3">
                 <div>
                   <h3 class="text-base font-extrabold text-ink-900">بەستنەوەی نهێنی بە بنکەدراوەی Supabase (خشتەی public.sales_data)</h3>
-                  <p class="text-xs text-ink-500 mt-0.5">بەستەری پرۆژەکەت ئامادەیە؛ تەنها کلیلی <code class="font-mono font-bold">anon public</code> دابنێ بۆ خوێندنەوەی ڕاستەوخۆی <code class="font-mono font-bold">sales_data</code></p>
+                  <p class="text-xs text-ink-500 mt-0.5">بەستەر و کلیلی پرۆژەکەت ئامادەکراوە بۆ خوێندنەوەی ڕاستەوخۆی <code class="font-mono font-bold">sales_data</code></p>
                 </div>
                 <span id="adminDbStatusBadge" class="ui-chip font-mono text-[10px]">LOCAL + SUPABASE READY</span>
               </div>
@@ -1423,11 +1351,11 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label class="block text-xs font-bold text-ink-900 mb-1">Supabase Project URL</label>
-                  <input type="text" id="cfgSupabaseUrl" value="https://rcigaaefhlerxbrbnnmj.supabase.co" placeholder="https://rcigaaefhlerxbrbnnmj.supabase.co" dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
+                  <input type="text" id="cfgSupabaseUrl" value="https://rcigaaefhlerxbrbnnmj.supabase.co" dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-ink-900 mb-1">Supabase Anon / Public Key</label>
-                  <input type="password" id="cfgSupabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5..." dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
+                  <input type="password" id="cfgSupabaseKey" dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
                 </div>
               </div>
 
@@ -1436,19 +1364,16 @@
                 <button onclick="syncAllToSupabase()" class="btn-secondary px-4 py-2.5 text-xs font-bold">هاوکاتکردنی یوسەر و ئۆفەرەکان</button>
               </div>
 
-              <!-- Ready-to-Run SQL Schema for Supabase -->
               <div class="pt-3 border-t border-border">
                 <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-xs font-extrabold text-ink-900">کۆدی SQL بۆ کردنەوەی مۆڵەتی خوێندنەوەی sales_data و دروستکردنی خشتەکانی یوسەر و ئۆفەر:</span>
+                  <span class="text-xs font-extrabold text-ink-900">کۆدی SQL بۆ کردنەوەی مۆڵەتی sales_data و دروستکردنی خشتەکانی یوسەر و ئۆفەر:</span>
                   <button onclick="copySqlSchema()" class="btn-secondary px-2.5 py-1 text-[11px] font-bold">کۆپیکردنی SQL</button>
                 </div>
-                <pre id="sqlSchemaCode" dir="ltr" class="bg-ink-900 text-surface-bright p-3.5 rounded-[10px] font-mono text-[11px] overflow-x-auto leading-relaxed">-- 1. کردنەوەی مۆڵەتی خوێندنەوە و خێراکردنی خشتەی sales_data
+                <pre id="sqlSchemaCode" dir="ltr" class="bg-ink-900 text-surface-bright p-3.5 rounded-[10px] font-mono text-[11px] overflow-x-auto leading-relaxed">-- 1. کردنەوەی مۆڵەتی خوێندنەوەی خشتەی sales_data
 ALTER TABLE public.sales_data ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public read sales_data" ON public.sales_data;
 CREATE POLICY "Allow public read sales_data" ON public.sales_data FOR SELECT USING (true);
-
-CREATE INDEX IF NOT EXISTS idx_sales_data_cust_prod 
-ON public.sales_data ("کۆدی کریار", "کۆدی بەرهەم", "بەرواری پسوڵە" DESC);
+GRANT SELECT ON public.sales_data TO anon, authenticated;
 
 -- 2. خشتەی بەکارهێنەران و IMEI و چێک لیستی دەسەڵاتەکان
 CREATE TABLE IF NOT EXISTS public.app_users (
@@ -1490,9 +1415,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     </div>
   </div>
 
-  <!-- ========================================================= -->
-  <!-- MODAL 1: FULL MASTER CATALOG & PRICE REPORT               -->
-  <!-- ========================================================= -->
+  <!-- MODAL 1: FULL MASTER CATALOG & PRICE REPORT -->
   <div id="fullCatalogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
     <div class="bg-surface border border-border rounded-[16px] max-w-3xl w-full max-h-[88vh] flex flex-col shadow-level-4 overflow-hidden">
       <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between">
@@ -1509,15 +1432,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         <input type="text" id="catalogFilterInput" oninput="renderFullCatalogTable()" placeholder="گەڕان بەدوای کۆدی بابەت یان ناوی بەرهەم..." class="ui-input flex-1 px-3.5 py-2 text-xs font-bold">
       </div>
 
-      <div class="p-4 overflow-y-auto flex-1 space-y-2.5" id="fullCatalogTableBody">
-        <!-- Populated dynamically -->
-      </div>
+      <div class="p-4 overflow-y-auto flex-1 space-y-2.5" id="fullCatalogTableBody"></div>
     </div>
   </div>
 
-  <!-- ========================================================= -->
-  <!-- MODAL 2: NOTIFICATIONS CENTER                             -->
-  <!-- ========================================================= -->
+  <!-- MODAL 2: NOTIFICATIONS CENTER -->
   <div id="notificationsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
     <div class="bg-surface border border-border rounded-[16px] max-w-md w-full max-h-[80vh] flex flex-col shadow-level-4 overflow-hidden">
       <div class="px-5 py-3.5 border-b border-border flex items-center justify-between bg-surface-bright">
@@ -1529,15 +1448,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <div id="notificationsListContainer" class="p-4 overflow-y-auto space-y-2.5 flex-1">
-        <!-- Populated dynamically -->
-      </div>
+      <div id="notificationsListContainer" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
     </div>
   </div>
 
-  <!-- ========================================================= -->
-  <!-- MODAL 3: GENERAL MESSAGE MODAL                            -->
-  <!-- ========================================================= -->
+  <!-- MODAL 3: GENERAL MESSAGE MODAL -->
   <div id="generalModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/50 backdrop-blur-xs">
     <div class="bg-surface border border-border rounded-[16px] max-w-xs w-full p-5 text-center shadow-level-4 space-y-3">
       <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex items-center justify-center mx-auto text-base">
@@ -1550,16 +1465,13 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
   </div>
 
   <!-- ========================================================= -->
-  <!-- APPLICATION LOGIC & SUPABASE `sales_data` ENGINE          -->
+  <!-- APPLICATION LOGIC & DUAL-SCHEMA SUPABASE `sales_data`     -->
   <!-- ========================================================= -->
   <script>
-    // ---------------------------------------------------------
-    // 0. SUPABASE CREDENTIALS (Project URL pre-configured)
-    // ---------------------------------------------------------
+    // 0. SUPABASE CREDENTIALS (کلیلەکەت لێرە چالاک کراوە)
     const DEFAULT_SUPABASE_URL = 'https://rcigaaefhlerxbrbnnmj.supabase.co';
-    const DEFAULT_SUPABASE_ANON_KEY = ''; // sb_publishable_TYGtSJnjvbT2AtkfH519Jw_nsgbLkwS
+    const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_TYGtSJnjvbT2AtkfH519Jw_nsgbLkwS';
 
-    // 1. Generate or Retrieve Persistent Hardware/Device IMEI Fingerprint
     function getDeviceHardwareImei() {
       let saved = localStorage.getItem('sahel_device_imei');
       if (!saved) {
@@ -1573,43 +1485,36 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     const CURRENT_DEVICE_IMEI = getDeviceHardwareImei();
     document.getElementById('loginDeviceImei').value = CURRENT_DEVICE_IMEI;
 
-    // 2. Master Product Catalog (Matches your actual sales_data products + fallback)
     const masterCatalog = [
       { code: "808", name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", pieces_per_carton: 12, base_price: 48000, category: "زەیتون" },
       { code: "1873", name: "گەنمەشامی قوتو 425گرام24عدد/مارینا", pieces_per_carton: 24, base_price: 26500, category: "خۆراک" },
-      { code: "1285", name: "پەنیری 100گرام40عدد/کیبی", pieces_per_carton: 40, base_price: 34000, category: "شیرەمەنی" },
-      { code: "2617", name: "ڕۆنی زەیتوون ٥٠٠ مل پلە یەک", pieces_per_carton: 12, base_price: 48000, category: "ڕۆن و زەیت" },
-      { code: "1422", name: "شەربەتی فرێش ئەناناس ١ لیتر", pieces_per_carton: 12, base_price: 45000, category: "خواردنەوە" }
+      { code: "1285", name: "پەنیری 100گرام40عدد/کیبی", pieces_per_carton: 40, base_price: 34000, category: "شیرەمەنی" }
     ];
 
-    // 3. Fallback Sales Dataset (Used only before Supabase Key is entered)
     const salesDataset = [
       { customer_code: "164", customer_name: "عمادی/توبزاوە", invoice_no: "89503", location: "توبزاوە", product_code: "808", product_name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", invoice_date: "2026-09-23", carton_price: 48000, qty_carton: 3, qty_piece: 0 },
-      { customer_code: "164", customer_name: "عمادی/توبزاوە", invoice_no: "88410", location: "توبزاوە", product_code: "808", product_name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", invoice_date: "2026-08-14", carton_price: 47500, qty_carton: 5, qty_piece: 6 },
-      { customer_code: "164", customer_name: "عمادی/توبزاوە", invoice_no: "87102", location: "توبزاوە", product_code: "808", product_name: "زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا", invoice_date: "2026-07-02", carton_price: 49000, qty_carton: 2, qty_piece: 0 },
       { customer_code: "2270", customer_name: "کاک هەواپ/UK مارکێتی", invoice_no: "89618", location: "هەولێر", product_code: "1873", product_name: "گەنمەشامی قوتو 425گرام24عدد/مارینا", invoice_date: "2026-09-23", carton_price: 26500, qty_carton: 1, qty_piece: 12 },
       { customer_code: "9155", customer_name: "مارکێت سۆلاف کاک محمد احمد سعید", invoice_no: "89601", location: "هەولێر", product_code: "1285", product_name: "پەنیری 100گرام40عدد/کیبی", invoice_date: "2026-09-23", carton_price: 34000, qty_carton: 0.25, qty_piece: 10 }
     ];
 
-    // Helper: Map a raw row from Supabase `public.sales_data` (Kurdish column names) to normalized object
+    // فەنکشنی زیرەک بۆ خوێندنەوەی هەردوو جۆری ستوونی ئینگلیزی و کوردی بەبێ هەڵە
     function mapSupabaseRow(row) {
-      const rawDate = String(row['بەرواری پسوڵە'] || '');
+      const rawDate = String(row.invoice_date ?? row['بەرواری پسوڵە'] ?? '');
       const cleanDate = rawDate.includes('T') ? rawDate.split('T')[0] : rawDate.split(' ')[0];
       return {
-        customer_code: String(row['کۆدی کریار'] ?? '').trim(),
-        customer_name: String(row['ناوی کریار'] ?? '').trim(),
-        invoice_no: String(row['ژمارەی پسوڵە'] ?? '').replace(/\.0$/, ''),
+        customer_code: String(row.customer_code ?? row['کۆدی کریار'] ?? '').trim().replace(/\.0$/, ''),
+        customer_name: String(row.customer_name ?? row['ناوی کریار'] ?? '').trim(),
+        invoice_no: String(row.invoice_no ?? row['ژمارەی پسوڵە'] ?? '').replace(/\.0$/, ''),
         invoice_date: cleanDate,
-        product_code: String(row['کۆدی بەرهەم'] ?? '').trim(),
-        product_name: String(row['ناوی بەرهەم'] ?? '').trim(),
-        qty_carton: Number(row['فرۆشی بەرهەم بە کارتۆن'] ?? 0),
-        qty_piece: Number(row['فرۆشی بەرهەم بە دانە'] ?? 0),
-        carton_price: Number(row['نرخی فرۆشی یەک کارتۆن'] ?? 0),
+        product_code: String(row.product_code ?? row['کۆدی بەرهەم'] ?? '').trim().replace(/\.0$/, ''),
+        product_name: String(row.product_name ?? row['ناوی بەرهەم'] ?? '').trim(),
+        qty_carton: Number(row.qty_carton ?? row['فرۆشی بەرهەم بە کارتۆن'] ?? 0),
+        qty_piece: Number(row.qty_piece ?? row['فرۆشی بەرهەم بە دانە'] ?? 0),
+        carton_price: Number(row.carton_price ?? row['نرخی فرۆشی یەک کارتۆن'] ?? 0),
         location: ''
       };
     }
 
-    // 4. Default Users with IMEI Binding & Permission Checklists
     const defaultUsers = [
       {
         username: "admin",
@@ -1634,7 +1539,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
     ];
 
-    // 5. Default Announcements & Special Offers
     const defaultAnnouncements = [
       {
         id: 101,
@@ -1651,21 +1555,16 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
     ];
 
-    // State Management
     const state = {
       currentUser: null,
       users: JSON.parse(localStorage.getItem('sahel_app_users')) || defaultUsers,
       announcements: JSON.parse(localStorage.getItem('sahel_announcements')) || defaultAnnouncements,
       unreadCount: 1,
       supabaseClient: null,
+      schemaLang: 'en', // 'en' or 'ku' auto-detected
       lastFormattedSummary: '',
       catalogCache: [...masterCatalog]
     };
-
-    const karwanIdx = state.users.findIndex(u => u.username === 'karwan');
-    if (karwanIdx !== -1 && state.users[karwanIdx].imei_device_id.startsWith('IMEI-358920')) {
-      state.users[karwanIdx].imei_device_id = CURRENT_DEVICE_IMEI;
-    }
 
     function normalizeCode(val) {
       let str = String(val || '').trim();
@@ -1679,31 +1578,51 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       return str;
     }
 
-    // Initialize Supabase silently and sync users/announcements if available
+    // ناوی ستوون بەپێی زمانەکەی ناو Supabase دەگەڕێنێتەوە
+    function col(enName) {
+      const kuMap = {
+        customer_code: 'کۆدی کریار',
+        customer_name: 'ناوی کریار',
+        invoice_no: 'ژمارەی پسوڵە',
+        invoice_date: 'بەرواری پسوڵە',
+        product_code: 'کۆدی بەرهەم',
+        product_name: 'ناوی بەرهەم',
+        qty_carton: 'فرۆشی بەرهەم بە کارتۆن',
+        qty_piece: 'فرۆشی بەرهەم بە دانە',
+        carton_price: 'نرخی فرۆشی یەک کارتۆن'
+      };
+      return state.schemaLang === 'ku' ? kuMap[enName] : enName;
+    }
+
     async function initSupabaseSilent() {
       const url = localStorage.getItem('sahel_sb_url') || DEFAULT_SUPABASE_URL;
       const key = localStorage.getItem('sahel_sb_key') || DEFAULT_SUPABASE_ANON_KEY;
       if (url && key && window.supabase) {
         try {
           state.supabaseClient = window.supabase.createClient(url, key);
+
+          // Auto-detect whether `sales_data` has English or Kurdish column names
+          const { data: sampleRows, error: sampleErr } = await state.supabaseClient.from('sales_data').select('*').limit(1);
+          if (!sampleErr && sampleRows && sampleRows.length > 0) {
+            state.schemaLang = ('customer_code' in sampleRows[0]) ? 'en' : 'ku';
+          }
+
           const badge = document.getElementById('adminDbStatusBadge');
           const hubStatus = document.getElementById('hubDbStatusText');
           if (badge) {
-            badge.textContent = 'SUPABASE CONNECTED ✓';
+            badge.textContent = `SUPABASE CONNECTED (${state.schemaLang.toUpperCase()}) ✓`;
             badge.classList.add('ui-chip-active');
           }
           if (hubStatus) {
             hubStatus.textContent = 'بەستراوە (LIVE)';
           }
 
-          // Load users from Supabase `app_users` if table exists
           const { data: dbUsers } = await state.supabaseClient.from('app_users').select('*');
           if (dbUsers && dbUsers.length > 0) {
             state.users = dbUsers;
             localStorage.setItem('sahel_app_users', JSON.stringify(dbUsers));
           }
 
-          // Load announcements from Supabase `price_announcements` if table exists
           const { data: dbAnns } = await state.supabaseClient.from('price_announcements').select('*').order('id', { ascending: false });
           if (dbAnns && dbAnns.length > 0) {
             state.announcements = dbAnns;
@@ -1717,9 +1636,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
     initSupabaseSilent();
 
-    // =========================================================
-    // AUTHENTICATION & IMEI / DEVICE VERIFICATION
-    // =========================================================
     function copyDeviceImei() {
       const temp = document.createElement('textarea');
       temp.value = CURRENT_DEVICE_IMEI;
@@ -1762,7 +1678,10 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const errBox = document.getElementById('loginError');
       const errText = document.getElementById('loginErrorText');
 
-      // Check Supabase app_users first if connected
+      if (!state.supabaseClient) {
+        await initSupabaseSilent();
+      }
+
       if (state.supabaseClient) {
         try {
           const { data: remoteUser } = await state.supabaseClient
@@ -1788,7 +1707,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // Check IMEI / Device Binding (Fixed for missing/empty DB column)
       const allowedImei = String(foundUser.imei_device_id || foundUser.imei || '*').trim();
       const isUnrestricted = !allowedImei || allowedImei === '*' || allowedImei.toUpperCase() === 'ALL' || allowedImei.toUpperCase() === 'ANY' || foundUser.username.toLowerCase() === 'admin';
 
@@ -1796,7 +1714,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         errText.innerHTML = `⛔ <b>ڕێگەپێنەدراو (IMEI Mismatch):</b> ئەم هەژمارە تەنها لەسەر ئامێری (<code class="font-mono">${allowedImei}</code>) کار دەکات و ناتوانرێت لەسەر مۆبایلی تر بکرێتەوە.`;
         errBox.classList.remove('hidden');
         return;
-      
       }
 
       state.currentUser = foundUser;
@@ -1898,7 +1815,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 7: 5 DISTINCT PRICES + CARTON & PIECE QUANTITIES (FROM `sales_data`)
+    // FEATURE 7: 5 DISTINCT PRICES + CARTON & PIECE QUANTITIES
     // =========================================================
     function setQuickSearch(cust, prod) {
       document.getElementById('searchCustCode').value = cust;
@@ -1931,16 +1848,15 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       let matches = [];
 
-      // Query directly from Supabase `public.sales_data` if connected
       if (state.supabaseClient) {
         try {
           const { data, error } = await state.supabaseClient
             .from('sales_data')
             .select('*')
-            .eq('کۆدی کریار', custCode)
-            .eq('کۆدی بەرهەم', prodCode)
-            .gt('نرخی فرۆشی یەک کارتۆن', 0)
-            .order('بەرواری پسوڵە', { ascending: false })
+            .eq(col('customer_code'), custCode)
+            .eq(col('product_code'), prodCode)
+            .gt(col('carton_price'), 0)
+            .order(col('invoice_date'), { ascending: false })
             .limit(100);
 
           if (error) throw error;
@@ -1963,7 +1879,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // Extract up to 5 Distinct Prices ordered from latest
       const distinctPriceRecords = [];
       const seenPrices = new Set();
       for (const row of matches) {
@@ -2057,7 +1972,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 6: MARKET ITEMS PORTFOLIO & ONE-CLICK DRILLDOWN (FROM `sales_data`)
+    // FEATURE 6: MARKET ITEMS PORTFOLIO & ONE-CLICK DRILLDOWN
     // =========================================================
     function selectMarketPortfolio(code) {
       document.getElementById('marketSearchInput').value = code;
@@ -2077,14 +1992,15 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       let rows = [];
       if (state.supabaseClient) {
         try {
-          const targetQ = query || '164';
           let sbQuery = state.supabaseClient.from('sales_data').select('*');
-          if (/^\d+$/.test(targetQ)) {
-            sbQuery = sbQuery.eq('کۆدی کریار', targetQ);
-          } else {
-            sbQuery = sbQuery.ilike('ناوی کریار', `%${targetQ}%`);
+          if (query) {
+            if (/^\d+$/.test(query)) {
+              sbQuery = sbQuery.eq(col('customer_code'), query);
+            } else {
+              sbQuery = sbQuery.ilike(col('customer_name'), `%${query}%`);
+            }
           }
-          const { data, error } = await sbQuery.order('بەرواری پسوڵە', { ascending: false }).limit(300);
+          const { data, error } = await sbQuery.order(col('invoice_date'), { ascending: false }).limit(300);
           if (!error && data) {
             rows = data.map(mapSupabaseRow);
           }
@@ -2094,7 +2010,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       } else {
         const qLower = query.toLowerCase();
         rows = salesDataset.filter(r => {
-          if (!qLower) return r.customer_code === "164";
+          if (!qLower) return true;
           return r.customer_code.toLowerCase().includes(qLower) || r.customer_name.toLowerCase().includes(qLower);
         });
       }
@@ -2111,7 +2027,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const custCode = rows[0].customer_code;
       const custName = rows[0].customer_name;
 
-      // Group unique products sold to this market
       const productMap = new Map();
       rows
         .filter(r => r.customer_code === custCode)
@@ -2183,7 +2098,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 4: PRICE HISTORY & LOCATION AUDIT REPORT (FROM `sales_data`)
+    // FEATURE 4: PRICE HISTORY & LOCATION AUDIT REPORT
     // =========================================================
     async function updateAuditProdNamePreview() {
       const code = normalizeCode(document.getElementById('auditProdCode').value);
@@ -2193,9 +2108,10 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
       if (state.supabaseClient) {
-        const { data } = await state.supabaseClient.from('sales_data').select('ناوی بەرهەم').eq('کۆدی بەرهەم', code).limit(1);
+        const { data } = await state.supabaseClient.from('sales_data').select('*').eq(col('product_code'), code).limit(1);
         if (data && data.length > 0) {
-          hintEl.textContent = `✓ ${data[0]['ناوی بەرهەم']}`;
+          const mapped = mapSupabaseRow(data[0]);
+          hintEl.textContent = `✓ ${mapped.product_name}`;
           return;
         }
       }
@@ -2238,11 +2154,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       if (state.supabaseClient) {
         try {
           let q = state.supabaseClient.from('sales_data').select('*');
-          if (prodCode) q = q.eq('کۆدی بەرهەم', prodCode);
-          if (priceVal) q = q.eq('نرخی فرۆشی یەک کارتۆن', Number(priceVal));
-          if (fromDate) q = q.gte('بەرواری پسوڵە', fromDate);
-          if (toDate) q = q.lte('بەرواری پسوڵە', toDate + ' 23:59:59');
-          const { data, error } = await q.order('بەرواری پسوڵە', { ascending: false }).limit(150);
+          if (prodCode) q = q.eq(col('product_code'), prodCode);
+          if (priceVal) q = q.eq(col('carton_price'), Number(priceVal));
+          if (fromDate) q = q.gte(col('invoice_date'), fromDate);
+          if (toDate) q = q.lte(col('invoice_date'), toDate + ' 23:59:59');
+          const { data, error } = await q.order(col('invoice_date'), { ascending: false }).limit(150);
           if (!error && data) {
             results = data.map(mapSupabaseRow);
           }
@@ -2309,7 +2225,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 5: ANNOUNCEMENTS, SPECIAL OFFERS & AUTO PRODUCT LOOKUP FROM `sales_data`
+    // FEATURE 5: ANNOUNCEMENTS, SPECIAL OFFERS & AUTO PRODUCT LOOKUP
     // =========================================================
     function setAnnProduct(code) {
       document.getElementById('annProdCode').value = code;
@@ -2328,12 +2244,15 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         try {
           const { data } = await state.supabaseClient
             .from('sales_data')
-            .select('ناوی بەرهەم')
-            .eq('کۆدی بەرهەم', code)
+            .select('*')
+            .eq(col('product_code'), code)
             .limit(1);
-          if (data && data.length > 0 && data[0]['ناوی بەرهەم']) {
-            nameInput.value = data[0]['ناوی بەرهەم'];
-            return;
+          if (data && data.length > 0) {
+            const mapped = mapSupabaseRow(data[0]);
+            if (mapped.product_name) {
+              nameInput.value = mapped.product_name;
+              return;
+            }
           }
         } catch (err) {
           console.error(err);
@@ -2512,7 +2431,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       document.getElementById('notificationsModal').classList.add('hidden');
     }
 
-    // Full Catalog Modal (Loads distinct products from `sales_data` when connected)
     async function openFullCatalogModal() {
       document.getElementById('fullCatalogModal').classList.remove('hidden');
       const body = document.getElementById('fullCatalogTableBody');
@@ -2522,20 +2440,20 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         try {
           const { data } = await state.supabaseClient
             .from('sales_data')
-            .select('کۆدی بەرهەم, ناوی بەرهەم, نرخی فرۆشی یەک کارتۆن, بەرواری پسوڵە')
-            .gt('نرخی فرۆشی یەک کارتۆن', 0)
-            .order('بەرواری پسوڵە', { ascending: false })
+            .select('*')
+            .gt(col('carton_price'), 0)
+            .order(col('invoice_date'), { ascending: false })
             .limit(400);
 
           if (data && data.length > 0) {
             const prodMap = new Map();
-            data.forEach(r => {
-              const c = String(r['کۆدی بەرهەم'] || '').trim();
-              if (c && !prodMap.has(c)) {
-                prodMap.set(c, {
-                  code: c,
-                  name: String(r['ناوی بەرهەم'] || '').trim(),
-                  base_price: Number(r['نرخی فرۆشی یەک کارتۆن'] || 0),
+            data.forEach(raw => {
+              const r = mapSupabaseRow(raw);
+              if (r.product_code && !prodMap.has(r.product_code)) {
+                prodMap.set(r.product_code, {
+                  code: r.product_code,
+                  name: r.product_name,
+                  base_price: r.carton_price,
                   category: 'sales_data'
                 });
               }
@@ -2618,7 +2536,10 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       const userObj = { username, full_name, password, imei_device_id, permissions };
 
-      // ١. پشکنین و ناردنی ڕاستەوخۆ بۆ Supabase
+      if (!state.supabaseClient) {
+        await initSupabaseSilent();
+      }
+
       if (!state.supabaseClient) {
         alertModal('داتابەیس نەبەستراوە!', 'تکایە سەرەتا لە تابی (٢. بەستنەوەی داتابەیسی Supabase) کلیلی Anon Key دابنێ و پاشەکەوتی بکە.');
         return;
@@ -2633,7 +2554,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // ٢. ئەگەر لە Supabase سەرکەوتوو بوو، لەناو بەرنامەکەش نوێی بکەرەوە
       const existingIdx = state.users.findIndex(u => u.username.toLowerCase() === username);
       if (existingIdx !== -1) {
         state.users[existingIdx] = userObj;
@@ -2713,11 +2633,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       await initSupabaseSilent();
 
       if (state.supabaseClient) {
-        const { data, error } = await state.supabaseClient.from('sales_data').select('کۆدی کریار').limit(1);
+        const { data, error } = await state.supabaseClient.from('sales_data').select('*').limit(1);
         if (error) {
           alertModal('کێشە لە خوێندنەوەی sales_data', `پەیوەندی دروست بوو بەڵام خشتەی sales_data نەخوێندرایەوە (دڵنیابە لە کردنەوەی RLS Policy بە کۆدی SQLی خوارەوە): ${error.message}`);
         } else {
-          alertModal('بەستنەوە سەرکەوتوو بوو ✓', 'وێب ئەپەکە بە سەرکەوتوویی بەسترایەوە بە خشتەی public.sales_data لە Supabase!');
+          alertModal('بەستنەوە سەرکەوتوو بوو ✓', `وێب ئەپەکە بە سەرکەوتوویی بەسترایەوە بە خشتەی public.sales_data لە Supabase (شێوازی ستوونەکان: ${state.schemaLang.toUpperCase()})!`);
         }
       }
     }
@@ -2746,7 +2666,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       alertModal('کۆپی کرا', 'کۆدی SQL کۆپی کرا؛ لەناو SQL Editor لە داشبۆردی Supabase دایبنێ و Run بکە.');
     }
 
-    // Receipts Lookup from `sales_data` by `ژمارەی پسوڵە`
     function triggerReceipt(no) {
       document.getElementById('inputReceiptNo').value = no;
       lookupReceipt();
@@ -2765,7 +2684,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       let rows = [];
       if (state.supabaseClient) {
         try {
-          const { data } = await state.supabaseClient.from('sales_data').select('*').eq('ژمارەی پسوڵە', Number(val));
+          const { data } = await state.supabaseClient.from('sales_data').select('*').eq(col('invoice_no'), Number(val));
           if (data) rows = data.map(mapSupabaseRow);
         } catch (err) { console.error(err); }
       } else {
@@ -2793,7 +2712,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       `).join('');
     }
 
-    // General Modal
     function alertModal(title, body) {
       document.getElementById('modalTitle').textContent = title;
       document.getElementById('modalBody').textContent = body;
