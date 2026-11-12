@@ -368,32 +368,13 @@
 
       <!-- Login Form Column -->
       <div class="lg:col-span-7 p-5 sm:p-7 lg:p-9 flex flex-col justify-center">
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-border/70">
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-border/70">
           <div>
             <h2 class="text-base lg:text-lg font-extrabold text-ink-900">چوونەژوورەوەی ستاف و مەندووبان</h2>
-            <p class="text-[11px] lg:text-xs text-ink-500 mt-0.5">هەژمارەکەت بەستراوەتەوە بە ژمارەی ناسنامەی ئامێرەکەت (IMEI / Device ID)</p>
+            <p class="text-[11px] lg:text-xs text-ink-500 mt-0.5">تکایە ناوی بەکارهێنەر، تێپەڕەوشە و کۆدی ناسنامەی ئامێرەکەت (IMEI) بنووسە</p>
           </div>
           <div class="w-10 h-10 rounded-[12px] bg-primary text-surface-bright flex items-center justify-center shadow-level-1">
             <i class="fa-solid fa-fingerprint text-base"></i>
-          </div>
-        </div>
-
-        <!-- Quick Filter Chips for Demo Login -->
-        <div class="mb-4">
-          <span class="block text-[11px] font-bold text-ink-500 mb-1.5">تاقیکردنەوەی خێرای هەژمارەکان (کلیک بکە):</span>
-          <div class="flex flex-wrap gap-1.5">
-            <button type="button" onclick="fillDemoLogin('admin', 'admin123')" id="chip-admin" class="ui-chip ui-chip-active cursor-pointer">
-              <i class="fa-solid fa-user-shield text-[10px]"></i>
-              <span>بەڕێوەبەری گشتی (admin)</span>
-            </button>
-            <button type="button" onclick="fillDemoLogin('karwan', '1234')" id="chip-mandub" class="ui-chip hover:border-ink-700 cursor-pointer">
-              <i class="fa-solid fa-user-tag text-[10px]"></i>
-              <span>مەندووب: کاروان (karwan)</span>
-            </button>
-            <button type="button" onclick="fillDemoLogin('aco', '1234')" id="chip-aco" class="ui-chip hover:border-ink-700 cursor-pointer">
-              <i class="fa-solid fa-lock text-[10px]"></i>
-              <span>مەندووب (ئامێری جیاواز - بلۆککراو)</span>
-            </button>
           </div>
         </div>
 
@@ -406,8 +387,7 @@
                   type="text" 
                   id="loginUsername" 
                   required
-                  value="admin"
-                  placeholder="ناوی بەکارهێنەر" 
+                  placeholder="ناوی بەکارهێنەر بنووسە..." 
                   class="ui-input w-full pr-3.5 pl-9 py-2.5 text-sm font-mono font-semibold text-left"
                   dir="ltr"
                 >
@@ -424,7 +404,6 @@
                   type="password" 
                   id="loginPassword" 
                   required
-                  value="admin123"
                   placeholder="••••••••" 
                   class="ui-input w-full pr-10 pl-3.5 py-2.5 text-sm font-mono text-left"
                   dir="ltr"
@@ -440,27 +419,28 @@
             </div>
           </div>
 
-          <!-- Device ID / IMEI Binding Box -->
+          <!-- Editable Device ID / IMEI Binding Box -->
           <div class="bg-surface-bright border border-border rounded-[10px] p-3">
             <div class="flex items-center justify-between mb-1">
               <label class="text-[11px] font-extrabold text-ink-900 flex items-center gap-1.5">
                 <i class="fa-solid fa-laptop-medical text-primary"></i>
-                <span>ناسنامەی ئامێر / IMEI (مۆبایل یان کۆمپیوتەرەکەت):</span>
+                <span>ناسنامەی ئامێر / IMEI (کۆدی پێدراو لەلایەن ئەدمین):</span>
               </label>
               <button type="button" onclick="copyDeviceImei()" class="text-[10px] font-bold text-primary hover:underline flex items-center gap-1">
                 <i class="fa-regular fa-copy"></i>
-                <span id="copyImeiBtnText">کۆپیکردن بۆ ئەدمین</span>
+                <span id="copyImeiBtnText">کۆپیکردنی کۆد</span>
               </button>
             </div>
             <input 
               type="text" 
               id="loginDeviceImei" 
-              readonly
-              class="w-full bg-surface-muted/70 border border-border rounded-[6px] px-2.5 py-1.5 text-xs font-mono font-bold text-primary text-left select-all"
+              required
+              placeholder="کۆدی IMEI لێرە بنووسە..."
+              class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-primary text-left"
               dir="ltr"
             >
             <p class="text-[10px] text-ink-500 mt-1">
-              ئەم کۆدە تایبەتە بەم ئامێرەی تۆ. ئەگەر هەژمارەکەت لەسەر ئامێرێکی تر بکرێتەوە، سیستەم ڕێگری لێ دەکات.
+              ئەو کۆدی IMEIـیەی لەلایەن بەڕێوەبەرەوە پێت دراوە لێرە بینووسە بۆ چوونەژوورەوە.
             </p>
           </div>
 
@@ -1065,7 +1045,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
               <div>
                 <label class="block text-[11px] font-bold text-ink-900 mb-1">کۆدی بەرهەم</label>
                 <input type="text" id="auditProdCode" oninput="updateAuditProdNamePreview()" placeholder="نموونە: 808" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
@@ -1087,10 +1067,14 @@
                 <input type="date" id="auditToDate" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono">
               </div>
 
-              <div class="flex gap-2">
-                <button onclick="runPriceAuditReport()" class="btn-primary flex-1 py-2 text-xs font-bold flex items-center justify-center gap-1.5">
+              <div class="sm:col-span-2 flex flex-wrap gap-2">
+                <button onclick="runPriceAuditReport()" class="btn-primary flex-1 py-2 px-3 text-xs font-bold flex items-center justify-center gap-1.5">
                   <i class="fa-solid fa-filter"></i>
                   <span>فلتەرکردن</span>
+                </button>
+                <button onclick="runDistinctPricesHighToLow()" class="btn-secondary flex-1 py-2 px-3 text-xs font-extrabold text-primary border-primary flex items-center justify-center gap-1.5" title="هێنانی هەموو نرخە جیاوازەکانی ئەم بەرهەمە لە زۆرەوە بۆ کەم">
+                  <i class="fa-solid fa-arrow-down-wide-short"></i>
+                  <span>نرخە جیاوازەکان (زۆر بۆ کەم)</span>
                 </button>
                 <button onclick="resetAuditFilters()" class="btn-secondary px-3 py-2 text-xs font-bold">پاککردنەوە</button>
               </div>
@@ -1468,7 +1452,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
   <!-- APPLICATION LOGIC & DUAL-SCHEMA SUPABASE `sales_data`     -->
   <!-- ========================================================= -->
   <script>
-    // 0. SUPABASE CREDENTIALS (کلیلەکەت لێرە چالاک کراوە)
+    // 0. SUPABASE CREDENTIALS
     const DEFAULT_SUPABASE_URL = 'https://rcigaaefhlerxbrbnnmj.supabase.co';
     const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_TYGtSJnjvbT2AtkfH519Jw_nsgbLkwS';
 
@@ -1482,7 +1466,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       return saved;
     }
 
-    const CURRENT_DEVICE_IMEI = getDeviceHardwareImei();
+    let CURRENT_DEVICE_IMEI = getDeviceHardwareImei();
     document.getElementById('loginDeviceImei').value = CURRENT_DEVICE_IMEI;
 
     const masterCatalog = [
@@ -1497,7 +1481,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       { customer_code: "9155", customer_name: "مارکێت سۆلاف کاک محمد احمد سعید", invoice_no: "89601", location: "هەولێر", product_code: "1285", product_name: "پەنیری 100گرام40عدد/کیبی", invoice_date: "2026-09-23", carton_price: 34000, qty_carton: 0.25, qty_piece: 10 }
     ];
 
-    // فەنکشنی زیرەک بۆ خوێندنەوەی هەردوو جۆری ستوونی ئینگلیزی و کوردی بەبێ هەڵە
     function mapSupabaseRow(row) {
       const rawDate = String(row.invoice_date ?? row['بەرواری پسوڵە'] ?? '');
       const cleanDate = rawDate.includes('T') ? rawDate.split('T')[0] : rawDate.split(' ')[0];
@@ -1561,7 +1544,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       announcements: JSON.parse(localStorage.getItem('sahel_announcements')) || defaultAnnouncements,
       unreadCount: 1,
       supabaseClient: null,
-      schemaLang: 'en', // 'en' or 'ku' auto-detected
+      schemaLang: 'en',
       lastFormattedSummary: '',
       catalogCache: [...masterCatalog]
     };
@@ -1578,7 +1561,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       return str;
     }
 
-    // ناوی ستوون بەپێی زمانەکەی ناو Supabase دەگەڕێنێتەوە
     function col(enName) {
       const kuMap = {
         customer_code: 'کۆدی کریار',
@@ -1601,7 +1583,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         try {
           state.supabaseClient = window.supabase.createClient(url, key);
 
-          // Auto-detect whether `sales_data` has English or Kurdish column names
           const { data: sampleRows, error: sampleErr } = await state.supabaseClient.from('sales_data').select('*').limit(1);
           if (!sampleErr && sampleRows && sampleRows.length > 0) {
             state.schemaLang = ('customer_code' in sampleRows[0]) ? 'en' : 'ku';
@@ -1637,8 +1618,9 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     initSupabaseSilent();
 
     function copyDeviceImei() {
+      const val = document.getElementById('loginDeviceImei').value.trim() || CURRENT_DEVICE_IMEI;
       const temp = document.createElement('textarea');
-      temp.value = CURRENT_DEVICE_IMEI;
+      temp.value = val;
       document.body.appendChild(temp);
       temp.select();
       document.execCommand('copy');
@@ -1646,7 +1628,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       const txt = document.getElementById('copyImeiBtnText');
       txt.textContent = 'کۆپی کرا ✓';
-      setTimeout(() => { txt.textContent = 'کۆپیکردن بۆ ئەدمین'; }, 1800);
+      setTimeout(() => { txt.textContent = 'کۆپیکردنی کۆد'; }, 1800);
     }
 
     function togglePasswordVisibility() {
@@ -1661,20 +1643,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
     }
 
-    function fillDemoLogin(user, pass) {
-      document.getElementById('loginUsername').value = user;
-      document.getElementById('loginPassword').value = pass;
-      document.getElementById('loginError').classList.add('hidden');
-      ['chip-admin', 'chip-mandub', 'chip-aco'].forEach(id => document.getElementById(id).classList.remove('ui-chip-active'));
-      if (user === 'admin') document.getElementById('chip-admin').classList.add('ui-chip-active');
-      if (user === 'karwan') document.getElementById('chip-mandub').classList.add('ui-chip-active');
-      if (user === 'aco') document.getElementById('chip-aco').classList.add('ui-chip-active');
-    }
-
     async function handleLogin(e) {
       e.preventDefault();
       const username = document.getElementById('loginUsername').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value.trim();
+      const enteredImei = document.getElementById('loginDeviceImei').value.trim();
       const errBox = document.getElementById('loginError');
       const errText = document.getElementById('loginErrorText');
 
@@ -1710,10 +1683,16 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const allowedImei = String(foundUser.imei_device_id || foundUser.imei || '*').trim();
       const isUnrestricted = !allowedImei || allowedImei === '*' || allowedImei.toUpperCase() === 'ALL' || allowedImei.toUpperCase() === 'ANY' || foundUser.username.toLowerCase() === 'admin';
 
-      if (!isUnrestricted && allowedImei !== CURRENT_DEVICE_IMEI) {
-        errText.innerHTML = `⛔ <b>ڕێگەپێنەدراو (IMEI Mismatch):</b> ئەم هەژمارە تەنها لەسەر ئامێری (<code class="font-mono">${allowedImei}</code>) کار دەکات و ناتوانرێت لەسەر مۆبایلی تر بکرێتەوە.`;
+      if (!isUnrestricted && allowedImei !== enteredImei) {
+        errText.innerHTML = `⛔ <b>ڕێگەپێنەدراو (IMEI Mismatch):</b> کۆدی ناسنامەی ئامێرەکەت (${enteredImei || 'بەتاڵ'}) هاوتا نییە لەگەڵ کۆدی تۆمارکراوی ئەم بەکارهێنەرە.`;
         errBox.classList.remove('hidden');
         return;
+      }
+
+      // پاشەکەوتکردنی کۆدی IMEI لەسەر وێبگەڕی مەندووبەکە بۆ ئەوەی هەموو جارێک نەینووسێتەوە
+      if (enteredImei) {
+        CURRENT_DEVICE_IMEI = enteredImei;
+        localStorage.setItem('sahel_device_imei', enteredImei);
       }
 
       state.currentUser = foundUser;
@@ -2098,7 +2077,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 4: PRICE HISTORY & LOCATION AUDIT REPORT
+    // FEATURE 4: PRICE HISTORY & DISTINCT PRICES (HIGH TO LOW)
     // =========================================================
     async function updateAuditProdNamePreview() {
       const code = normalizeCode(document.getElementById('auditProdCode').value);
@@ -2135,6 +2114,127 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       document.getElementById('auditToDate').value = '';
       document.getElementById('auditProdNameHint').textContent = '';
       runPriceAuditReport();
+    }
+
+    // فەنکشنی نوێ: هێنانی هەموو نرخە جیاوازەکانی بەرهەمەکە لە زۆرەوە بۆ کەم
+    async function runDistinctPricesHighToLow() {
+      const prodCode = normalizeCode(document.getElementById('auditProdCode').value);
+      const fromDate = document.getElementById('auditFromDate').value;
+      const toDate = document.getElementById('auditToDate').value;
+      const container = document.getElementById('auditReportContainer');
+
+      if (!prodCode) {
+        alertModal('کۆدی بەرهەم پێویستە', 'تکایە سەرەتا کۆدی بەرهەم لە خانەی یەکەمدا بنووسە بۆ بینینی هەموو نرخە جیاوازەکانی لە زۆرەوە بۆ کەم.');
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-primary">
+          ⏳ خەریکی دەرکێشانی هەموو نرخە جیاوازەکانی بەرهەمی (${prodCode})ـم لە زۆرەوە بۆ کەم...
+        </div>
+      `;
+
+      let results = [];
+      if (state.supabaseClient) {
+        try {
+          let q = state.supabaseClient.from('sales_data').select('*').eq(col('product_code'), prodCode).gt(col('carton_price'), 0);
+          if (fromDate) q = q.gte(col('invoice_date'), fromDate);
+          if (toDate) q = q.lte(col('invoice_date'), toDate + ' 23:59:59');
+          const { data, error } = await q.order(col('carton_price'), { ascending: false }).limit(1000);
+          if (!error && data) {
+            results = data.map(mapSupabaseRow);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        results = salesDataset.filter(r => normalizeCode(r.product_code) === prodCode && r.carton_price > 0);
+      }
+
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-ink-500">
+            هیچ نرخێکی فرۆش بۆ بەرهەمی (${prodCode}) لە sales_data نەدۆزرایەوە.
+          </div>
+        `;
+        return;
+      }
+
+      // کۆکردنەوەی نرخە جیاوازەکان و ڕیزکردنیان لە زۆرەوە بۆ کەم
+      const priceGroups = new Map();
+      results.forEach(r => {
+        const p = Number(r.carton_price);
+        if (!priceGroups.has(p)) {
+          priceGroups.set(p, {
+            price: p,
+            count: 1,
+            total_cartons: r.qty_carton,
+            total_pieces: r.qty_piece,
+            latest_date: r.invoice_date,
+            sample_customer: r.customer_name,
+            markets: new Set([r.customer_code])
+          });
+        } else {
+          const g = priceGroups.get(p);
+          g.count += 1;
+          g.total_cartons += r.qty_carton;
+          g.total_pieces += r.qty_piece;
+          g.markets.add(r.customer_code);
+          if (new Date(r.invoice_date) > new Date(g.latest_date)) {
+            g.latest_date = r.invoice_date;
+            g.sample_customer = r.customer_name;
+          }
+        }
+      });
+
+      const sortedDistinct = Array.from(priceGroups.values()).sort((a, b) => b.price - a.price);
+      const prodName = results[0].product_name;
+
+      container.innerHTML = `
+        <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-3">
+            <div>
+              <h4 class="text-sm font-extrabold text-ink-900">هەموو نرخە جیاوازەکانی بەرهەمی: <span class="text-primary">${prodName} (${prodCode})</span></h4>
+              <p class="text-[11px] text-ink-500 mt-0.5">ڕیزکراوە لە گرانترین نرخەوە بۆ هەرزانترین نرخ (کلیک لە هەر نرخێک بکە بۆ بینینی مارکێتەکان)</p>
+            </div>
+            <span class="ui-chip ui-chip-active font-mono">${sortedDistinct.length} نرخی جیاواز</span>
+          </div>
+
+          <div class="space-y-2.5">
+            ${sortedDistinct.map((g, idx) => `
+              <div onclick="applyAuditPreset('${prodCode}', '${g.price}', '${fromDate}', '${toDate}')" 
+                class="bg-surface-bright border ${idx === 0 ? 'border-primary' : 'border-border'} hover:border-primary rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer transition shadow-level-1">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-[8px] ${idx === 0 ? 'bg-primary text-white' : 'bg-ink-100 text-ink-900'} font-mono font-extrabold text-xs flex items-center justify-center shrink-0">
+                    ${idx + 1}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-mono text-sm font-extrabold text-primary">${g.price.toLocaleString()} دینار</span>
+                      ${idx === 0 ? '<span class="ui-chip ui-chip-active !py-0 !px-2 !text-[10px]">بەرزترین نرخ</span>' : ''}
+                      ${idx === sortedDistinct.length - 1 && sortedDistinct.length > 1 ? '<span class="ui-chip !py-0 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">نزمترین نرخ</span>' : ''}
+                    </div>
+                    <p class="text-[11px] text-ink-500 mt-0.5">
+                      📅 دوایین بەروار بەم نرخە: <span class="font-mono font-bold text-ink-900">${g.latest_date}</span> • کڕیار: <b>${g.sample_customer}</b>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 self-end sm:self-center">
+                  <div class="bg-alert-infoBg border border-alert-infoBorder text-alert-infoText px-3 py-1.5 rounded-[8px] text-center">
+                    <span class="text-[10px] font-bold block">ژمارەی فرۆش</span>
+                    <span class="font-mono text-xs font-extrabold">${g.count} پسوڵە (${g.markets.size} مارکێت)</span>
+                  </div>
+                  <div class="bg-surface border border-border px-3 py-1.5 rounded-[8px] text-center">
+                    <span class="text-[10px] text-ink-500 font-bold block">کۆی بڕ</span>
+                    <span class="font-mono text-xs font-bold text-ink-900">${Number(g.total_cartons.toFixed(2))} کارتۆن</span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
     }
 
     async function runPriceAuditReport() {
@@ -2191,7 +2291,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
           <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-3">
             <h4 class="text-sm font-extrabold text-ink-900">ئەنجامی شوێن و مارکێتە فرۆشراوەکان (${results.length} پسوڵە لە ${uniqueMarkets} مارکێت)</h4>
-            <span class="ui-chip ui-chip-active font-mono">کۆی گشتی: ${totalCartons} کارتۆن</span>
+            <span class="ui-chip ui-chip-active font-mono">کۆی گشتی: ${Number(totalCartons.toFixed(2))} کارتۆن</span>
           </div>
 
           <div class="space-y-2.5">
