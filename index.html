@@ -10,6 +10,9 @@
   
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- SheetJS (xlsx) for Direct Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -578,7 +581,7 @@
       <div class="space-y-2 pt-4 border-t border-border">
         <button onclick="openFullCatalogModal()" class="btn-secondary w-full py-2.5 px-3 text-xs font-extrabold flex items-center justify-center gap-2">
           <i class="fa-solid fa-table-list text-primary"></i>
-          <span>لیستی گشتیی نرخی کاڵاکان</span>
+          <span>ڕاپۆرتی تەواوی نرخەکان (Excel/PDF)</span>
         </button>
         <button onclick="logout()" class="btn-tertiary w-full py-2 px-3 text-xs font-bold text-alert-errorText flex items-center justify-center gap-2">
           <i class="fa-solid fa-right-from-bracket"></i>
@@ -729,7 +732,7 @@
             </div>
             <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
               <button onclick="openFullCatalogModal()" class="btn-secondary px-3 py-2 text-xs font-bold">
-                خشتەی گشتیی نرخەکان
+                ڕاپۆرتی تەواوی نرخەکان
               </button>
               <button onclick="switchView('announcements')" class="btn-primary px-4 py-2 text-xs font-bold">
                 بینینی ئۆفەرەکان
@@ -804,7 +807,7 @@
                 <div>
                   <h4 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و ئۆفەر</h4>
                   <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
-                    بڵاوکردنەوەی نرخی نوێ، عرض خاص بە مەرج و هۆکارەوە، لەگەڵ ناردنی نۆتیفیکەیشن و ڕاپۆرتی گشتی.
+                    بینینی تەواوی نرخە ڕاگەیەندراوەکان بۆ هەموو بابەتەکان، فلتەری گەڕان بە کۆد و ناو، و داگرتنی ڕاپۆرت بە Excel و PDF.
                   </p>
                 </div>
                 <div class="mt-5">
@@ -1125,30 +1128,44 @@
           <div id="auditReportContainer" class="space-y-3"></div>
         </div>
 
-        <!-- VIEW 5: PRICE ANNOUNCEMENTS -->
+        <!-- VIEW 5: PRICE ANNOUNCEMENTS (SEPARATED VIEW vs PUBLISH ROLES + SEARCH FILTER) -->
         <div id="view-announcements" class="hidden space-y-4">
           
           <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h3 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و عرض خاص بۆ مەندووبەکان</h3>
-              <p class="text-xs text-ink-500 mt-0.5">نرخی فەرمی بەرهەمەکان، ئۆفەری تایبەت، مەرج و هۆکارەکان لەگەڵ ناردنی ئاگادارکردنەوە</p>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و عرض خاص بۆ مەندووبەکان</h3>
+                <span id="annPermissionModeBadge" class="ui-chip !py-0.5 !px-2.5 !text-[10px]">تەنها بینین (مەندووب)</span>
+              </div>
+              <p class="text-xs text-ink-500 mt-0.5">لیستی نرخی فەرمی هەموو بابەتەکان و ئۆفەرە تۆمارکراوەکان لەگەڵ مەرج و هۆکار</p>
             </div>
-            <button onclick="openFullCatalogModal()" class="btn-primary px-4 py-2.5 text-xs font-extrabold shadow-level-1 flex items-center gap-2">
-              <i class="fa-solid fa-table"></i>
-              <span>ڕاپۆرتی تەواوی نرخی بەرهەمەکان</span>
-            </button>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="exportAnnouncementsToExcel()" class="btn-secondary px-3.5 py-2.5 text-xs font-extrabold flex items-center gap-1.5 text-emerald-800 border-emerald-300">
+                <i class="fa-solid fa-file-excel text-emerald-700"></i>
+                <span>داگرتن بە Excel</span>
+              </button>
+              <button onclick="exportAnnouncementsToPDF()" class="btn-secondary px-3.5 py-2.5 text-xs font-extrabold flex items-center gap-1.5 text-red-800 border-red-300">
+                <i class="fa-solid fa-file-pdf text-red-700"></i>
+                <span>داگرتن بە PDF</span>
+              </button>
+              <button onclick="openFullCatalogModal()" class="btn-primary px-4 py-2.5 text-xs font-extrabold shadow-level-1 flex items-center gap-2">
+                <i class="fa-solid fa-table"></i>
+                <span>ڕاپۆرتی تەواوی نرخی بەرهەمەکان</span>
+              </button>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- Publisher Card (Visible ONLY to users with `manage_announcements` or `admin_users` permission) -->
             <div id="announcementPublisherCard" class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
               <div class="flex items-center justify-between border-b border-border pb-3">
                 <div class="flex items-center gap-2">
                   <span class="w-7 h-7 rounded-[8px] bg-primary text-surface-bright flex items-center justify-center text-xs">
                     <i class="fa-solid fa-bullhorn"></i>
                   </span>
-                  <h4 class="text-sm font-extrabold text-ink-900">بڵاوکردنەوەی نرخ و عرض خاص</h4>
+                  <h4 class="text-sm font-extrabold text-ink-900">دانانی نرخ و دروستکردنی عرض خاص</h4>
                 </div>
-                <span class="ui-chip ui-chip-active text-[10px]">ناردنی نۆتیفیکەیشن</span>
+                <span class="ui-chip ui-chip-active text-[10px]">مۆڵەتی بڵاوکردنەوە</span>
               </div>
 
               <div class="space-y-3">
@@ -1208,11 +1225,41 @@
 
               <button onclick="publishAnnouncement()" class="btn-primary w-full py-3 text-xs font-extrabold shadow-level-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-paper-plane"></i>
-                <span>ڕاگەیاندنی نرخ و ناردنی ئاگادارکردنەوە</span>
+                <span>تۆمارکردن و ڕاگەیاندنی نرخ بۆ مەندووبان</span>
               </button>
             </div>
 
-            <div class="lg:col-span-7 space-y-3">
+            <!-- Feed Column with Instant Search Filter by Code & Product Name -->
+            <div id="announcementsFeedColumn" class="lg:col-span-7 space-y-3">
+              <!-- Search & Filter Bar for Viewing Prices -->
+              <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-ink-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass text-primary"></i>
+                    <span>گەڕانی خێرا لە ناو نرخە ڕاگەیەندراوەکان (بە کۆد یان ناوی بابەت):</span>
+                  </span>
+                  <span id="annFeedCountBadge" class="ui-chip ui-chip-active font-mono !py-0.5 !px-2 !text-[10px]">0 بابەت</span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <div class="relative flex-1">
+                    <input 
+                      type="text" 
+                      id="annSearchFilterInput" 
+                      oninput="renderAnnouncementsFeed()" 
+                      placeholder="کۆدی بابەت (808) یان ناوی بەرهەم بنووسە بۆ دۆزینەوەی خێرای نرخ..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2 text-xs font-bold"
+                    >
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-ink-500 text-xs"></i>
+                  </div>
+                  <div class="flex gap-1.5 shrink-0">
+                    <button type="button" onclick="setAnnFilterType('all')" id="annFilterBtnAll" class="ui-chip ui-chip-active cursor-pointer !rounded-[8px] !py-2">هەمووی</button>
+                    <button type="button" onclick="setAnnFilterType('special')" id="annFilterBtnSpecial" class="ui-chip cursor-pointer !rounded-[8px] !py-2">★ تەنها عرض خاص</button>
+                    <button type="button" onclick="clearAnnSearchFilter()" class="btn-secondary px-3 py-2 text-xs font-bold">پاککردنەوە</button>
+                  </div>
+                </div>
+              </div>
+
               <div id="announcementsFeed" class="space-y-3"></div>
             </div>
           </div>
@@ -1315,7 +1362,7 @@
                   <div class="flex items-center justify-between mb-2.5">
                     <label class="text-xs font-extrabold text-ink-900 flex items-center gap-1.5">
                       <i class="fa-solid fa-list-check text-primary"></i>
-                      <span>چێک لیستی دەسەڵاتەکان:</span>
+                      <span>چێک لیستی دەسەڵاتەکان (جیاکردنەوەی بینین و دانانی نرخ):</span>
                     </label>
                     <div class="flex gap-2">
                       <button type="button" onclick="toggleAllPerms(true)" class="text-[11px] font-bold text-primary hover:underline">هەمووی</button>
@@ -1339,15 +1386,19 @@
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="announcements" checked class="ui-checkbox">
-                      <span class="text-xs font-bold text-ink-900">٤. ڕاگەیاندنی نرخ و ئۆفەر</span>
+                      <span class="text-xs font-bold text-ink-900">٤. بینینی نرخی بابەتەکان (مەندووب)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-alert-warnBorder bg-alert-warnBg/50 cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="manage_announcements" class="ui-checkbox">
+                      <span class="text-xs font-extrabold text-alert-warnText">٥. دانانی نرخ و دروستکردنی عرض خاص</span>
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="contracts" class="ui-checkbox">
-                      <span class="text-xs font-bold text-ink-900">٥. گرێبەست و پسوڵە</span>
+                      <span class="text-xs font-bold text-ink-900">٦. گرێبەست و پسوڵە</span>
                     </label>
-                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                    <label class="sm:col-span-2 flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="admin_users" class="ui-checkbox">
-                      <span class="text-xs font-bold text-alert-errorText">٦. بەڕێوەبەر و داتابەیس</span>
+                      <span class="text-xs font-bold text-alert-errorText">٧. بەڕێوەبەری گشتی و داتابەیس (Admin)</span>
                     </label>
                   </div>
                 </div>
@@ -1442,21 +1493,40 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     </div>
   </div>
 
-  <!-- MODAL 1: FULL MASTER CATALOG & PRICE REPORT -->
+  <!-- ========================================================= -->
+  <!-- MODAL 1: FULL ANNOUNCED PRICES REPORT + EXCEL & PDF       -->
+  <!-- ========================================================= -->
   <div id="fullCatalogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
-    <div class="bg-surface border border-border rounded-[16px] max-w-3xl w-full max-h-[88vh] flex flex-col shadow-level-4 overflow-hidden">
-      <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between">
+    <div class="bg-surface border border-border rounded-[16px] max-w-4xl w-full max-h-[90vh] flex flex-col shadow-level-4 overflow-hidden">
+      <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between flex-wrap gap-2">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-table-list"></i>
-          <h3 class="text-sm font-extrabold">ڕاپۆرتی تەواوی نرخی بەرهەمەکان لە خشتەی sales_data</h3>
+          <div>
+            <h3 class="text-sm font-extrabold">ڕاپۆرتی تەواوی نرخە ڕاگەیەندراوەکان و عرض خاص</h3>
+            <p class="text-[10px] text-surface-muted/80">تەواوی ئەو بابەت و نرخانەی لەلایەن کۆمپانیاوە ڕاگەیەندراون (ئامادە بۆ داگرتن بە Excel و PDF)</p>
+          </div>
         </div>
-        <button onclick="closeFullCatalogModal()" class="text-white/80 hover:text-white">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="exportAnnouncementsToExcel()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-[8px] text-xs font-extrabold flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-file-excel"></i>
+            <span>داگرتن بە Excel</span>
+          </button>
+          <button onclick="exportAnnouncementsToPDF()" class="bg-red-700 hover:bg-red-600 text-white px-3 py-1.5 rounded-[8px] text-xs font-extrabold flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>داگرتن بە PDF</span>
+          </button>
+          <button onclick="closeFullCatalogModal()" class="text-white/80 hover:text-white px-2">
+            <i class="fa-solid fa-xmark text-base"></i>
+          </button>
+        </div>
       </div>
 
-      <div class="p-4 border-b border-border bg-surface-bright flex gap-2">
-        <input type="text" id="catalogFilterInput" oninput="renderFullCatalogTable()" placeholder="گەڕان بەدوای کۆدی بابەت یان ناوی بەرهەم..." class="ui-input flex-1 px-3.5 py-2 text-xs font-bold">
+      <div class="p-4 border-b border-border bg-surface-bright flex flex-col sm:flex-row gap-2 items-center justify-between">
+        <div class="relative w-full sm:flex-1">
+          <input type="text" id="catalogFilterInput" oninput="renderFullCatalogTable()" placeholder="گەڕان بەدوای کۆدی بابەت یان ناوی بەرهەم لەناو ڕاپۆرت..." class="ui-input w-full pr-3.5 pl-9 py-2 text-xs font-bold">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-ink-500 text-xs"></i>
+        </div>
+        <span id="modalReportTotalCount" class="ui-chip ui-chip-active font-mono text-[11px] shrink-0">0 بابەت</span>
       </div>
 
       <div class="p-4 overflow-y-auto flex-1 space-y-2.5" id="fullCatalogTableBody"></div>
@@ -1548,14 +1618,14 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         full_name: "حەکیم لوقمان (بەڕێوەبەری گشتی)",
         password: "admin123",
         imei_device_id: "*",
-        permissions: ["price_lookup", "market_items", "price_audit", "announcements", "contracts", "admin_users"]
+        permissions: ["price_lookup", "market_items", "price_audit", "announcements", "manage_announcements", "contracts", "admin_users"]
       },
       {
         username: "karwan",
         full_name: "کاروان محەمەد (مەندووبی فرۆش)",
         password: "1234",
         imei_device_id: CURRENT_DEVICE_IMEI,
-        permissions: ["price_lookup", "market_items", "announcements"]
+        permissions: ["price_lookup", "market_items", "announcements"] // View-only on announcements
       }
     ];
 
@@ -1572,6 +1642,19 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         reason_text: "ئۆفەری تایبەتی کۆمپانیا بۆ زیادکردنی فرۆشی مانگانە",
         created_at: "2026-11-12 09:30",
         created_by: "حەکیم لوقمان"
+      },
+      {
+        id: 102,
+        product_code: "1873",
+        product_name: "گەنمەشامی قوتو 425گرام24عدد/مارینا",
+        tiers: [
+          { label: "نرخی فرۆشی تاک", price: 26500, isSpecial: false },
+          { label: "نرخی جوملە (١٥ کارتۆن+)", price: 25000, isSpecial: true }
+        ],
+        condition_text: "بۆ هەموو مارکێتەکان",
+        reason_text: "پاڵپشتی بازاڕ",
+        created_at: "2026-11-12 10:00",
+        created_by: "حەکیم لوقمان"
       }
     ];
 
@@ -1580,16 +1663,16 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       users: JSON.parse(localStorage.getItem('sahel_app_users')) || defaultUsers,
       announcements: JSON.parse(localStorage.getItem('sahel_announcements')) || defaultAnnouncements,
       unreadCount: 1,
+      annFilterType: 'all', // 'all' or 'special'
       supabaseClient: null,
       dbInitPromise: null,
       schemaReady: false,
       schemaLang: 'en',
       lastFormattedSummary: '',
       catalogCache: [...masterCatalog],
-      customersDirectory: new Map(), // code -> exact customer_name
-      productsDirectory: new Map(),  // code -> exact product_name
-      // Pagination states for View 4 (Price Audit)
-      auditMode: 'invoices', // 'invoices' or 'distinct'
+      customersDirectory: new Map(),
+      productsDirectory: new Map(),
+      auditMode: 'invoices',
       auditAllInvoices: [],
       auditAllDistinct: [],
       auditCurrentPage: 1,
@@ -1625,6 +1708,13 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       return state.schemaLang === 'ku' ? kuMap[enName] : enName;
     }
 
+    function canManageAnnouncements() {
+      if (!state.currentUser || !state.currentUser.permissions) return false;
+      return state.currentUser.permissions.includes('manage_announcements') ||
+             state.currentUser.permissions.includes('admin_users') ||
+             state.currentUser.username.toLowerCase() === 'admin';
+    }
+
     // =========================================================
     // ANTI-GLITCH DB INITIALIZATION & DIRECTORY PRE-LOADER
     // =========================================================
@@ -1656,7 +1746,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
               hubStatus.textContent = 'بەستراوە (LIVE)';
             }
 
-            // Load users & announcements
             const { data: dbUsers } = await state.supabaseClient.from('app_users').select('*');
             if (dbUsers && dbUsers.length > 0) {
               state.users = dbUsers;
@@ -1669,7 +1758,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
               updateNotifBadgeUI();
             }
 
-            // Warm up Customer & Product Autocomplete Directory in background
             preloadAutocompleteDirectories();
           } catch (e) {
             console.error('DB Init error:', e);
@@ -1712,11 +1800,10 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
     }
 
-    // Start DB initialization immediately on page load
     ensureDbReady();
 
     // =========================================================
-    // AUTOCOMPLETE DROPDOWN FOR CUSTOMERS & PRODUCTS (EXACT SYSTEM NAMES)
+    // AUTOCOMPLETE DROPDOWN FOR CUSTOMERS & PRODUCTS
     // =========================================================
     let autocompleteTimer = null;
 
@@ -1743,14 +1830,12 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         await ensureDbReady();
         const matches = new Map();
 
-        // 1. Search local directory cache first
         state.customersDirectory.forEach((name, code) => {
           if (code.includes(q) || name.toLowerCase().includes(q.toLowerCase())) {
             matches.set(code, name);
           }
         });
 
-        // 2. Live query from Supabase if fewer than 10 matches in cache
         if (state.supabaseClient && matches.size < 10) {
           try {
             const cCodeCol = col('customer_code');
@@ -1991,9 +2076,10 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       document.getElementById('hubDeviceTag').textContent = CURRENT_DEVICE_IMEI;
 
       const isAdmin = state.currentUser.permissions.includes('admin_users');
-      const roleText = isAdmin ? 'بەڕێوەبەر' : 'مەندووب';
+      const canPublishPrices = canManageAnnouncements();
+      const roleText = isAdmin ? 'بەڕێوەبەر' : (canPublishPrices ? 'سەرپەرشتیار' : 'مەندووب');
       document.getElementById('userBadgeRole').textContent = roleText;
-      document.getElementById('hubPermCountChip').textContent = `${state.currentUser.permissions.length} بەش ڕێگەپێدراوە`;
+      document.getElementById('hubPermCountChip').textContent = `${state.currentUser.permissions.length} مۆڵەت چالاکە`;
 
       const sbName = document.getElementById('sidebarUserName');
       const sbRole = document.getElementById('sidebarRoleBadge');
@@ -2002,9 +2088,26 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       if (sbRole) sbRole.textContent = roleText;
       if (sbImei) sbImei.textContent = CURRENT_DEVICE_IMEI;
 
+      // Role separation inside Announcements View:
+      // Reps without `manage_announcements` only see the full-width price list & search filter!
       const pubCard = document.getElementById('announcementPublisherCard');
-      if (pubCard) {
-        pubCard.classList.toggle('hidden', !isAdmin);
+      const feedCol = document.getElementById('announcementsFeedColumn');
+      const modeBadge = document.getElementById('annPermissionModeBadge');
+      if (pubCard && feedCol) {
+        pubCard.classList.toggle('hidden', !canPublishPrices);
+        if (canPublishPrices) {
+          feedCol.className = 'lg:col-span-7 space-y-3';
+          if (modeBadge) {
+            modeBadge.textContent = 'مۆڵەتی دانان و بینینی نرخ';
+            modeBadge.className = 'ui-chip ui-chip-active !py-0.5 !px-2.5 !text-[10px]';
+          }
+        } else {
+          feedCol.className = 'lg:col-span-12 space-y-3';
+          if (modeBadge) {
+            modeBadge.textContent = 'تەنها بینینی نرخەکان (مەندووب)';
+            modeBadge.className = 'ui-chip !py-0.5 !px-2.5 !text-[10px]';
+          }
+        }
       }
 
       applyPermissionsVisibility();
@@ -2018,11 +2121,17 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const perms = state.currentUser ? state.currentUser.permissions : [];
       document.querySelectorAll('[data-perm]').forEach(el => {
         const reqPerm = el.getAttribute('data-perm');
-        el.classList.toggle('hidden', !perms.includes(reqPerm));
+        const allowed = reqPerm === 'announcements'
+          ? (perms.includes('announcements') || perms.includes('manage_announcements'))
+          : perms.includes(reqPerm);
+        el.classList.toggle('hidden', !allowed);
       });
       document.querySelectorAll('[data-card-perm]').forEach(el => {
         const reqPerm = el.getAttribute('data-card-perm');
-        el.classList.toggle('hidden', !perms.includes(reqPerm));
+        const allowed = reqPerm === 'announcements'
+          ? (perms.includes('announcements') || perms.includes('manage_announcements'))
+          : perms.includes(reqPerm);
+        el.classList.toggle('hidden', !allowed);
       });
     }
 
@@ -2141,7 +2250,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         try {
           let q = state.supabaseClient.from('sales_data').select('*').gt(col('carton_price'), 0);
 
-          // Customer filter: by code if numeric/resolved, or exact/ilike name
           if (resolvedCustCode && rawCustInput.includes(state.customersDirectory.get(resolvedCustCode) || '')) {
             q = q.eq(col('customer_code'), resolvedCustCode);
           } else if (/^\d+$/.test(rawCustInput)) {
@@ -2150,7 +2258,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
             q = q.eq(col('customer_name'), rawCustInput);
           }
 
-          // Product filter: by code or name
           if (/^\d+$/.test(rawProdInput)) {
             q = q.eq(col('product_code'), rawProdInput);
           } else {
@@ -2159,7 +2266,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
           let { data, error } = await q.order(col('invoice_date'), { ascending: false }).limit(500);
 
-          // Fallback to ilike on customer_name if exact match returned empty
           if ((!data || data.length === 0) && !/^\d+$/.test(rawCustInput)) {
             let q2 = state.supabaseClient.from('sales_data').select('*').gt(col('carton_price'), 0).ilike(col('customer_name'), `%${rawCustInput}%`);
             if (/^\d+$/.test(rawProdInput)) {
@@ -2441,7 +2547,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     // =========================================================
     let auditReqId = 0;
 
-    // Fetch ALL rows for a product in chunks of 1000 so no distinct price is ever missed
     async function fetchAllProductSalesRows(prodCode, fromDate, toDate, specificPrice) {
       let allMapped = [];
       let fromIdx = 0;
@@ -2473,7 +2578,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         if (error || !data || data.length === 0) break;
         allMapped.push(...data.map(mapSupabaseRow));
 
-        // If no specific product filter was given, 1000 latest rows is sufficient for preview
         if (!prodCode || data.length < step) break;
         fromIdx += step;
       }
@@ -2541,7 +2645,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       `;
     }
 
-    // ١. هێنانی تەواوی نرخە جیاوازەکانی بەرهەمەکە لە زۆرەوە بۆ کەم بە بێ لەدەستچوون + لاپەڕەبەندی
     async function runDistinctPricesHighToLow(page = 1) {
       const myReq = ++auditReqId;
       await ensureDbReady();
@@ -2585,7 +2688,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // Group ALL distinct prices accurately
       const priceGroups = new Map();
       results.forEach(r => {
         const p = Math.round(Number(r.carton_price || 0));
@@ -2683,7 +2785,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       `;
     }
 
-    // ٢. فلتەرکردنی مێژووی فرۆش و مارکێتەکان بە لاپەڕەبەندی (Pagination)
     async function runPriceAuditReport(page = 1) {
       const myReq = ++auditReqId;
       await ensureDbReady();
@@ -2785,7 +2886,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     // =========================================================
-    // FEATURE 5: ANNOUNCEMENTS, SPECIAL OFFERS & AUTO PRODUCT LOOKUP
+    // FEATURE 5: ANNOUNCEMENTS, SEARCH FILTER & EXCEL/PDF EXPORT
     // =========================================================
     function setAnnProduct(code) {
       document.getElementById('annProdCode').value = code;
@@ -2867,6 +2968,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     async function publishAnnouncement() {
+      if (!canManageAnnouncements()) {
+        alertModal('بێ مۆڵەت', 'تەنها بەڕێوەبەر یان کەسی ڕێپێدراو دەتوانێت نرخ و عرض خاص زیاد بکات.');
+        return;
+      }
+
       await ensureDbReady();
       const code = normalizeCode(document.getElementById('annProdCode').value);
       const prodNameVal = document.getElementById('annProdName').value.trim();
@@ -2903,12 +3009,17 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         created_by: state.currentUser ? state.currentUser.full_name : 'ئەدمین'
       };
 
+      // Replace previous announcement for same product code or unshift as latest
+      const existingIdx = state.announcements.findIndex(a => normalizeCode(a.product_code) === code);
+      if (existingIdx !== -1) {
+        state.announcements.splice(existingIdx, 1);
+      }
       state.announcements.unshift(newAnn);
       localStorage.setItem('sahel_announcements', JSON.stringify(state.announcements));
 
       if (state.supabaseClient) {
         try {
-          await state.supabaseClient.from('price_announcements').insert([newAnn]);
+          await state.supabaseClient.from('price_announcements').upsert([newAnn]);
         } catch (e) { console.error(e); }
       }
 
@@ -2918,21 +3029,87 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       triggerToast(`ڕاگەیاندنی نوێ: ${prodNameVal}`, `${tiers[0].label}: ${tiers[0].price.toLocaleString()} دینار`);
     }
 
+    async function deleteAnnouncementItem(id) {
+      if (!canManageAnnouncements()) return;
+      state.announcements = state.announcements.filter(a => Number(a.id) !== Number(id));
+      localStorage.setItem('sahel_announcements', JSON.stringify(state.announcements));
+      if (state.supabaseClient) {
+        try {
+          await state.supabaseClient.from('price_announcements').delete().eq('id', id);
+        } catch (err) { console.error(err); }
+      }
+      renderAnnouncementsFeed();
+      renderFullCatalogTable();
+    }
+
+    function setAnnFilterType(type) {
+      state.annFilterType = type;
+      document.getElementById('annFilterBtnAll').classList.toggle('ui-chip-active', type === 'all');
+      document.getElementById('annFilterBtnSpecial').classList.toggle('ui-chip-active', type === 'special');
+      renderAnnouncementsFeed();
+    }
+
+    function clearAnnSearchFilter() {
+      const inp = document.getElementById('annSearchFilterInput');
+      if (inp) inp.value = '';
+      setAnnFilterType('all');
+    }
+
+    function getFilteredAnnouncements(searchQuery = '', onlySpecial = false) {
+      const q = normalizeCode(searchQuery).toLowerCase();
+      return state.announcements.filter(a => {
+        const codeMatch = String(a.product_code || '').toLowerCase().includes(q);
+        const nameMatch = String(a.product_name || '').toLowerCase().includes(q);
+        const matchesText = !q || codeMatch || nameMatch;
+        if (!matchesText) return false;
+        if (onlySpecial) {
+          return (a.tiers || []).some(t => t.isSpecial);
+        }
+        return true;
+      });
+    }
+
     function renderAnnouncementsFeed() {
       const feed = document.getElementById('announcementsFeed');
       if (!feed) return;
-      feed.innerHTML = state.announcements.map(a => `
+
+      const searchVal = document.getElementById('annSearchFilterInput') ? document.getElementById('annSearchFilterInput').value : '';
+      const filtered = getFilteredAnnouncements(searchVal, state.annFilterType === 'special');
+
+      const countBadge = document.getElementById('annFeedCountBadge');
+      if (countBadge) countBadge.textContent = `${filtered.length} بابەت`;
+
+      const hasManagePerm = canManageAnnouncements();
+
+      if (filtered.length === 0) {
+        feed.innerHTML = `
+          <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-ink-500">
+            هیچ نرخێکی ڕاگەیەندراو بەم کۆد یان ناوە نەدۆزرایەوە.
+          </div>
+        `;
+        return;
+      }
+
+      feed.innerHTML = filtered.map(a => `
         <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-2 space-y-3">
           <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border pb-2.5">
             <div class="flex items-center gap-2">
               <span class="font-mono text-xs font-extrabold bg-primary text-white px-2.5 py-0.5 rounded">کۆد: ${a.product_code}</span>
               <h5 class="text-sm font-extrabold text-ink-900">${a.product_name}</h5>
+              <span class="ui-chip !py-0 !px-2 !text-[10px]">${(a.tiers || []).length} نرخ</span>
             </div>
-            <span class="font-mono text-[11px] text-ink-500">${a.created_at} • ${a.created_by}</span>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[11px] text-ink-500">${a.created_at} • ${a.created_by || 'ئەدمین'}</span>
+              ${hasManagePerm ? `
+                <button onclick="deleteAnnouncementItem('${a.id}')" class="text-alert-errorText hover:bg-alert-errorBg px-2 py-1 rounded text-xs font-bold" title="سڕینەوەی ئەم نرخە">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              ` : ''}
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            ${a.tiers.map(t => `
+            ${(a.tiers || []).map(t => `
               <div class="${t.isSpecial ? 'bg-alert-warnBg border-alert-warnBorder text-alert-warnText' : 'bg-surface-bright border-border text-ink-900'} border rounded-[10px] p-3 flex items-center justify-between">
                 <div>
                   <span class="text-xs font-extrabold block">${t.label}</span>
@@ -2944,8 +3121,8 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-surface-bright p-3 rounded-[10px] border border-border">
-            <div><span class="font-bold text-ink-500">📌 مەرج:</span> <span class="font-semibold text-ink-900">${a.condition_text}</span></div>
-            <div><span class="font-bold text-ink-500">💡 هۆکار:</span> <span class="font-semibold text-ink-900">${a.reason_text}</span></div>
+            <div><span class="font-bold text-ink-500">📌 مەرج:</span> <span class="font-semibold text-ink-900">${a.condition_text || '-'}</span></div>
+            <div><span class="font-bold text-ink-500">💡 هۆکار:</span> <span class="font-semibold text-ink-900">${a.reason_text || '-'}</span></div>
           </div>
         </div>
       `).join('');
@@ -2987,7 +3164,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
             <span class="font-mono text-[10px] text-ink-500">${a.created_at}</span>
           </div>
           <div class="text-xs font-bold text-ink-900">
-            ${a.tiers.map(t => `${t.label}: ${Number(t.price).toLocaleString()} د.ع`).join(' • ')}
+            ${(a.tiers || []).map(t => `${t.label}: ${Number(t.price).toLocaleString()} د.ع`).join(' • ')}
           </div>
           <p class="text-[11px] text-ink-500">مەرج: ${a.condition_text} | هۆکار: ${a.reason_text}</p>
         </div>
@@ -2999,40 +3176,12 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       document.getElementById('notificationsModal').classList.add('hidden');
     }
 
+    // =========================================================
+    // FULL ANNOUNCED PRICES REPORT MODAL + EXCEL & PDF EXPORT
+    // =========================================================
     async function openFullCatalogModal() {
       document.getElementById('fullCatalogModal').classList.remove('hidden');
-      const body = document.getElementById('fullCatalogTableBody');
       await ensureDbReady();
-
-      if (state.supabaseClient) {
-        body.innerHTML = `<div class="p-6 text-center text-xs font-bold text-primary">⏳ خەریکی ئامادەکردنی لیستی بەرهەمەکانم لە خشتەی sales_data...</div>`;
-        try {
-          const { data } = await state.supabaseClient
-            .from('sales_data')
-            .select('*')
-            .gt(col('carton_price'), 0)
-            .order(col('invoice_date'), { ascending: false })
-            .limit(800);
-
-          if (data && data.length > 0) {
-            const prodMap = new Map();
-            data.forEach(raw => {
-              const r = mapSupabaseRow(raw);
-              if (r.product_code && !prodMap.has(r.product_code)) {
-                prodMap.set(r.product_code, {
-                  code: r.product_code,
-                  name: r.product_name,
-                  base_price: r.carton_price,
-                  category: 'sales_data'
-                });
-              }
-            });
-            state.catalogCache = Array.from(prodMap.values());
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      }
       renderFullCatalogTable();
     }
 
@@ -3043,26 +3192,194 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     function renderFullCatalogTable() {
       const q = normalizeCode(document.getElementById('catalogFilterInput').value).toLowerCase();
       const body = document.getElementById('fullCatalogTableBody');
+      const countEl = document.getElementById('modalReportTotalCount');
 
-      const filtered = state.catalogCache.filter(p => !q || p.code.toLowerCase().includes(q) || p.name.toLowerCase().includes(q));
-      body.innerHTML = filtered.map(p => {
-        const latestAnn = state.announcements.find(a => a.product_code === p.code);
-        return `
-          <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="font-mono text-xs font-extrabold bg-primary text-white px-2 py-0.5 rounded">${p.code}</span>
-                <h5 class="text-sm font-extrabold text-ink-900">${p.name}</h5>
-              </div>
-            </div>
-            <div class="text-left">
-              <span class="text-[10px] text-ink-500 font-bold block">کۆتا نرخی تۆمارکراو</span>
-              <span class="font-mono text-sm font-extrabold text-primary">${Number(p.base_price).toLocaleString()} دینار</span>
-              ${latestAnn ? `<span class="block text-[10px] font-bold text-alert-warnText">★ ئۆفەری چالاکی هەیە</span>` : ''}
-            </div>
+      const filtered = getFilteredAnnouncements(q, false);
+      if (countEl) countEl.textContent = `${filtered.length} بابەت ڕاگەیەندراوە`;
+
+      if (filtered.length === 0) {
+        body.innerHTML = `
+          <div class="p-8 text-center text-xs font-bold text-ink-500">
+            هیچ بابەتێکی ڕاگەیەندراو بەم کۆد یان ناوە نەدۆزرایەوە.
           </div>
         `;
+        return;
+      }
+
+      body.innerHTML = filtered.map((a, idx) => `
+        <div class="bg-surface-bright border border-border rounded-[12px] p-4 space-y-2.5 shadow-level-1">
+          <div class="flex items-center justify-between flex-wrap gap-2 border-b border-border/70 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-ink-100 text-ink-900 font-mono text-xs font-extrabold flex items-center justify-center">${idx + 1}</span>
+              <span class="font-mono text-xs font-extrabold bg-primary text-white px-2.5 py-0.5 rounded">کۆد: ${a.product_code}</span>
+              <h5 class="text-sm font-extrabold text-ink-900">${a.product_name}</h5>
+            </div>
+            <span class="font-mono text-[11px] text-ink-500">بەرواری ڕاگەیاندن: ${a.created_at}</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            ${(a.tiers || []).map((t, tIdx) => `
+              <div class="${t.isSpecial ? 'bg-alert-warnBg border-alert-warnBorder text-alert-warnText' : 'bg-surface border-border text-ink-900'} border rounded-[8px] px-3 py-2 flex items-center justify-between">
+                <div>
+                  <span class="text-[11px] font-extrabold block">${tIdx + 1}. ${t.label}</span>
+                  ${t.isSpecial ? '<span class="text-[9px] font-black">★ عرض خاص</span>' : ''}
+                </div>
+                <span class="font-mono text-xs font-black">${Number(t.price).toLocaleString()} د.ع</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-ink-700 pt-1">
+            <div><b>📌 مەرج:</b> ${a.condition_text || '-'}</div>
+            <div><b>💡 هۆکار:</b> ${a.reason_text || '-'}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Export All Announced Prices (with all multi-price tiers) to Excel (.xlsx)
+    function exportAnnouncementsToExcel() {
+      const q = document.getElementById('catalogFilterInput') ? document.getElementById('catalogFilterInput').value : '';
+      const list = getFilteredAnnouncements(q, false);
+
+      if (list.length === 0) {
+        alertModal('ئاگاداری', 'هیچ نرخێکی ڕاگەیەندراو نییە بۆ داگرتن بە ئێکسڵ.');
+        return;
+      }
+
+      // Find maximum number of tiers across all announced products so every tier gets its own column
+      const maxTiers = list.reduce((max, a) => Math.max(max, (a.tiers || []).length), 1);
+
+      const excelRows = list.map((a, index) => {
+        const rowObj = {
+          'ژمارە': index + 1,
+          'کۆدی بابەت': a.product_code,
+          'ناوی بەرهەم': a.product_name,
+          'کۆی نرخەکان': (a.tiers || []).map(t => `${t.label}: ${Number(t.price).toLocaleString()} د.ع${t.isSpecial ? ' (عرض خاص)' : ''}`).join(' | ')
+        };
+
+        for (let i = 0; i < maxTiers; i++) {
+          const tier = (a.tiers || [])[i];
+          rowObj[`جۆری نرخی ${i + 1}`] = tier ? `${tier.label}${tier.isSpecial ? ' (عرض خاص)' : ''}` : '-';
+          rowObj[`بڕی نرخی ${i + 1} (دینار)`] = tier ? Number(tier.price) : '';
+        }
+
+        rowObj['مەرجی فرۆشتن'] = a.condition_text || '-';
+        rowObj['هۆکار و تێبینی'] = a.reason_text || '-';
+        rowObj['بەرواری ڕاگەیاندن'] = a.created_at || '-';
+        rowObj['ڕاگەیەنەر'] = a.created_by || '-';
+        return rowObj;
+      });
+
+      if (window.XLSX) {
+        const ws = XLSX.utils.json_to_sheet(excelRows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'نرخە ڕاگەیەندراوەکان');
+        const dateStr = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `Sahel_Announced_Prices_${dateStr}.xlsx`);
+      } else {
+        alertModal('ئاگاداری', 'کتێبخانەی ئێکسڵ بار نەبووە، تکایە پەیوەندی ئینتەرنێت بپشکنە.');
+      }
+    }
+
+    // Export All Announced Prices (with all multi-price tiers) to Printable / Save-as-PDF Report
+    function exportAnnouncementsToPDF() {
+      const q = document.getElementById('catalogFilterInput') ? document.getElementById('catalogFilterInput').value : '';
+      const list = getFilteredAnnouncements(q, false);
+
+      if (list.length === 0) {
+        alertModal('ئاگاداری', 'هیچ نرخێکی ڕاگەیەندراو نییە بۆ داگرتن بە PDF.');
+        return;
+      }
+
+      const todayStr = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      const printWin = window.open('', '_blank');
+
+      const rowsHtml = list.map((a, idx) => {
+        const tiersBadges = (a.tiers || []).map(t => `
+          <div style="display:inline-block; margin:2px 4px; padding:4px 8px; border-radius:6px; border:1px solid ${t.isSpecial ? '#D97706' : '#0A3D43'}; background:${t.isSpecial ? '#FEF3C7' : '#F0FDF4'}; font-size:11px;">
+            <b>${t.label}:</b> <span style="font-family:monospace; font-weight:800;">${Number(t.price).toLocaleString()} د.ع</span>
+            ${t.isSpecial ? '<strong style="color:#B45309;"> (★ عرض خاص)</strong>' : ''}
+          </div>
+        `).join('');
+
+        return `
+          <tr>
+            <td style="text-align:center; font-family:monospace; font-weight:700;">${idx + 1}</td>
+            <td style="text-align:center; font-family:monospace; font-weight:800; color:#0A3D43;">${a.product_code}</td>
+            <td style="font-weight:800;">${a.product_name}</td>
+            <td>${tiersBadges}</td>
+            <td>${a.condition_text || '-'}</td>
+            <td>${a.reason_text || '-'}</td>
+            <td style="font-family:monospace; font-size:11px;">${a.created_at || '-'}</td>
+          </tr>
+        `;
       }).join('');
+
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html lang="ckb" dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <title>ڕاپۆرتی فەرمی نرخی بەرهەمەکان — کۆمپانیای ساحل العراق</title>
+          <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+          <style>
+            body { font-family: 'Vazirmatn', sans-serif; padding: 24px; color: #1C1B19; background: #FFFFFF; }
+            .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0A3D43; padding-bottom: 14px; margin-bottom: 20px; }
+            .title { font-size: 20px; font-weight: 800; color: #0A3D43; margin: 0; }
+            .subtitle { font-size: 12px; color: #555; margin-top: 4px; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            th, td { border: 1px solid #BDB9B0; padding: 8px 10px; text-align: right; vertical-align: middle; }
+            th { background-color: #0A3D43; color: #FFFFFF; font-weight: 800; }
+            tr:nth-child(even) { background-color: #F6F4EF; }
+            @media print {
+              .no-print { display: none !important; }
+              body { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom:16px; display:flex; gap:10px;">
+            <button onclick="window.print()" style="background:#0A3D43; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-family:inherit; font-weight:800; cursor:pointer;">
+              🖨️ چاپکردن / پاشەکەوتکردن وەک PDF
+            </button>
+            <button onclick="window.close()" style="background:#EAE7E0; color:#1C1B19; border:1px solid #BDB9B0; padding:10px 16px; border-radius:8px; font-family:inherit; font-weight:700; cursor:pointer;">
+              داخستن
+            </button>
+          </div>
+          <div class="header">
+            <div>
+              <h1 class="title">کۆمپانیای ساحل العراق — ڕاپۆرتی گشتیی نرخی بەرهەمەکان و عرض خاص</h1>
+              <p class="subtitle">لیستی فەرمی هەموو ئەو نرخانەی لەلایەن کارگێڕییەوە بۆ مەندووبان ڕاگەیەندراون</p>
+            </div>
+            <div style="text-align:left; font-size:12px;">
+              <div><b>بەرواری دەرچوون:</b> <span style="font-family:monospace;">${todayStr}</span></div>
+              <div><b>کۆی بابەتەکان:</b> ${list.length} بابەت</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th style="width:85px;">کۆدی بابەت</th>
+                <th style="width:200px;">ناوی بەرهەم</th>
+                <th>نرخە دیاریکراوەکان و عرض خاص</th>
+                <th style="width:140px;">مەرجی فرۆشتن</th>
+                <th style="width:140px;">هۆکار</th>
+                <th style="width:110px;">بەروار</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+          <script>
+            window.onload = function() { setTimeout(function() { window.print(); }, 400); };
+          <\/script>
+        </body>
+        </html>
+      `);
+      printWin.document.close();
     }
 
     // =========================================================
@@ -3100,6 +3417,11 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const imei_device_id = document.getElementById('usrImei').value.trim() || '*';
 
       const permissions = Array.from(document.querySelectorAll('input[name="usrPerm"]:checked')).map(cb => cb.value);
+      // If user has `manage_announcements`, automatically ensure `announcements` view tab is enabled too
+      if (permissions.includes('manage_announcements') && !permissions.includes('announcements')) {
+        permissions.push('announcements');
+      }
+
       if (permissions.length === 0) {
         alertModal('کێشەی دەسەڵات', 'تکایە لانیکەم یەک بەش لە چێک لیستەکەدا بۆ ئەم بەکارهێنەرە دیاری بکە.');
         return;
@@ -3142,7 +3464,8 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         price_lookup: 'نرخی بەرهەم',
         market_items: 'کاڵای مارکێت',
         price_audit: 'ڕاپۆرتی مێژوو',
-        announcements: 'ڕاگەیاندنی نرخ',
+        announcements: 'بینینی نرخەکان',
+        manage_announcements: '★ دانانی نرخ و عرض خاص',
         contracts: 'گرێبەستەکان',
         admin_users: 'ئەدمین/داتابەیس'
       };
@@ -3157,7 +3480,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
               <span class="font-mono text-[11px] bg-alert-infoBg text-alert-infoText px-2 py-0.5 rounded">IMEI: ${u.imei_device_id}</span>
             </div>
             <div class="flex flex-wrap gap-1 pt-1">
-              ${(u.permissions || []).map(p => `<span class="ui-chip !py-0 !px-2 !text-[10px]">${permLabels[p] || p}</span>`).join('')}
+              ${(u.permissions || []).map(p => `<span class="ui-chip !py-0 !px-2 !text-[10px] ${p === 'manage_announcements' ? 'bg-alert-warnBg border-alert-warnBorder text-alert-warnText' : ''}">${permLabels[p] || p}</span>`).join('')}
             </div>
           </div>
           <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0">
@@ -3219,7 +3542,8 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
       try {
         await state.supabaseClient.from('app_users').upsert(state.users, { onConflict: 'username' });
-        alertModal('هاوکاتکردن سەرکەوتوو بوو', 'تەواوی خشتەی بەکارهێنەران و دەسەڵاتەکان لەگەڵ Supabase هاوکات کران.');
+        await state.supabaseClient.from('price_announcements').upsert(state.announcements, { onConflict: 'id' });
+        alertModal('هاوکاتکردن سەرکەوتوو بوو', 'تەواوی خشتەی بەکارهێنەران و نرخە ڕاگەیەندراوەکان لەگەڵ Supabase هاوکات کران.');
       } catch (e) {
         alertModal('کێشە لە هاوکاتکردن', e.message);
       }
