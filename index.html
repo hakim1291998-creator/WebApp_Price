@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>کۆمپانیای ساحل العراق — سیستەمی ناوەندیی فرۆش و مەندووبان | v3.5</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- SheetJS (xlsx) for Direct Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Professional Kurdish & Monospace Fonts: Vazirmatn, Noto Sans Arabic, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Vazirmatn', 'Noto Sans Arabic', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            canvas: '#EAE7E0',
+            surface: {
+              DEFAULT: '#F6F4EF',
+              bright: '#FAF8F5',
+              muted: '#E5E2DC',
+            },
+            primary: {
+              DEFAULT: '#0A3D43',
+              hover: '#145057',
+              active: '#06282C',
+              subtle: '#E1EFF3',
+            },
+            border: {
+              DEFAULT: '#D6D2C9',
+              dark: '#BDB9B0',
+            },
+            ink: {
+              900: '#1C1B19',
+              700: '#4A4843',
+              500: '#78756E',
+              300: '#BDB9B0',
+              100: '#E5E2DC',
+              50: '#F5F3EE',
+            },
+            alert: {
+              successBg: '#E3F1E6',
+              successBorder: '#A5CFAF',
+              successText: '#1E522B',
+              infoBg: '#E1EFF3',
+              infoBorder: '#9EC5D1',
+              infoText: '#134959',
+              warnBg: '#F9F0D9',
+              warnBorder: '#DEC385',
+              warnText: '#6B4E09',
+              errorBg: '#F7E3E1',
+              errorBorder: '#D99E99',
+              errorText: '#6E1F1A',
+            }
+          },
+          boxShadow: {
+            'level-1': '0 2px 4px -1px rgba(28, 27, 25, 0.06), 0 1px 2px -1px rgba(28, 27, 25, 0.04)',
+            'level-2': '0 4px 6px -2px rgba(28, 27, 25, 0.08), 0 2px 4px -2px rgba(28, 27, 25, 0.04)',
+            'level-3': '0 8px 16px -4px rgba(28, 27, 25, 0.10), 0 4px 6px -2px rgba(28, 27, 25, 0.05)',
+            'level-4': '0 14px 28px -6px rgba(28, 27, 25, 0.14), 0 6px 10px -4px rgba(28, 27, 25, 0.06)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <script type="module" crossorigin src="./assets/index-DgAzDaMw.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CqDuoNiB.css">
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white" onclick="closeAllAutocompletes(event)">
+
+  <!-- Top Architectural Ruler -->
+  <div class="ruler-bar w-full flex items-center justify-between px-4 lg:px-8 select-none overflow-hidden shrink-0">
+    <div class="flex items-center gap-10 lg:gap-16">
+      <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span class="hidden md:inline">11</span><span class="hidden md:inline">12</span><span class="hidden xl:inline">13</span><span class="hidden xl:inline">14</span>
+    </div>
+    <div class="font-mono text-[10px] tracking-widest uppercase text-ink-700 font-semibold">
+      SAHEL AL-IRAQ • ENTERPRISE DESKTOP & MOBILE v3.5
+    </div>
+  </div>
+
+  <!-- Toast Notification Banner (Real-time Alert) -->
+  <div id="toastBanner" class="hidden fixed top-8 left-4 right-4 max-w-lg mx-auto z-50 bg-primary text-surface-bright border border-ink-900 rounded-[12px] p-3.5 shadow-level-4 flex items-center justify-between transition-all">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-[8px] bg-white/15 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-bell text-amber-300 animate-bounce"></i>
+      </div>
+      <div>
+        <h4 id="toastTitle" class="text-xs font-extrabold">ئاگاداری نوێی نرخ و ئۆفەر</h4>
+        <p id="toastBody" class="text-[11px] opacity-90 mt-0.5"></p>
+      </div>
+    </div>
+    <button onclick="hideToast()" class="text-white/70 hover:text-white px-2">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 1. LOGIN SCREEN (Responsive Mobile Card & Desktop Split)   -->
+  <!-- ========================================================= -->
+  <div id="screen-login" class="flex-1 flex flex-col justify-center items-center px-4 py-6 lg:py-12 max-w-md lg:max-w-5xl mx-auto w-full">
+    
+    <!-- Mobile-Only Header -->
+    <div class="w-full text-right mb-5 border-b border-border pb-4 lg:hidden">
+      <div class="flex items-center justify-between mb-2">
+        <span class="ui-chip ui-chip-active font-mono text-[10px]">Version 3.5 | Enterprise</span>
+        <span class="font-mono text-xs text-ink-500">IMEI GUARD ACTIVE</span>
+      </div>
+      <h1 class="text-3xl font-black text-ink-900 tracking-tight leading-tight">
+        کۆمپانیای ساحل العراق
+      </h1>
+      <p class="text-xs font-medium text-ink-700 mt-1">
+        سیستەمی ناوەندیی نرخی بەرهەم، مارکێتەکان، ڕاپۆرت و ئۆفەرەکان
+      </p>
+    </div>
+
+    <!-- Responsive Split Container -->
+    <div class="w-full grid grid-cols-1 lg:grid-cols-12 bg-surface border border-border rounded-[20px] shadow-level-4 overflow-hidden">
+      
+      <!-- Desktop Right Showcase Panel -->
+      <div class="hidden lg:flex lg:col-span-5 bg-primary text-surface-bright p-8 flex-col justify-between relative overflow-hidden">
+        <div class="space-y-5 relative z-10">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-[11px] bg-white/15 px-3 py-1 rounded-full font-bold tracking-wider">PRODUCT UI v3.5</span>
+            <span class="font-mono text-[11px] text-emerald-300 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              ONLINE 24/7
+            </span>
+          </div>
+
+          <div class="pt-2">
+            <div class="w-12 h-12 rounded-[14px] bg-white/15 border border-white/20 flex items-center justify-center font-mono text-2xl font-black mb-4">
+              S
+            </div>
+            <h1 class="text-3xl font-black tracking-tight leading-snug">
+              کۆمپانیای ساحل العراق
+            </h1>
+            <p class="text-xs text-surface-muted/85 mt-2 leading-relaxed">
+              پلاتفۆرمی ناوەندیی بەڕێوەبردنی فرۆش، پشکنینی ٥ نرخی جیاوازی بەرهەم، چاودێریکردنی کاڵای مارکێتەکان و ڕاگەیاندنی خێرای ئۆفەرەکان بۆ مەندووبان و بەڕێوەبەران.
+            </p>
+          </div>
+
+          <div class="space-y-3 pt-4 border-t border-white/15 text-xs">
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-[8px] bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-layer-group text-amber-300"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold">شیکاری ٥ نرخی جیاواز + بڕ بە کارتۆن و دانە</h4>
+                <p class="text-[11px] text-surface-muted/75 mt-0.5">دەرکێشانی ڕاستەوخۆی کۆتا نرخ، نرخی پێشتر و هەرزانترین نرخ لەگەڵ بەروار.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-[8px] bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-shield-halved text-emerald-300"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold">پاراستنی هەژمار بە قفڵی ئامێر (IMEI Lock)</h4>
+                <p class="text-[11px] text-surface-muted/75 mt-0.5">ڕێگریکردن لە کردنەوەی هەژماری مەندووب لەسەر مۆبایل یان کۆمپیوتەری بێگانە.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-7 h-7 rounded-[8px] bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-bolt text-sky-300"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold">بەستراوە بە خشتەی فەرمی public.sales_data</h4>
+                <p class="text-[11px] text-surface-muted/75 mt-0.5">بەستراوە بە بنکەدراوەی PostgreSQL لەسەر Supabase بە خێرایی کەمتر لە چرکەیەک.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-white/15 flex items-center justify-between text-[11px] font-mono text-surface-muted/70 relative z-10">
+          <span>CLEAN SAAS MONOCHROME</span>
+          <span>ERBIL • KIRKUK • IRAQ</span>
+        </div>
+      </div>
+
+      <!-- Login Form Column -->
+      <div class="lg:col-span-7 p-5 sm:p-7 lg:p-9 flex flex-col justify-center">
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-border/70">
+          <div>
+            <h2 class="text-base lg:text-lg font-extrabold text-ink-900">چوونەژوورەوەی ستاف و مەندووبان</h2>
+            <p class="text-[11px] lg:text-xs text-ink-500 mt-0.5">تکایە ناوی بەکارهێنەر، تێپەڕەوشە و کۆدی ناسنامەی ئامێرەکەت (IMEI) بنووسە</p>
+          </div>
+          <div class="w-10 h-10 rounded-[12px] bg-primary text-surface-bright flex items-center justify-center shadow-level-1">
+            <i class="fa-solid fa-fingerprint text-base"></i>
+          </div>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-bold text-ink-900 mb-1">ناوی بەکارهێنەر (Username)</label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="loginUsername" 
+                  required
+                  placeholder="ناوی بەکارهێنەر بنووسە..." 
+                  class="ui-input w-full pr-3.5 pl-9 py-2.5 text-sm font-mono font-semibold text-left"
+                  dir="ltr"
+                >
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-ink-500">
+                  <i class="fa-regular fa-user text-xs"></i>
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-ink-900 mb-1">تێپەڕەوشە (Password)</label>
+              <div class="relative">
+                <input 
+                  type="password" 
+                  id="loginPassword" 
+                  required
+                  placeholder="••••••••" 
+                  class="ui-input w-full pr-10 pl-3.5 py-2.5 text-sm font-mono text-left"
+                  dir="ltr"
+                >
+                <button 
+                  type="button" 
+                  onclick="togglePasswordVisibility()" 
+                  class="absolute inset-y-0 right-0 flex items-center pr-3 text-ink-500 hover:text-ink-900 focus:outline-none"
+                >
+                  <i id="passwordToggleIcon" class="fa-regular fa-eye text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editable Device ID / IMEI Binding Box -->
+          <div class="bg-surface-bright border border-border rounded-[10px] p-3">
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[11px] font-extrabold text-ink-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-laptop-medical text-primary"></i>
+                <span>ناسنامەی ئامێر / IMEI (کۆدی پێدراو لەلایەن ئەدمین):</span>
+              </label>
+              <button type="button" onclick="copyDeviceImei()" class="text-[10px] font-bold text-primary hover:underline flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i>
+                <span id="copyImeiBtnText">کۆپیکردنی کۆد</span>
+              </button>
+            </div>
+            <input 
+              type="text" 
+              id="loginDeviceImei" 
+              required
+              placeholder="کۆدی IMEI لێرە بنووسە..."
+              class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-primary text-left"
+              dir="ltr"
+            >
+            <p class="text-[10px] text-ink-500 mt-1">
+              ئەو کۆدی IMEIـیەی لەلایەن بەڕێوەبەرەوە پێت دراوە لێرە بینووسە بۆ چوونەژوورەوە.
+            </p>
+          </div>
+
+          <!-- Styleguide Error Alert -->
+          <div id="loginError" class="hidden rounded-[8px] bg-alert-errorBg border border-alert-errorBorder text-alert-errorText px-3.5 py-2.5 text-xs font-semibold flex items-start gap-2.5">
+            <i class="fa-solid fa-circle-exclamation text-sm shrink-0 mt-0.5"></i>
+            <span id="loginErrorText">هەڵە لە چوونەژوورەوە.</span>
+          </div>
+
+          <button 
+            type="submit" 
+            id="loginSubmitBtn"
+            class="btn-primary w-full py-3 px-4 font-bold text-sm shadow-level-2 flex items-center justify-center gap-2"
+          >
+            <span>پشکنینی ئامێر و چوونەژوورەوە بۆ سیستەم</span>
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. MAIN APPLICATION SHELL (Responsive Mobile + Desktop)    -->
+  <!-- ========================================================= -->
+  <div id="screen-app" class="hidden flex-1 flex flex-col lg:flex-row max-w-[1440px] mx-auto w-full">
+    
+    <!-- DESKTOP / LAPTOP PERMANENT RIGHT SIDEBAR -->
+    <aside class="hidden lg:flex lg:w-72 xl:w-80 shrink-0 bg-surface border-l border-border flex-col justify-between p-5 select-none sticky top-[22px] h-[calc(100vh-22px)] overflow-y-auto">
+      <div class="space-y-5">
+        <!-- Brand Header -->
+        <div class="flex items-center gap-3 pb-4 border-b border-border">
+          <div class="w-11 h-11 rounded-[12px] bg-primary text-surface-bright flex items-center justify-center font-mono font-black text-lg shadow-level-2 shrink-0">
+            S
+          </div>
+          <div>
+            <h2 class="text-base font-black text-ink-900 leading-tight">کۆمپانیای ساحل العراق</h2>
+            <p class="text-[11px] text-ink-500 font-semibold mt-0.5">سیستەمی ناوەندیی فرۆش و نرخ</p>
+          </div>
+        </div>
+
+        <!-- User Profile & IMEI Box -->
+        <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 space-y-2 shadow-level-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-ink-500">بەکارهێنەری چالاک</span>
+            <span id="sidebarRoleBadge" class="ui-chip ui-chip-active !py-0.5 !px-2.5 !text-[10px]">ئەدمین</span>
+          </div>
+          <p id="sidebarUserName" class="text-xs font-extrabold text-ink-900 truncate"></p>
+          <div class="pt-1.5 border-t border-border/60 flex items-center justify-between text-[10px] font-mono text-ink-500">
+            <span>DEVICE LOCK:</span>
+            <span id="sidebarImeiCode" class="font-bold text-primary"></span>
+          </div>
+        </div>
+
+        <!-- Sidebar Navigation Links -->
+        <div class="space-y-1.5">
+          <span class="block text-[10px] font-mono uppercase tracking-wider text-ink-500 px-2 mb-1">بەشەکانی سیستەم (MODULES)</span>
+          
+          <button onclick="switchView('hub')" id="side-hub" class="sidebar-link sidebar-link-active">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-grip w-4 text-center"></i>
+              <span>داشبۆردی سەرەکی</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">00</span>
+          </button>
+
+          <button onclick="switchView('pricing')" id="side-pricing" data-perm="price_lookup" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-tags w-4 text-center"></i>
+              <span>نرخی بەرهەم (٥ نرخ)</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">01</span>
+          </button>
+
+          <button onclick="switchView('market_items')" id="side-market_items" data-perm="market_items" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-store w-4 text-center"></i>
+              <span>کاڵاکانی ناو مارکێت</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">02</span>
+          </button>
+
+          <button onclick="switchView('price_audit')" id="side-price_audit" data-perm="price_audit" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-magnifying-glass-location w-4 text-center"></i>
+              <span>ڕاپۆرتی مێژووی نرخ</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">03</span>
+          </button>
+
+          <button onclick="switchView('announcements')" id="side-announcements" data-perm="announcements" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-bullhorn w-4 text-center"></i>
+              <span>ڕاگەیاندنی نرخ و ئۆفەر</span>
+            </span>
+            <span class="bg-alert-warnBg text-alert-warnText border border-alert-warnBorder font-mono text-[10px] px-1.5 py-0.2 rounded-full">عرض</span>
+          </button>
+
+          <button onclick="switchView('services')" id="side-services" data-perm="services" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-hand-holding-dollar w-4 text-center"></i>
+              <span>خزمەتگوزارییەکان</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">05</span>
+          </button>
+
+          <button onclick="switchView('contracts')" id="side-contracts" data-perm="contracts" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-file-contract w-4 text-center"></i>
+              <span>گرێبەست و پسوڵەکان</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">06</span>
+          </button>
+
+          <button onclick="switchView('admin_users')" id="side-admin_users" data-perm="admin_users" class="sidebar-link">
+            <span class="flex items-center gap-2.5">
+              <i class="fa-solid fa-users-gear w-4 text-center"></i>
+              <span>بەکارهێنەران و داتابەیس</span>
+            </span>
+            <span class="font-mono text-[10px] opacity-75">ADMIN</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Quick Actions in Sidebar -->
+      <div class="space-y-2 pt-4 border-t border-border">
+        <button onclick="openFullCatalogModal()" class="btn-secondary w-full py-2.5 px-3 text-xs font-extrabold flex items-center justify-center gap-2">
+          <i class="fa-solid fa-table-list text-primary"></i>
+          <span>ڕاپۆرتی تەواوی نرخەکان (Excel/PDF)</span>
+        </button>
+        <button onclick="logout()" class="btn-tertiary w-full py-2 px-3 text-xs font-bold text-alert-errorText flex items-center justify-center gap-2">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>چوونەدەرەوە لە هەژمار</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT COLUMN -->
+    <div class="flex-1 flex flex-col min-w-0 pb-16 lg:pb-8">
+      
+      <!-- Sticky Header -->
+      <header class="sticky top-0 z-30 bg-surface/95 backdrop-blur-md border-b border-border px-4 lg:px-8 pt-3 pb-0 lg:py-3.5 shadow-level-1">
+        <div class="flex items-center justify-between pb-3 lg:pb-0">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex lg:hidden items-center justify-center font-mono font-bold text-base shadow-level-1">
+              S
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 id="desktopActiveViewTitle" class="text-sm sm:text-base lg:text-lg font-extrabold text-ink-900 leading-none">
+                  کۆمپانیای ساحل العراق — ناوەندی کۆنترۆڵ
+                </h2>
+                <span id="userBadgeRole" class="ui-chip ui-chip-active !py-0.5 !px-2.5 !text-[10px] lg:hidden">ئەدمین</span>
+              </div>
+              <p id="userDisplayName" class="text-[11px] lg:text-xs text-ink-500 font-medium mt-1">
+                بەخێربێیت بۆ سیستەمی زیرەکی نرخ و بەڕێوەبردنی فرۆش
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="openFullCatalogModal()" class="hidden md:flex btn-secondary px-3.5 py-2 text-xs font-extrabold items-center gap-1.5">
+              <i class="fa-solid fa-table-list text-primary"></i>
+              <span>ڕاپۆرتی تەواوی نرخی بەرهەمەکان</span>
+            </button>
+
+            <button onclick="openNotificationsModal()" class="btn-secondary relative px-3 py-2 text-xs font-bold flex items-center gap-1.5" title="ئاگادارکردنەوەکانی نرخ و ئۆفەر">
+              <i class="fa-regular fa-bell text-sm text-primary"></i>
+              <span class="hidden sm:inline text-xs">ئاگادارییەکان</span>
+              <span id="notifUnreadBadge" class="bg-alert-errorText text-white font-mono text-[10px] font-extrabold px-1.5 py-0.2 rounded-full">
+                1
+              </span>
+            </button>
+
+            <button onclick="logout()" title="دەرچوون" class="lg:hidden btn-secondary px-3 py-2 text-xs font-bold text-alert-errorText flex items-center gap-1">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span class="hidden sm:inline">دەرچوون</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile-Only Underline Tabs -->
+        <div id="topTabsContainer" class="flex lg:hidden items-center gap-4 overflow-x-auto no-scrollbar border-t border-border/60 pt-2.5">
+          <button onclick="switchView('hub')" id="tab-hub" class="ui-tab ui-tab-active whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-grip text-xs"></i>
+            <span>سەرەکی</span>
+          </button>
+          <button onclick="switchView('pricing')" id="tab-pricing" data-perm="price_lookup" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-tags text-xs"></i>
+            <span>نرخی بەرهەم (٥ نرخ)</span>
+          </button>
+          <button onclick="switchView('market_items')" id="tab-market_items" data-perm="market_items" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-store text-xs"></i>
+            <span>کاڵاکانی مارکێت</span>
+          </button>
+          <button onclick="switchView('price_audit')" id="tab-price_audit" data-perm="price_audit" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-magnifying-glass-location text-xs"></i>
+            <span>ڕاپۆرتی مێژووی نرخ</span>
+          </button>
+          <button onclick="switchView('announcements')" id="tab-announcements" data-perm="announcements" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-bullhorn text-xs"></i>
+            <span>ڕاگەیاندنی نرخ و ئۆفەر</span>
+          </button>
+          <button onclick="switchView('services')" id="tab-services" data-perm="services" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-hand-holding-dollar text-xs"></i>
+            <span>خزمەتگوزارییەکان</span>
+          </button>
+          <button onclick="switchView('contracts')" id="tab-contracts" data-perm="contracts" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-file-contract text-xs"></i>
+            <span>گرێبەست و پسوڵە</span>
+          </button>
+          <button onclick="switchView('admin_users')" id="tab-admin_users" data-perm="admin_users" class="ui-tab whitespace-nowrap flex items-center gap-1.5">
+            <i class="fa-solid fa-users-gear text-xs"></i>
+            <span>بەکارهێنەران و داتابەیس</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN WORKSPACE CONTAINER -->
+      <main class="flex-1 p-4 lg:p-8 space-y-5">
+
+        <!-- VIEW 1: HUB / OVERVIEW -->
+        <div id="view-hub" class="space-y-5">
+          
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">بنکەدراوەی چالاک</span>
+                <span class="font-mono text-base font-black text-ink-900 mt-0.5 block">sales_data</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-primary/10 text-primary flex items-center justify-center">
+                <i class="fa-solid fa-database"></i>
+              </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">بارودۆخی پەیوەندی</span>
+                <span id="hubDbStatusText" class="font-mono text-xs font-black text-primary mt-0.5 block">پەیوەست دەکرێت...</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-primary/10 text-primary flex items-center justify-center">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">ناسنامەی ئامێر (IMEI)</span>
+                <span id="hubDeviceTag" class="font-mono text-xs font-extrabold text-primary mt-1 block truncate max-w-[130px]">VERIFIED</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-alert-successBg text-alert-successText flex items-center justify-center">
+                <i class="fa-solid fa-shield-check"></i>
+              </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">بەشە ڕێپێدراوەکان</span>
+                <span id="hubPermCountChip" class="text-xs font-extrabold text-ink-900 mt-1 block">مۆڵەتەکان چالاکن</span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-ink-100 text-ink-700 flex items-center justify-center">
+                <i class="fa-solid fa-key"></i>
+              </div>
+            </div>
+          </div>
+
+          <div id="hubLatestOfferBanner" class="rounded-[14px] bg-alert-infoBg border border-alert-infoBorder text-alert-infoText p-4 shadow-level-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-fire-flame-curved text-base"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs sm:text-sm font-extrabold">دوایین ڕاگەیاندنی نرخ و عرض خاص:</span>
+                  <span class="ui-chip ui-chip-active !py-0 !px-2 !text-[9px]">نوێ</span>
+                </div>
+                <p id="hubBannerText" class="text-xs sm:text-sm font-semibold mt-0.5">
+                  کۆد 808 (زەیتونی رەش کامل 1.200گرام12عدد/ئارشیا) — عرض خاص: 46,500 دینار
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+              <button onclick="openFullCatalogModal()" class="btn-secondary px-3 py-2 text-xs font-bold">
+                ڕاپۆرتی تەواوی نرخەکان
+              </button>
+              <button onclick="switchView('announcements')" class="btn-primary px-4 py-2 text-xs font-bold">
+                بینینی ئۆفەرەکان
+              </button>
+            </div>
+          </div>
+
+          <!-- Hub Dynamic Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            
+            <div data-card-perm="price_lookup" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">01 • PRICING</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">٥ نرخی جیاواز</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">نرخی بەرهەم (٥ نرخ + بڕ)</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    پشکنینی کۆد یان ناوی مارکێت و بەرهەم لە خشتەی <code class="font-mono">sales_data</code> بۆ بینینی ٥ نرخی جیاواز، بەروار، و بڕی فرۆشراو بە کارتۆن و دانە.
+                  </p>
+                </div>
+                <div class="mt-5 flex gap-2">
+                  <button onclick="switchView('pricing'); setQuickSearch('164', '808')" class="btn-secondary flex-1 py-2.5 text-xs font-bold">نموونەی خێرا</button>
+                  <button onclick="switchView('pricing')" class="btn-primary flex-1 py-2.5 text-xs font-bold">کردنەوەی بەش</button>
+                </div>
+              </div>
+            </div>
+
+            <div data-card-perm="market_items" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">02 • MARKET PORTFOLIO</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px]">بەستنەوەی خۆکار</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">کاڵاکانی ناو مارکێت</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    کۆد یان ناوی مارکێت بنووسە بۆ زانینی هەموو ئەو کاڵایانەی بۆی داخڵ کراوە و بە یەک کلیک نرخەکانی ببینە.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('market_items')" class="btn-primary w-full py-2.5 text-xs font-bold">پشکنینی مارکێتەکان</button>
+                </div>
+              </div>
+            </div>
+
+            <div data-card-perm="price_audit" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">03 • AUDIT REPORT</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px]">فلتەری نرخ و بەروار</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">ڕاپۆرتی مێژووی نرخی بەرهەم</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    نرخێکی دیاریکراو و بەروار بدە بە سیستەم یان هەموو نرخە جیاوازەکان لە زۆرەوە بۆ کەم بە لاپەڕەبەندی ببینە.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('price_audit')" class="btn-primary w-full py-2.5 text-xs font-bold">کردنەوەی ڕاپۆرت</button>
+                </div>
+              </div>
+            </div>
+
+            <div data-card-perm="announcements" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">04 • OFFERS & ALERTS</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-alert-warnBg border-alert-warnBorder text-alert-warnText">عرض خاص</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و ئۆفەر</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    بینینی تەواوی نرخە ڕاگەیەندراوەکان بۆ هەموو بابەتەکان، فلتەری گەڕان بە کۆد و ناو، و داگرتنی ڕاپۆرت بە Excel و PDF.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('announcements')" class="btn-primary w-full py-2.5 text-xs font-bold">بەشی نرخ و ئۆفەرەکان</button>
+                </div>
+              </div>
+            </div>
+
+            <div data-card-perm="services" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">05 • SERVICES & RENT</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-emerald-50 text-emerald-800 border-emerald-300 font-extrabold">خزمەتگوزاری</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">خزمەتگوزارییەکان (کرێ، بەڕاد، داشکاندن)</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    تۆمارکردن و بینینی خزمەتگوزارییەکانی مارکێت لەوانە کرێی مانگانە، بەڕاد، موجەمیدە، رەف، داشکاندنی تایبەت لەگەڵ تێچوو و داگرتنی Excel.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('services')" class="btn-primary w-full py-2.5 text-xs font-bold">کردنەوەی خزمەتگوزارییەکان</button>
+                </div>
+              </div>
+            </div>
+
+            <div data-card-perm="contracts" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold text-ink-700">05 • DOCUMENTS</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px]">گرێبەست و پسوڵە</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">گرێبەستەکان و پسوڵە</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    ئەرشیفی فایلە فەرمییەکانی گرێبەست و گەڕان بەدوای ناوەڕۆکی پسوڵەکان بە ژمارەی پسوڵە لە <code class="font-mono">sales_data</code>.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('contracts')" class="btn-secondary w-full py-2.5 text-xs font-bold">کردنەوەی ئەرشیف</button>
+                </div>
+              </div>
+            </div>
+
+            <div data-card-perm="admin_users" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
+              <div class="h-12 bg-primary text-surface-bright px-4 flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold">06 • ADMIN & SUPABASE</span>
+                <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-white/20 text-white border-white/30">تایبەت بە ئەدمین</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 class="text-base font-extrabold text-ink-900">بەکارهێنەران، IMEI و داتابەیس</h4>
+                  <p class="text-xs text-ink-700 mt-1.5 leading-relaxed">
+                    دروستکردنی یوسەر بە ناو، پاسۆرد، کۆدی جیهاز (IMEI)، چێک لیستی دەسەڵاتەکان و بەستنەوەی Supabase.
+                  </p>
+                </div>
+                <div class="mt-5">
+                  <button onclick="switchView('admin_users')" class="btn-primary w-full py-2.5 text-xs font-bold">بەڕێوەبردنی سیستەم</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- VIEW 2: PRODUCT PRICE LOOKUP -->
+        <div id="view-pricing" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <div class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4 lg:sticky lg:top-24">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 class="text-base font-extrabold text-ink-900">فۆڕمی لێکۆڵینەوەی نرخ</h3>
+                  <p class="text-xs text-ink-500 mt-0.5">کۆد یان ناوی مارکێت و بەرهەم بنووسە بۆ دەرکێشانی ٥ نرخ</p>
+                </div>
+                <span class="ui-chip ui-chip-active font-mono text-[10px]">5-PRICES</span>
+              </div>
+
+              <div class="space-y-3.5">
+                <!-- Customer Code or Exact Name with Autocomplete -->
+                <div class="relative">
+                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆد یان ناوی کریار / مارکێت</label>
+                  <div class="relative">
+                    <input 
+                      type="text" 
+                      id="searchCustCode" 
+                      autocomplete="off"
+                      oninput="handleCustomerAutocomplete(this.value, 'priceCustSuggestBox', 'pricing')"
+                      onfocus="handleCustomerAutocomplete(this.value, 'priceCustSuggestBox', 'pricing')"
+                      placeholder="کۆد (164) یان ناوی مارکێت بنووسە..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-bold"
+                    >
+                    <i class="fa-solid fa-store absolute left-3 top-3 text-ink-500 text-xs"></i>
+                  </div>
+                  <span id="selectedPriceCustomerHint" class="text-[11px] font-extrabold text-primary block mt-1"></span>
+                  <div id="priceCustSuggestBox" class="autocomplete-Menu hidden"></div>
+                </div>
+
+                <!-- Product Code or Name with Autocomplete -->
+                <div class="relative">
+                  <label class="block text-xs font-bold text-ink-900 mb-1.5">کۆد یان ناوی بەرهەم</label>
+                  <div class="relative">
+                    <input 
+                      type="text" 
+                      id="searchProdCode" 
+                      autocomplete="off"
+                      oninput="handleProductAutocomplete(this.value, 'priceProdSuggestBox', 'pricing')"
+                      onfocus="handleProductAutocomplete(this.value, 'priceProdSuggestBox', 'pricing')"
+                      placeholder="کۆدی بەرهەم (808) یان ناوی کاڵا..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-bold"
+                    >
+                    <i class="fa-solid fa-box-open absolute left-3 top-3 text-ink-500 text-xs"></i>
+                  </div>
+                  <span id="selectedPriceProductHint" class="text-[11px] font-extrabold text-primary block mt-1"></span>
+                  <div id="priceProdSuggestBox" class="autocomplete-Menu hidden"></div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1">
+                <button onclick="executePriceLookup()" class="btn-primary flex-1 py-3 px-4 font-bold text-xs sm:text-sm shadow-level-1 flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                  <span>گەڕان و هێنانی ٥ نرخ</span>
+                </button>
+                <button onclick="clearPriceSearch()" class="btn-secondary py-3 px-3.5 text-xs font-bold">پاککردنەوە</button>
+              </div>
+
+              <div class="pt-3 border-t border-border">
+                <span class="block text-[11px] font-bold text-ink-500 mb-2">نموونەی ئامادەکراو لە خشتەی sales_data (کلیک بکە):</span>
+                <div class="flex flex-col gap-1.5">
+                  <button type="button" onclick="setQuickSearch('164', '808')" class="ui-chip hover:border-primary cursor-pointer font-mono justify-between w-full !rounded-[8px] !py-2">
+                    <span>عمادی/توبزاوە (164) • زەیتونی رەش کامل (808)</span>
+                    <span class="text-primary font-bold">٥ نرخ ←</span>
+                  </button>
+                  <button type="button" onclick="setQuickSearch('2270', '1873')" class="ui-chip hover:border-primary cursor-pointer font-mono justify-between w-full !rounded-[8px] !py-2">
+                    <span>کاک هەواپ/UK مارکێتی (2270) • گەنمەشامی قوتو (1873)</span>
+                    <span class="text-primary font-bold">نرخ ←</span>
+                  </button>
+                  <button type="button" onclick="setQuickSearch('9155', '1285')" class="ui-chip hover:border-primary cursor-pointer font-mono justify-between w-full !rounded-[8px] !py-2">
+                    <span>مارکێت سۆلاف (9155) • پەنیری 100گرام کیبی (1285)</span>
+                    <span class="text-primary font-bold">نرخ ←</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-4">
+              <div id="priceNotFound" class="hidden rounded-[12px] bg-alert-warnBg border border-alert-warnBorder text-alert-warnText p-4 shadow-level-1">
+                <div class="flex items-start gap-3">
+                  <i class="fa-solid fa-triangle-exclamation text-base mt-0.5"></i>
+                  <div>
+                    <h4 id="priceNotFoundTitle" class="text-xs font-extrabold">ئاگاداری</h4>
+                    <p id="priceNotFoundDesc" class="text-xs mt-0.5"></p>
+                  </div>
+                </div>
+              </div>
+
+              <div id="priceResultCard" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-3">
+                <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-sm"></i>
+                    <span class="text-sm font-extrabold">ئەنجامی شیکاری — ٥ نرخی جیاوازی بەرهەم و بڕەکەی</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span id="resTotalDistinctBadge" class="font-mono text-[11px] bg-white/15 px-2.5 py-0.5 rounded">5 نرخ</span>
+                    <button onclick="copyResultSummary()" class="bg-white/20 hover:bg-white/30 text-white text-xs font-bold px-2.5 py-1 rounded flex items-center gap-1">
+                      <i class="fa-regular fa-copy"></i>
+                      <span id="copyBtnText">کۆپیکردن</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="p-5 space-y-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-border">
+                    <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex items-center justify-between">
+                      <div>
+                        <span class="text-[11px] font-bold text-ink-500 block">👤 کڕیار / مارکێت</span>
+                        <p id="resCustName" class="text-sm font-extrabold text-ink-900 mt-0.5"></p>
+                        <span id="resCustCode" class="font-mono text-xs font-semibold text-primary"></span>
+                      </div>
+                      <button onclick="openCustomerPortfolioFromPrice()" class="btn-secondary px-2.5 py-1.5 text-[11px] font-bold shrink-0">
+                        کاڵاکانی مارکێت
+                      </button>
+                    </div>
+
+                    <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 flex items-center justify-between">
+                      <div>
+                        <span class="text-[11px] font-bold text-ink-500 block">📦 بەرهەم</span>
+                        <p id="resProdName" class="text-sm font-extrabold text-ink-900 mt-0.5"></p>
+                        <span id="resProdCode" class="font-mono text-xs font-semibold text-primary"></span>
+                      </div>
+                      <span id="resPackInfo" class="ui-chip font-mono text-[10px] shrink-0">sales_data</span>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-alert-infoBg border border-alert-infoBorder text-alert-infoText rounded-[10px] p-3 text-center">
+                      <span class="text-[11px] font-bold block">١. کۆتا نرخ</span>
+                      <span id="kpiLastPrice" class="font-mono text-xs sm:text-base font-black block mt-0.5"></span>
+                    </div>
+                    <div class="bg-surface-bright border border-border rounded-[10px] p-3 text-center">
+                      <span class="text-[11px] font-bold text-ink-500 block">٢. نرخی پێشتر</span>
+                      <span id="kpiPrevPrice" class="font-mono text-xs sm:text-base font-black text-ink-900 block mt-0.5"></span>
+                    </div>
+                    <div class="bg-alert-successBg border border-alert-successBorder text-alert-successText rounded-[10px] p-3 text-center">
+                      <span class="text-[11px] font-bold block">٣. هەرزانترین نرخ</span>
+                      <span id="kpiLowestPrice" class="font-mono text-xs sm:text-base font-black block mt-0.5"></span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 class="text-xs font-extrabold text-ink-900 mb-2.5 flex items-center gap-1.5">
+                      <i class="fa-solid fa-list-ol text-primary"></i>
+                      <span>خشتەی ٥ نرخی جیاوازی فرۆشراو لەگەڵ بەروار و بڕ (بە کارتۆن و دانە):</span>
+                    </h4>
+                    <div id="fivePricesContainer" class="space-y-2.5"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- VIEW 3: MARKET PORTFOLIO -->
+        <div id="view-market_items" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <div class="lg:col-span-4 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4 lg:sticky lg:top-24">
+              <div class="border-b border-border pb-3">
+                <h3 class="text-base font-extrabold text-ink-900">گەڕانی مارکێت و کڕیار</h3>
+                <p class="text-xs text-ink-500 mt-0.5">کۆد یان ناوی مارکێت بنووسە و لە لیستەکەدا هەڵیبژێرە</p>
+              </div>
+
+              <div class="relative">
+                <div class="flex gap-2">
+                  <div class="relative flex-1">
+                    <input 
+                      type="text" 
+                      id="marketSearchInput" 
+                      autocomplete="off"
+                      oninput="handleCustomerAutocomplete(this.value, 'marketCustSuggestBox', 'market')"
+                      onfocus="handleCustomerAutocomplete(this.value, 'marketCustSuggestBox', 'market')"
+                      placeholder="کۆد یان ناوی مارکێت (164)..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2.5 text-xs sm:text-sm font-semibold"
+                    >
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-ink-500 text-xs"></i>
+                  </div>
+                  <button onclick="renderMarketPortfolio()" class="btn-primary px-4 py-2 text-xs font-bold">گەڕان</button>
+                </div>
+                <span id="selectedMarketCustomerHint" class="text-[11px] font-extrabold text-primary block mt-1"></span>
+                <div id="marketCustSuggestBox" class="autocomplete-Menu hidden"></div>
+              </div>
+
+              <div class="space-y-2 pt-2 border-t border-border">
+                <span class="text-[11px] font-bold text-ink-500 block">نموونەی مارکێتەکان لە داتابەیس:</span>
+                <button onclick="selectMarketPortfolio('164', 'عمادی/توبزاوە')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                  <span class="font-bold">164 | عمادی/توبزاوە</span>
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+                <button onclick="selectMarketPortfolio('2270', 'کاک هەواپ/UK مارکێتی')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                  <span class="font-bold">2270 | کاک هەواپ/UK مارکێتی</span>
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+                <button onclick="selectMarketPortfolio('9155', 'مارکێت سۆلاف کاک محمد احمد سعید')" class="ui-chip hover:border-primary cursor-pointer w-full justify-between !rounded-[10px] !py-2.5">
+                  <span class="font-bold">9155 | مارکێت سۆلاف کاک محمد احمد سعید</span>
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="marketPortfolioResult" class="lg:col-span-8 space-y-3"></div>
+
+          </div>
+        </div>
+
+        <!-- VIEW 4: PRICE HISTORY & LOCATION AUDIT REPORT (WITH PAGINATION) -->
+        <div id="view-price_audit" class="hidden space-y-4">
+          <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+            <div class="flex items-center justify-between border-b border-border pb-3 flex-wrap gap-2">
+              <div>
+                <h3 class="text-base font-extrabold text-ink-900">ڕاپۆرتی مێژووی نرخی بەرهەم و فلتەری شوێنەکان</h3>
+                <p class="text-xs text-ink-500 mt-0.5">بزانە بەرهەمێکی دیاریکراو بە چ نرخێک و لە چ بەروارێکدا بە کام مارکێتانە فرۆشراوە لەگەڵ هەموو نرخە جیاوازەکان</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="applyAuditPreset('808', '', '', '')" class="ui-chip cursor-pointer font-mono">هەموو فرۆشەکانی کاڵای 808</button>
+                <button onclick="applyAuditPreset('1873', '', '', '')" class="ui-chip cursor-pointer font-mono">کاڵای 1873</button>
+                <button onclick="applyAuditPreset('1285', '', '', '')" class="ui-chip cursor-pointer font-mono">کاڵای 1285</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+              <div class="relative">
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">کۆد یان ناوی بەرهەم</label>
+                <input 
+                  type="text" 
+                  id="auditProdCode" 
+                  autocomplete="off"
+                  oninput="handleProductAutocomplete(this.value, 'auditProdSuggestBox', 'audit')" 
+                  onfocus="handleProductAutocomplete(this.value, 'auditProdSuggestBox', 'audit')"
+                  placeholder="نموونە: 808" 
+                  class="ui-input w-full px-3 py-2 text-xs font-bold"
+                >
+                <span id="auditProdNameHint" class="text-[10px] text-primary font-bold block mt-1 truncate"></span>
+                <div id="auditProdSuggestBox" class="autocomplete-Menu hidden"></div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">نرخی دیاریکراو (ئیختیاری)</label>
+                <input type="text" id="auditTargetPrice" placeholder="نموونە: 48000" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">لە بەرواری</label>
+                <input type="date" id="auditFromDate" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-ink-900 mb-1">تا بەرواری</label>
+                <input type="date" id="auditToDate" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono">
+              </div>
+
+              <div class="sm:col-span-2 flex flex-wrap gap-2">
+                <button onclick="runPriceAuditReport(1)" class="btn-primary flex-1 py-2 px-2.5 text-xs font-bold flex items-center justify-center gap-1.5" title="گەڕان بەپێی فلتەرەکانی سەرەوە">
+                  <i class="fa-solid fa-filter"></i>
+                  <span>فلتەرکردن</span>
+                </button>
+                <button onclick="runDistinctPricesHighToLow(1)" class="btn-secondary flex-1 py-2 px-2 text-xs font-extrabold text-primary border-primary flex items-center justify-center gap-1.5" title="هێنانی هەموو نرخە جیاوازەکان لە زۆرەوە بۆ کەم">
+                  <i class="fa-solid fa-arrow-down-wide-short"></i>
+                  <span>زۆر بۆ کەم</span>
+                </button>
+                <button onclick="runDistinctPricesLowToHigh(1)" class="btn-secondary flex-1 py-2 px-2 text-xs font-extrabold text-ink-700 border-border hover:border-primary flex items-center justify-center gap-1.5" title="هێنانی هەموو نرخە جیاوازەکان لە کەمەوە بۆ زۆر">
+                  <i class="fa-solid fa-arrow-up-wide-short"></i>
+                  <span>کەم بۆ زۆر</span>
+                </button>
+                <button onclick="resetAuditFilters()" class="btn-secondary px-2.5 py-2 text-xs font-bold" title="پاککردنەوەی هەموو خانەکان">پاککردنەوە</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="auditReportContainer" class="space-y-3"></div>
+        </div>
+
+        <!-- VIEW 5: PRICE ANNOUNCEMENTS (SEPARATED VIEW vs PUBLISH ROLES + SEARCH FILTER) -->
+        <div id="view-announcements" class="hidden space-y-4">
+          
+          <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-extrabold text-ink-900">ڕاگەیاندنی نرخەکان و عرض خاص بۆ مەندووبەکان</h3>
+                <span id="annPermissionModeBadge" class="ui-chip !py-0.5 !px-2.5 !text-[10px]">تەنها بینین (مەندووب)</span>
+              </div>
+              <p class="text-xs text-ink-500 mt-0.5">لیستی نرخی فەرمی هەموو بابەتەکان و ئۆفەرە تۆمارکراوەکان لەگەڵ مەرج و هۆکار</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="exportAnnouncementsToExcel()" class="btn-secondary px-3.5 py-2.5 text-xs font-extrabold flex items-center gap-1.5 text-emerald-800 border-emerald-300">
+                <i class="fa-solid fa-file-excel text-emerald-700"></i>
+                <span>داگرتن بە Excel</span>
+              </button>
+              <button onclick="exportAnnouncementsToPDF()" class="btn-secondary px-3.5 py-2.5 text-xs font-extrabold flex items-center gap-1.5 text-red-800 border-red-300">
+                <i class="fa-solid fa-file-pdf text-red-700"></i>
+                <span>داگرتن بە PDF</span>
+              </button>
+              <button onclick="openFullCatalogModal()" class="btn-primary px-4 py-2.5 text-xs font-extrabold shadow-level-1 flex items-center gap-2">
+                <i class="fa-solid fa-table"></i>
+                <span>ڕاپۆرتی تەواوی نرخی بەرهەمەکان</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- Publisher Card (Visible ONLY to users with `manage_announcements` or `admin_users` permission) -->
+            <div id="announcementPublisherCard" class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-[8px] bg-primary text-surface-bright flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-bullhorn"></i>
+                  </span>
+                  <h4 class="text-sm font-extrabold text-ink-900">دانانی نرخ و دروستکردنی عرض خاص</h4>
+                </div>
+                <span class="ui-chip ui-chip-active text-[10px]">مۆڵەتی بڵاوکردنەوە</span>
+              </div>
+
+              <div class="space-y-3">
+                <div class="relative">
+                  <label class="block text-xs font-bold text-ink-900 mb-1">١. کۆدی بابەت بنووسە (خۆکار ناو لە sales_data دەدۆزێتەوە)</label>
+                  <input 
+                    type="text" 
+                    id="annProdCode" 
+                    autocomplete="off"
+                    oninput="autoLookupCatalogProduct(); handleProductAutocomplete(this.value, 'annProdSuggestBox', 'ann')" 
+                    placeholder="نموونە: 808 یان 1873" 
+                    dir="ltr"
+                    class="ui-input w-full px-3.5 py-2 text-sm font-mono font-extrabold text-left"
+                  >
+                  <div id="annProdSuggestBox" class="autocomplete-Menu hidden"></div>
+                  <div class="flex gap-1.5 mt-1.5 flex-wrap">
+                    <button type="button" onclick="setAnnProduct('808')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">808</button>
+                    <button type="button" onclick="setAnnProduct('1873')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">1873</button>
+                    <button type="button" onclick="setAnnProduct('1285')" class="text-[10px] font-mono bg-ink-100 px-2 py-0.5 rounded hover:bg-primary hover:text-white">1285</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">ناوی بەرهەم (ئۆتۆماتیکی لە داتابەیسەوە)</label>
+                  <input 
+                    type="text" 
+                    id="annProdName" 
+                    readonly 
+                    placeholder="کۆدی بابەت بنووسە..." 
+                    class="ui-input w-full px-3.5 py-2 text-xs font-extrabold bg-surface-muted/60 text-primary"
+                  >
+                </div>
+              </div>
+
+              <div class="bg-surface-bright border border-border rounded-[12px] p-3.5 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-extrabold text-ink-900">٢. دانانی نرخەکان و عرض خاص:</label>
+                  <button type="button" onclick="addPriceTierRow()" class="btn-secondary px-2.5 py-1 text-[11px] font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-plus text-primary"></i>
+                    <span>زیادکردنی نرخی تر</span>
+                  </button>
+                </div>
+
+                <div id="annPriceTiersList" class="space-y-2"></div>
+              </div>
+
+              <div class="space-y-2.5">
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٣. مەرجی فرۆشتن (Condition)</label>
+                  <input type="text" id="annCondition" placeholder="نموونە: تەنها بە نەقد یان بۆ ١٠ کارتۆن بەسەرەوە" class="ui-input w-full px-3 py-2 text-xs font-semibold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٤. هۆکار و تێبینی (Reason)</label>
+                  <input type="text" id="annReason" placeholder="نموونە: عرض خاص بۆ کێبڕکێی بازاڕ لەم هەفتەیەدا" class="ui-input w-full px-3 py-2 text-xs font-semibold">
+                </div>
+              </div>
+
+              <button onclick="publishAnnouncement()" class="btn-primary w-full py-3 text-xs font-extrabold shadow-level-2 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>تۆمارکردن و ڕاگەیاندنی نرخ بۆ مەندووبان</span>
+              </button>
+            </div>
+
+            <!-- Feed Column with Instant Search Filter by Code & Product Name -->
+            <div id="announcementsFeedColumn" class="lg:col-span-7 space-y-3">
+              <!-- Search & Filter Bar for Viewing Prices -->
+              <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-ink-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass text-primary"></i>
+                    <span>گەڕانی خێرا لە ناو نرخە ڕاگەیەندراوەکان (بە کۆد یان ناوی بابەت):</span>
+                  </span>
+                  <span id="annFeedCountBadge" class="ui-chip ui-chip-active font-mono !py-0.5 !px-2 !text-[10px]">0 بابەت</span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <div class="relative flex-1">
+                    <input 
+                      type="text" 
+                      id="annSearchFilterInput" 
+                      oninput="renderAnnouncementsFeed()" 
+                      placeholder="کۆدی بابەت (808) یان ناوی بەرهەم بنووسە بۆ دۆزینەوەی خێرای نرخ..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2 text-xs font-bold"
+                    >
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-ink-500 text-xs"></i>
+                  </div>
+                  <div class="flex gap-1.5 shrink-0">
+                    <button type="button" onclick="setAnnFilterType('all')" id="annFilterBtnAll" class="ui-chip ui-chip-active cursor-pointer !rounded-[8px] !py-2">هەمووی</button>
+                    <button type="button" onclick="setAnnFilterType('special')" id="annFilterBtnSpecial" class="ui-chip cursor-pointer !rounded-[8px] !py-2">★ تەنها عرض خاص</button>
+                    <button type="button" onclick="clearAnnSearchFilter()" class="btn-secondary px-3 py-2 text-xs font-bold">پاککردنەوە</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="announcementsFeed" class="space-y-3"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: SERVICES (خزمەتگوزاری: کرێ، بەراد، موجەمیدە، رەف، داشکاندن) -->
+        <div id="view-services" class="hidden space-y-4">
+          
+          <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-extrabold text-ink-900">خزمەتگوزارییەکان (کرێ، بەراد، داشکاندن و پێداویستی مارکێت)</h3>
+                <span id="servicePermissionModeBadge" class="ui-chip !py-0.5 !px-2.5 !text-[10px]">تەنها بینین (مەندووب)</span>
+              </div>
+              <p class="text-xs text-ink-500 mt-0.5">تۆمارکردن و بینینی خزمەتگوزارییەکانی مارکێت و کرێی مانگانە لەگەڵ تێچوو و وردەکاری</p>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button onclick="exportServicesToExcel()" class="btn-secondary px-3.5 py-2.5 text-xs font-extrabold flex items-center gap-1.5 text-emerald-800 border-emerald-300">
+                <i class="fa-solid fa-file-excel text-emerald-700"></i>
+                <span>داگرتن بە Excel</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <!-- Publisher Card (Visible ONLY to users with `manage_services` or `admin_users` permission) -->
+            <div id="servicePublisherCard" class="lg:col-span-5 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-[8px] bg-primary text-surface-bright flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                  </span>
+                  <h4 class="text-sm font-extrabold text-ink-900">تۆمارکردنی خزمەتگوزاری نوێ</h4>
+                </div>
+                <span class="ui-chip ui-chip-active text-[10px]">مۆڵەتی تۆمارکردن</span>
+              </div>
+
+              <input type="hidden" id="serviceEditId" value="">
+
+              <div class="space-y-3">
+                <!-- Market Autocomplete -->
+                <div class="relative">
+                  <label class="block text-xs font-bold text-ink-900 mb-1">١. مارکێت / کڕیار هەڵبژێرە</label>
+                  <input 
+                    type="text" 
+                    id="serviceCustInput" 
+                    autocomplete="off"
+                    oninput="handleCustomerAutocomplete(this.value, 'serviceCustSuggestBox', 'service')" 
+                    onfocus="handleCustomerAutocomplete(this.value, 'serviceCustSuggestBox', 'service')"
+                    placeholder="ناوی مارکێت یان کۆدی کڕیار بنووسە..." 
+                    class="ui-input w-full px-3.5 py-2 text-xs font-bold"
+                  >
+                  <span id="selectedServiceCustomerHint" class="text-[10px] text-primary font-bold block mt-1 truncate"></span>
+                  <div id="serviceCustSuggestBox" class="autocomplete-Menu hidden"></div>
+                </div>
+
+                <!-- Service Type Dropdown -->
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٢. جۆری خزمەتگوزاری</label>
+                  <select id="serviceTypeSelect" class="ui-input w-full px-3 py-2 text-xs font-extrabold bg-surface">
+                    <option value="کرێ">کرێ (کرێی مانگانە یان ستاند)</option>
+                    <option value="بەراد">بەراد (بەفرگر / بەڕادی شیرەمەنی)</option>
+                    <option value="موجەمیدە">موجەمیدە (بەستێنەری بەستوو)</option>
+                    <option value="رەف">رەف (رەف و ستاندی نمایش)</option>
+                    <option value="خصم">خصم (داشکاندنی تایبەتی پسوڵە)</option>
+                    <option value="پێداویستی تر">پێداویستی تر</option>
+                  </select>
+                </div>
+
+                <!-- Cost / Rent Amount -->
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٣. بڕی تێچوو / کرێ (بە دیناری عێراقی)</label>
+                  <div class="relative">
+                    <input 
+                      type="number" 
+                      id="serviceCostAmount" 
+                      placeholder="نموونە: 150000" 
+                      dir="ltr"
+                      class="ui-input w-full px-3.5 py-2 text-sm font-mono font-black text-left pl-14"
+                    >
+                    <span class="absolute left-3 top-2.5 text-xs font-extrabold text-ink-500">د.ع</span>
+                  </div>
+                </div>
+
+                <!-- Service Date -->
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٤. بەرواری دەستپێکردن / تۆمار</label>
+                  <input type="date" id="serviceDate" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono">
+                </div>
+
+                <!-- Description / Notes -->
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">٥. هۆکار و تێبینی (ڕوونکردنەوەی تەواو)</label>
+                  <textarea 
+                    id="serviceDescription" 
+                    rows="2" 
+                    placeholder="وردەکاری خزمەتگوزاری، مەرجەکان یان ژمارەی ستاند..." 
+                    class="ui-input w-full px-3 py-2 text-xs font-semibold"
+                  ></textarea>
+                </div>
+              </div>
+
+              <button onclick="publishServiceRecord()" class="btn-primary w-full py-3 text-xs font-extrabold shadow-level-2 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>پاشەکەوتکردن و بڵاوکردنەوەی خزمەتگوزاری</span>
+              </button>
+            </div>
+
+            <!-- Feed Column with Search & Filter -->
+            <div id="servicesFeedColumn" class="lg:col-span-7 space-y-3">
+              <div class="bg-surface border border-border rounded-[16px] p-4 shadow-level-1 space-y-3">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <span class="text-xs font-extrabold text-ink-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-magnifying-glass text-primary"></i>
+                    <span>گەڕانی خێرا لە ناو خزمەتگوزارییەکان:</span>
+                  </span>
+                  <div class="flex items-center gap-2">
+                    <span id="servicesFeedTotalAmountBadge" class="ui-chip font-mono !py-0.5 !px-2 !text-[10px] bg-emerald-50 text-emerald-800 border-emerald-300 font-extrabold">کۆ: 0 د.ع</span>
+                    <span id="servicesFeedCountBadge" class="ui-chip ui-chip-active font-mono !py-0.5 !px-2 !text-[10px]">0 تۆمار</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <div class="relative flex-1">
+                    <input 
+                      type="text" 
+                      id="serviceSearchInput" 
+                      oninput="renderServicesFeed()" 
+                      placeholder="ناوی مارکێت، کۆد یان تێبینی بنووسە..." 
+                      class="ui-input w-full pr-3.5 pl-9 py-2 text-xs font-bold"
+                    >
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-ink-500 text-xs"></i>
+                  </div>
+                  <div class="flex gap-1.5 shrink-0 flex-wrap">
+                    <button type="button" onclick="setServiceFilterType('all')" data-service-filter="all" class="ui-chip ui-chip-active cursor-pointer !rounded-[8px] !py-2">هەمووی</button>
+                    <button type="button" onclick="setServiceFilterType('کرێ')" data-service-filter="کرێ" class="ui-chip cursor-pointer !rounded-[8px] !py-2">کرێ</button>
+                    <button type="button" onclick="setServiceFilterType('بەراد')" data-service-filter="بەراد" class="ui-chip cursor-pointer !rounded-[8px] !py-2">بەراد</button>
+                    <button type="button" onclick="setServiceFilterType('موجەمیدە')" data-service-filter="موجەمیدە" class="ui-chip cursor-pointer !rounded-[8px] !py-2">موجەمیدە</button>
+                    <button type="button" onclick="setServiceFilterType('رەف')" data-service-filter="رەف" class="ui-chip cursor-pointer !rounded-[8px] !py-2">رەف</button>
+                    <button type="button" onclick="setServiceFilterType('خصم')" data-service-filter="خصم" class="ui-chip cursor-pointer !rounded-[8px] !py-2">خصم</button>
+                    <button type="button" onclick="clearServiceSearchFilter()" class="btn-secondary px-3 py-2 text-xs font-bold">پاککردنەوە</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="servicesFeed" class="space-y-3"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW 6: CONTRACTS & RECEIPTS -->
+        <div id="view-contracts" class="hidden space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
+              <h3 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2">گەڕان بەدوای پسوڵەکان لە خشتەی sales_data</h3>
+              <div class="flex gap-2">
+                <input type="text" id="inputReceiptNo" placeholder="ژمارەی پسوڵە (89503)" dir="ltr" class="ui-input flex-1 px-3 py-2 text-xs font-mono text-left">
+                <button onclick="lookupReceipt()" class="btn-primary px-4 py-2 text-xs font-bold">گەڕان</button>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="triggerReceipt('89503')" class="ui-chip font-mono cursor-pointer">#89503</button>
+                <button onclick="triggerReceipt('89618')" class="ui-chip font-mono cursor-pointer">#89618</button>
+                <button onclick="triggerReceipt('89601')" class="ui-chip font-mono cursor-pointer">#89601</button>
+              </div>
+              <div id="receiptResult" class="hidden bg-surface-bright border border-border rounded-[10px] p-3 space-y-2">
+                <div class="flex items-center justify-between border-b border-border pb-2">
+                  <h5 class="text-xs font-extrabold text-primary">پسوڵەی #<span id="outReceiptNo" class="font-mono"></span></h5>
+                  <span id="outReceiptCust" class="text-[11px] font-bold text-ink-900"></span>
+                </div>
+                <div id="outReceiptItems" class="space-y-1.5 text-xs"></div>
+              </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
+              <h3 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2">فۆڵدەری گرێبەستە فەرمییەکان</h3>
+              <div class="space-y-2">
+                <div class="bg-surface-bright border border-border rounded-[10px] p-3 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-file-pdf text-primary"></i>
+                    <span class="text-xs font-bold">گرێبەستی عمادی/توبزاوە ٢٠٢٦.pdf</span>
+                  </div>
+                  <button onclick="alertModal('داگرتنی گرێبەست', 'فایلی گرێبەست دادەبەزێت...')" class="btn-secondary px-2.5 py-1 text-xs font-bold">داگرتن</button>
+                </div>
+                <div class="bg-surface-bright border border-border rounded-[10px] p-3 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-file-pdf text-primary"></i>
+                    <span class="text-xs font-bold">گرێبەستی مارکێت سۆلاف.pdf</span>
+                  </div>
+                  <button onclick="alertModal('داگرتنی گرێبەست', 'فایلی گرێبەست دادەبەزێت...')" class="btn-secondary px-2.5 py-1 text-xs font-bold">داگرتن</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 7: ADMIN USERS & SUPABASE DB -->
+        <div id="view-admin_users" class="hidden space-y-5">
+          
+          <div class="flex flex-wrap gap-2">
+            <button onclick="switchAdminSubTab('users')" id="adminSubBtnUsers" class="btn-primary px-4 py-2.5 text-xs font-extrabold flex items-center gap-1.5">
+              <i class="fa-solid fa-user-check"></i>
+              <span>١. دروستکردنی بەکارهێنەر و IMEI و دەسەڵاتەکان</span>
+            </button>
+            <button onclick="switchAdminSubTab('db')" id="adminSubBtnDb" class="btn-secondary px-4 py-2.5 text-xs font-extrabold flex items-center gap-1.5">
+              <i class="fa-solid fa-database"></i>
+              <span>٢. بەستنەوەی داتابەیسی Supabase (تەنها ئەدمین)</span>
+            </button>
+          </div>
+
+          <div id="adminSubViewUsers" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <div class="lg:col-span-6 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 class="text-base font-extrabold text-ink-900">دروستکردنی یوسەر و قفڵی IMEI</h3>
+                  <p class="text-xs text-ink-500 mt-0.5">پاشەکەوتکردن لە خشتەی <code class="font-mono text-primary">app_users</code> لە Supabase</p>
+                </div>
+                <span class="ui-chip ui-chip-active font-mono text-[10px]">IMEI + ROLES</span>
+              </div>
+
+              <form id="userForm" onsubmit="saveUserAccount(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-ink-900 mb-1">ناوی تەواوی مەندووب / ستاف</label>
+                    <input type="text" id="usrFullName" required placeholder="نموونە: کاروان محەمەد" class="ui-input w-full px-3 py-2 text-xs font-bold">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-ink-900 mb-1">ناوی بەکارهێنەر (Username)</label>
+                    <input type="text" id="usrUsername" required placeholder="نموونە: karwan" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-ink-900 mb-1">پاسۆرد (Password)</label>
+                    <input type="text" id="usrPassword" required placeholder="نموونە: 1234" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="text-xs font-bold text-ink-900">کۆدی جیهاز / IMEI</label>
+                      <button type="button" onclick="fillCurrentDeviceImeiToForm()" class="text-[10px] font-bold text-primary hover:underline">ئامێری ئێستا</button>
+                    </div>
+                    <input type="text" id="usrImei" required placeholder="IMEI یان * بۆ هەموو جیهازێک" dir="ltr" class="ui-input w-full px-3 py-2 text-xs font-mono font-bold text-left">
+                  </div>
+                </div>
+
+                <div class="bg-surface-bright border border-border rounded-[12px] p-4">
+                  <div class="flex items-center justify-between mb-2.5">
+                    <label class="text-xs font-extrabold text-ink-900 flex items-center gap-1.5">
+                      <i class="fa-solid fa-list-check text-primary"></i>
+                      <span>چێک لیستی دەسەڵاتەکان (جیاکردنەوەی بینین و دانانی نرخ):</span>
+                    </label>
+                    <div class="flex gap-2">
+                      <button type="button" onclick="toggleAllPerms(true)" class="text-[11px] font-bold text-primary hover:underline">هەمووی</button>
+                      <span class="text-ink-300">|</span>
+                      <button type="button" onclick="toggleAllPerms(false)" class="text-[11px] font-bold text-ink-500 hover:underline">هیچیان</button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="price_lookup" checked class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">١. نرخی بەرهەم (٥ نرخ)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="market_items" checked class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٢. کاڵاکانی ناو مارکێت</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="price_audit" class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٣. ڕاپۆرتی مێژووی نرخ</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="announcements" checked class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٤. بینینی نرخی بابەتەکان (مەندووب)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-alert-warnBorder bg-alert-warnBg/50 cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="manage_announcements" class="ui-checkbox">
+                      <span class="text-xs font-extrabold text-alert-warnText">٥. دانانی نرخ و دروستکردنی عرض خاص</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="services" checked class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٦. بینینی خزمەتگوزارییەکان (مەندووب)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-emerald-300 bg-emerald-50 cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="manage_services" class="ui-checkbox">
+                      <span class="text-xs font-extrabold text-emerald-800">٧. تۆمارکردنی خزمەتگوزاری (کرێ، بەڕاد، ...)</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="contracts" class="ui-checkbox">
+                      <span class="text-xs font-bold text-ink-900">٨. گرێبەست و پسوڵە</span>
+                    </label>
+                    <label class="sm:col-span-2 flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
+                      <input type="checkbox" name="usrPerm" value="admin_users" class="ui-checkbox">
+                      <span class="text-xs font-bold text-alert-errorText">٩. بەڕێوەبەری گشتی و داتابەیس (Admin)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-primary w-full py-2.5 text-xs font-extrabold shadow-level-1 flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-user-plus"></i>
+                  <span>پاشەکەوتکردنی بەکارهێنەر لە خشتەی Supabase</span>
+                </button>
+              </form>
+            </div>
+
+            <div class="lg:col-span-6 bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-3">
+              <h4 class="text-sm font-extrabold text-ink-900 border-b border-border pb-2.5">لیستی بەکارهێنەران و ئامێرە ڕێپێدراوەکان (<span id="usersCountLabel"></span>)</h4>
+              <div id="usersTableContainer" class="space-y-2.5"></div>
+            </div>
+          </div>
+
+          <div id="adminSubViewDb" class="hidden space-y-4">
+            <div class="bg-surface border border-border rounded-[16px] p-5 shadow-level-2 space-y-4">
+              <div class="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 class="text-base font-extrabold text-ink-900">بەستنەوەی نهێنی بە بنکەدراوەی Supabase (خشتەی public.sales_data)</h3>
+                  <p class="text-xs text-ink-500 mt-0.5">بەستەر و کلیلی پرۆژەکەت ئامادەکراوە بۆ خوێندنەوەی ڕاستەوخۆی <code class="font-mono font-bold">sales_data</code></p>
+                </div>
+                <span id="adminDbStatusBadge" class="ui-chip font-mono text-[10px]">LOCAL + SUPABASE READY</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">Supabase Project URL</label>
+                  <input type="text" id="cfgSupabaseUrl" value="https://rcigaaefhlerxbrbnnmj.supabase.co" dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-ink-900 mb-1">Supabase Anon / Public Key</label>
+                  <input type="password" id="cfgSupabaseKey" dir="ltr" class="ui-input w-full px-3.5 py-2.5 text-xs font-mono text-left">
+                </div>
+              </div>
+
+              <div class="flex gap-2">
+                <button onclick="saveSupabaseConfig()" class="btn-primary px-5 py-2.5 text-xs font-extrabold">پاشەکەوتکردن و تاقیکردنەوەی پەیوەندی بە sales_data</button>
+                <button onclick="syncAllToSupabase()" class="btn-secondary px-4 py-2.5 text-xs font-bold">هاوکاتکردنی یوسەر و ئۆفەرەکان</button>
+              </div>
+
+              <div class="pt-3 border-t border-border">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="text-xs font-extrabold text-ink-900">کۆدی SQL بۆ کردنەوەی مۆڵەتی sales_data و دروستکردنی خشتەکانی یوسەر و ئۆفەر:</span>
+                  <button onclick="copySqlSchema()" class="btn-secondary px-2.5 py-1 text-[11px] font-bold">کۆپیکردنی SQL</button>
+                </div>
+                <pre id="sqlSchemaCode" dir="ltr" class="bg-ink-900 text-surface-bright p-3.5 rounded-[10px] font-mono text-[11px] overflow-x-auto leading-relaxed">-- 1. کردنەوەی مۆڵەتی خوێندنەوەی خشتەی sales_data
+ALTER TABLE public.sales_data ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read sales_data" ON public.sales_data;
+CREATE POLICY "Allow public read sales_data" ON public.sales_data FOR SELECT USING (true);
+GRANT SELECT ON public.sales_data TO anon, authenticated;
+
+-- 2. خشتەی بەکارهێنەران و IMEI و چێک لیستی دەسەڵاتەکان
+CREATE TABLE IF NOT EXISTS public.app_users (
+  id SERIAL PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  full_name TEXT NOT NULL,
+  password TEXT NOT NULL,
+  imei_device_id TEXT NOT NULL DEFAULT '*',
+  permissions JSONB NOT NULL DEFAULT '["price_lookup","market_items","announcements"]',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all app_users" ON public.app_users;
+CREATE POLICY "Allow all app_users" ON public.app_users FOR ALL USING (true) WITH CHECK (true);
+
+-- 3. خشتەی ڕاگەیاندنی نرخ و عرض خاص
+CREATE TABLE IF NOT EXISTS public.price_announcements (
+  id BIGINT PRIMARY KEY,
+  product_code TEXT NOT NULL,
+  product_name TEXT NOT NULL,
+  tiers JSONB NOT NULL,
+  condition_text TEXT,
+  reason_text TEXT,
+  created_by TEXT,
+  created_at TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.price_announcements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all price_announcements" ON public.price_announcements;
+CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR ALL USING (true) WITH CHECK (true);
+
+-- 4. خشتەی خزمەتگوزارییەکان (کرێ، بەراد، موجەمیدە، رەف، داشکاندن)
+CREATE TABLE IF NOT EXISTS public.market_services (
+  id BIGINT PRIMARY KEY,
+  customer_code TEXT NOT NULL,
+  customer_name TEXT NOT NULL,
+  service_type TEXT NOT NULL,
+  cost_amount NUMERIC NOT NULL DEFAULT 0,
+  description_text TEXT,
+  service_date TEXT NOT NULL,
+  created_by TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.market_services ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all market_services" ON public.market_services;
+CREATE POLICY "Allow all market_services" ON public.market_services FOR ALL USING (true) WITH CHECK (true);</pre>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: FULL ANNOUNCED PRICES REPORT + EXCEL & PDF       -->
+  <!-- ========================================================= -->
+  <div id="fullCatalogModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
+    <div class="bg-surface border border-border rounded-[16px] max-w-4xl w-full max-h-[90vh] flex flex-col shadow-level-4 overflow-hidden">
+      <div class="bg-primary text-surface-bright px-5 py-3.5 flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-table-list"></i>
+          <div>
+            <h3 class="text-sm font-extrabold">ڕاپۆرتی تەواوی نرخە ڕاگەیەندراوەکان و عرض خاص</h3>
+            <p class="text-[10px] text-surface-muted/80">تەواوی ئەو بابەت و نرخانەی لەلایەن کۆمپانیاوە ڕاگەیەندراون (ئامادە بۆ داگرتن بە Excel و PDF)</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportAnnouncementsToExcel()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-[8px] text-xs font-extrabold flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-file-excel"></i>
+            <span>داگرتن بە Excel</span>
+          </button>
+          <button onclick="exportAnnouncementsToPDF()" class="bg-red-700 hover:bg-red-600 text-white px-3 py-1.5 rounded-[8px] text-xs font-extrabold flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>داگرتن بە PDF</span>
+          </button>
+          <button onclick="closeFullCatalogModal()" class="text-white/80 hover:text-white px-2">
+            <i class="fa-solid fa-xmark text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 border-b border-border bg-surface-bright flex flex-col sm:flex-row gap-2 items-center justify-between">
+        <div class="relative w-full sm:flex-1">
+          <input type="text" id="catalogFilterInput" oninput="renderFullCatalogTable()" placeholder="گەڕان بەدوای کۆدی بابەت یان ناوی بەرهەم لەناو ڕاپۆرت..." class="ui-input w-full pr-3.5 pl-9 py-2 text-xs font-bold">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-ink-500 text-xs"></i>
+        </div>
+        <span id="modalReportTotalCount" class="ui-chip ui-chip-active font-mono text-[11px] shrink-0">0 بابەت</span>
+      </div>
+
+      <div class="p-4 overflow-y-auto flex-1 space-y-2.5" id="fullCatalogTableBody"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: NOTIFICATIONS CENTER -->
+  <div id="notificationsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
+    <div class="bg-surface border border-border rounded-[16px] max-w-md w-full max-h-[80vh] flex flex-col shadow-level-4 overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-border flex items-center justify-between bg-surface-bright">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-bell text-primary"></i>
+          <div>
+            <h3 class="text-sm font-extrabold text-ink-900">ناوەندی ئاگادارکردنەوەکان</h3>
+            <span class="text-[10px] text-ink-500 font-bold block">تەنها ڕاگەیاندنەکانی ٤٨ کاتژمێری ڕابردوو</span>
+          </div>
+        </div>
+        <button onclick="closeNotificationsModal()" class="text-ink-500 hover:text-ink-900">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="notificationsListContainer" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
+      <div class="px-4 py-2.5 bg-surface-bright border-t border-border flex items-center justify-between">
+        <button onclick="closeNotificationsModal(); switchView('announcements');" class="text-xs font-extrabold text-primary hover:underline flex items-center gap-1">
+          <span>بینینی تەواوی ئەرشیفی ڕاگەیاندنەکان</span>
+          <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        </button>
+        <button onclick="closeNotificationsModal()" class="text-xs font-bold text-ink-500 hover:text-ink-800">داخستن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: GENERAL MESSAGE MODAL -->
+  <div id="generalModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/50 backdrop-blur-xs">
+    <div class="bg-surface border border-border rounded-[16px] max-w-xs w-full p-5 text-center shadow-level-4 space-y-3">
+      <div class="w-10 h-10 rounded-[10px] bg-primary text-surface-bright flex items-center justify-center mx-auto text-base">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 id="modalTitle" class="text-sm font-extrabold text-ink-900">ئاگاداری</h3>
+      <p id="modalBody" class="text-xs text-ink-700 leading-relaxed"></p>
+      <button onclick="closeModal()" class="btn-primary w-full py-2.5 text-xs font-bold">داخستن</button>
+    </div>
+  </div>
+
+
+  <!-- Modular Vite Entry Point -->
+</body>
+</html>
