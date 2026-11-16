@@ -1,0 +1,44 @@
+{
+  "id": "./index.html",
+  "name": "کۆمپانیای ساحل العراق — سیستەمی ناوەندیی فرۆش",
+  "short_name": "ساحل العراق",
+  "description": "سیستەمی ناوەندیی نرخی بەرهەم، مارکێتەکان، ڕاپۆرت و ئۆفەرەکانی کۆمپانیای ساحل العراق",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EAE7E0",
+  "theme_color": "#0A3D43",
+  "dir": "rtl",
+  "lang": "ckb",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
