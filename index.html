@@ -90,7 +90,7 @@
     }
   </script>
 
-  <script type="module" crossorigin src="./assets/index-BwjxWQYs.js"></script>
+  <script type="module" crossorigin src="./assets/index-OqNJTLjx.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-BFQFZtXE.css">
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white" onclick="closeAllAutocompletes(event)">
@@ -505,7 +505,7 @@
         <!-- VIEW 1: HUB / OVERVIEW -->
         <div id="view-hub" class="space-y-5">
           
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between">
               <div>
                 <span class="text-[11px] font-bold text-ink-500 block">بنکەدراوەی چالاک</span>
@@ -543,6 +543,19 @@
               </div>
               <div class="w-9 h-9 rounded-[8px] bg-ink-100 text-ink-700 flex items-center justify-center">
                 <i class="fa-solid fa-key"></i>
+              </div>
+            </div>
+
+            <!-- Status Card: Last Database Update (Issue 3) -->
+            <div class="bg-surface border border-border rounded-[12px] p-3.5 shadow-level-1 flex items-center justify-between col-span-2 sm:col-span-1">
+              <div>
+                <span class="text-[11px] font-bold text-ink-500 block">کۆتا نوێکردنەوەی داتا</span>
+                <span id="dbLastUpdateText" class="font-mono text-xs sm:text-sm font-black text-primary mt-1 block">
+                  پشکنین...
+                </span>
+              </div>
+              <div class="w-9 h-9 rounded-[8px] bg-primary/10 text-primary flex items-center justify-center">
+                <i class="fa-regular fa-calendar-check"></i>
               </div>
             </div>
           </div>
