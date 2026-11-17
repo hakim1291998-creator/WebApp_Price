@@ -2005,37 +2005,75 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // 1. Instant local search with 0ms delay
+      // ١. پشکنینی خێرا لە میمۆری ناوخۆیی
       const localMatches = filterAndSortDirectory(state.customersDirectory, q);
       renderCustomerDropdown(localMatches, boxId, contextType);
 
-      // 2. Debounced remote search only if local matches are fewer than 10
-      if (state.supabaseClient && localMatches.length < 10) {
+      // ٢. پشکنین؛ ئایا کۆدی تەواو هاوتا (وەک "1") لە میمۆریدا هەیە؟
+      const hasExactMatch = state.customersDirectory.has(q);
+
+      // ئەگەر کۆدی تەواو هاوتا نەبوو یان ئەنجامەکان کەم بوون، ڕاستەوخۆ لە Supabase بیهێنە
+      if (state.supabaseClient && (!hasExactMatch || localMatches.length < 15)) {
         autocompleteTimer = setTimeout(async () => {
           try {
             await ensureDbReady();
             const cCodeCol = col('customer_code');
             const cNameCol = col('customer_name');
-            let sbQ = state.supabaseClient.from('sales_data').select(`${cCodeCol}, ${cNameCol}`);
+
             if (/^\d+$/.test(q)) {
-              sbQ = sbQ.ilike(cCodeCol, `${q}%`);
+              // یەکەم: بەدوای کۆدی تەواو هاوتادا بگەڕێ (بۆ نموونە ڕێک ژمارە 1 بۆ کۆگای یوسف)
+              const { data: exactData } = await state.supabaseClient
+                .from('sales_data')
+                .select(`${cCodeCol}, ${cNameCol}`)
+                .eq(cCodeCol, q)
+                .limit(5);
+
+              if (exactData && exactData.length > 0) {
+                exactData.forEach(r => {
+                  const c = normalizeCode(r[cCodeCol]);
+                  const n = String(r[cNameCol] ?? '').trim();
+                  if (c && n) state.customersDirectory.set(c, n);
+                });
+              }
+
+              // دووەم: گەڕان بەدوای کۆدە نزیکەکان ئەگەر ستوونەکە Text بوو
+              const { data: likeData } = await state.supabaseClient
+                .from('sales_data')
+                .select(`${cCodeCol}, ${cNameCol}`)
+                .ilike(cCodeCol, `${q}%`)
+                .limit(50);
+
+              if (likeData && likeData.length > 0) {
+                likeData.forEach(r => {
+                  const c = normalizeCode(r[cCodeCol]);
+                  const n = String(r[cNameCol] ?? '').trim();
+                  if (c && n) state.customersDirectory.set(c, n);
+                });
+              }
             } else {
-              sbQ = sbQ.ilike(cNameCol, `%${q}%`);
+              // ئەگەر بە ناو گەڕا
+              const { data: nameData } = await state.supabaseClient
+                .from('sales_data')
+                .select(`${cCodeCol}, ${cNameCol}`)
+                .ilike(cNameCol, `%${q}%`)
+                .limit(60);
+
+              if (nameData && nameData.length > 0) {
+                nameData.forEach(r => {
+                  const c = normalizeCode(r[cCodeCol]);
+                  const n = String(r[cNameCol] ?? '').trim();
+                  if (c && n) state.customersDirectory.set(c, n);
+                });
+              }
             }
-            const { data } = await sbQ.limit(80);
-            if (data && data.length > 0) {
-              data.forEach(r => {
-                const c = normalizeCode(r[cCodeCol]);
-                const n = String(r[cNameCol] ?? '').trim();
-                if (c && n) state.customersDirectory.set(c, n);
-              });
-              const updated = filterAndSortDirectory(state.customersDirectory, q);
-              renderCustomerDropdown(updated, boxId, contextType);
-            }
+
+            // نوێکردنەوەی لیستەکە؛ کۆدی "1" ڕاستەوخۆ دێتە ڕیزی یەکەم
+            const updated = filterAndSortDirectory(state.customersDirectory, q);
+            renderCustomerDropdown(updated, boxId, contextType);
           } catch (err) {
             console.error('Remote customer lookup error:', err);
           }
-        }, 300);
+        }, 180);
       }
     }
 
@@ -2102,37 +2140,68 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      // 1. Instant local search with 0ms delay
       const localMatches = filterAndSortDirectory(state.productsDirectory, q);
       renderProductDropdown(localMatches, boxId, contextType);
 
-      // 2. Debounced remote query if local matches are fewer than 10
-      if (state.supabaseClient && localMatches.length < 10) {
+      const hasExactMatch = state.productsDirectory.has(q);
+
+      if (state.supabaseClient && (!hasExactMatch || localMatches.length < 15)) {
         autocompleteTimer = setTimeout(async () => {
           try {
             await ensureDbReady();
             const pCodeCol = col('product_code');
             const pNameCol = col('product_name');
-            let sbQ = state.supabaseClient.from('sales_data').select(`${pCodeCol}, ${pNameCol}`);
+
             if (/^\d+$/.test(q)) {
-              sbQ = sbQ.ilike(pCodeCol, `${q}%`);
+              const { data: exactData } = await state.supabaseClient
+                .from('sales_data')
+                .select(`${pCodeCol}, ${pNameCol}`)
+                .eq(pCodeCol, q)
+                .limit(5);
+
+              if (exactData && exactData.length > 0) {
+                exactData.forEach(r => {
+                  const c = normalizeCode(r[pCodeCol]);
+                  const n = String(r[pNameCol] ?? '').trim();
+                  if (c && n) state.productsDirectory.set(c, n);
+                });
+              }
+
+              const { data: likeData } = await state.supabaseClient
+                .from('sales_data')
+                .select(`${pCodeCol}, ${pNameCol}`)
+                .ilike(pCodeCol, `${q}%`)
+                .limit(50);
+
+              if (likeData && likeData.length > 0) {
+                likeData.forEach(r => {
+                  const c = normalizeCode(r[pCodeCol]);
+                  const n = String(r[pNameCol] ?? '').trim();
+                  if (c && n) state.productsDirectory.set(c, n);
+                });
+              }
             } else {
-              sbQ = sbQ.ilike(pNameCol, `%${q}%`);
+              const { data: nameData } = await state.supabaseClient
+                .from('sales_data')
+                .select(`${pCodeCol}, ${pNameCol}`)
+                .ilike(pNameCol, `%${q}%`)
+                .limit(60);
+
+              if (nameData && nameData.length > 0) {
+                nameData.forEach(r => {
+                  const c = normalizeCode(r[pCodeCol]);
+                  const n = String(r[pNameCol] ?? '').trim();
+                  if (c && n) state.productsDirectory.set(c, n);
+                });
+              }
             }
-            const { data } = await sbQ.limit(80);
-            if (data && data.length > 0) {
-              data.forEach(r => {
-                const c = normalizeCode(r[pCodeCol]);
-                const n = String(r[pNameCol] ?? '').trim();
-                if (c && n) state.productsDirectory.set(c, n);
-              });
-              const updated = filterAndSortDirectory(state.productsDirectory, q);
-              renderProductDropdown(updated, boxId, contextType);
-            }
+
+            const updated = filterAndSortDirectory(state.productsDirectory, q);
+            renderProductDropdown(updated, boxId, contextType);
           } catch (err) {
             console.error('Remote product lookup error:', err);
           }
-        }, 300);
+        }, 180);
       }
     }
 
@@ -2189,6 +2258,8 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
     async function handleLogin(e) {
       e.preventDefault();
+      unlockMobileAudio();
+      requestNotificationPermission();
       const username = document.getElementById('loginUsername').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value.trim();
       const enteredImei = document.getElementById('loginDeviceImei').value.trim();
@@ -2255,6 +2326,71 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       enterApplication();
       requestNotificationPermission();
+
+    }
+    let realtimeSub = null;
+    let lastSeenAnnouncementId = null;
+
+    function setupRealtimeNotifications() {
+      if (state.announcements && state.announcements.length > 0) {
+        lastSeenAnnouncementId = Number(state.announcements[0].id);
+      }
+      if (!state.supabaseClient) return;
+
+      if (!realtimeSub) {
+        realtimeSub = state.supabaseClient
+          .channel('public:price_announcements')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'price_announcements' }, payload => {
+            handleIncomingAnnouncement(payload.new);
+          })
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'price_announcements' }, payload => {
+            handleIncomingAnnouncement(payload.new);
+          })
+          .subscribe();
+      }
+
+      setInterval(async () => {
+        if (!state.supabaseClient) return;
+        try {
+          const { data } = await state.supabaseClient
+            .from('price_announcements')
+            .select('*')
+            .order('id', { ascending: false })
+            .limit(5);
+
+          if (data && data.length > 0) {
+            const newest = data[0];
+            if (lastSeenAnnouncementId && Number(newest.id) > lastSeenAnnouncementId) {
+              handleIncomingAnnouncement(newest);
+            }
+            state.announcements = data;
+            localStorage.setItem('sahel_announcements', JSON.stringify(data));
+            lastSeenAnnouncementId = Number(newest.id);
+          }
+        } catch (e) {}
+      }, 20000);
+    }
+
+    function handleIncomingAnnouncement(newAnn) {
+      if (!newAnn || !newAnn.id) return;
+      if (lastSeenAnnouncementId && Number(newAnn.id) <= lastSeenAnnouncementId) return;
+      lastSeenAnnouncementId = Number(newAnn.id);
+
+      const existingIdx = state.announcements.findIndex(a => Number(a.id) === Number(newAnn.id) || normalizeCode(a.product_code) === normalizeCode(newAnn.product_code));
+      if (existingIdx !== -1) state.announcements.splice(existingIdx, 1);
+      state.announcements.unshift(newAnn);
+      localStorage.setItem('sahel_announcements', JSON.stringify(state.announcements));
+
+      state.unreadCount += 1;
+      updateNotifBadgeUI();
+      renderAnnouncementsFeed();
+
+      const t0 = (newAnn.tiers && newAnn.tiers[0]) ? `${newAnn.tiers[0].label}: ${Number(newAnn.tiers[0].price).toLocaleString()} د.ع` : '';
+      const title = `📢 نرخی نوێ: ${newAnn.product_name}`;
+      const body = `کۆد ${newAnn.product_code} — ${t0}`;
+
+      triggerToast(title, body);
+      triggerMobileNotification(title, body);
     }
 
     async function enterApplication() {
@@ -2305,6 +2441,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       await ensureDbReady();
       fetchLatestDbUpdate();
       setQuickSearch('164', '808');
+      setupRealtimeNotifications();
     }
 
     function applyPermissionsVisibility() {
