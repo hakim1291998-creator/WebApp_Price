@@ -1883,6 +1883,62 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     ];
 
     const SALES_SELECT = '*, customers(customer_name), products(product_name)';
+    const ANN_SELECT = '*, price_announcement_tiers(id, tier_label, price, is_special, sort_order)';
+
+    function formatAnnTimestamp(raw) {
+      if (!raw) return '-';
+      const d = new Date(raw);
+      if (isNaN(d.getTime())) return String(raw).slice(0, 16).replace('T', ' ');
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function mapAnnouncementRow(row) {
+      const code = normalizeCode(row.product_code);
+      const catalogItem = masterCatalog.find(p => normalizeCode(p.code) === code);
+      const resolvedName = state.productsDirectory.get(code) || catalogItem?.name || row.product_name || `بەرهەمی #${code}`;
+
+      const rawCreator = String(row.created_by || '').trim();
+      const matchedUser = state.users.find(u => u.username.toLowerCase() === rawCreator.toLowerCase());
+      const resolvedCreator = matchedUser ? matchedUser.full_name : (rawCreator || 'ئەدمین');
+
+      let tiers = [];
+      if (Array.isArray(row.price_announcement_tiers)) {
+        tiers = [...row.price_announcement_tiers]
+          .sort((a, b) => Number(a.sort_order || 0) - Number(b.sort_order || 0))
+          .map(t => ({
+            label: t.tier_label || 'نرخی دیاریکراو',
+            price: Number(t.price || 0),
+            isSpecial: Boolean(t.is_special)
+          }));
+      } else if (Array.isArray(row.tiers)) {
+        tiers = row.tiers;
+      }
+
+      return {
+        id: Number(row.id),
+        product_code: code,
+        product_name: resolvedName,
+        tiers,
+        condition_text: row.condition_text || 'بەپێی ڕێنمایی کۆمپانیا',
+        reason_text: row.reason_text || 'نوێکردنەوەی نرخی بازاڕ',
+        created_by_username: matchedUser ? matchedUser.username : rawCreator,
+        created_by: resolvedCreator,
+        created_at: formatAnnTimestamp(row.created_at)
+      };
+    }
+
+    function refreshAnnouncementNames() {
+      if (!Array.isArray(state.announcements)) return;
+      state.announcements = state.announcements.map(a => {
+        const code = normalizeCode(a.product_code);
+        const dirName = state.productsDirectory.get(code);
+        return dirName ? { ...a, product_name: dirName } : a;
+      });
+      localStorage.setItem('sahel_announcements', JSON.stringify(state.announcements));
+      updateNotifBadgeUI();
+      renderAnnouncementsFeed();
+    }
 
     function mapSupabaseRow(row) {
       const rawDate = String(row.invoice_date ?? row['بەرواری پسوڵە'] ?? '');
@@ -2054,25 +2110,30 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
               state.users = dbUsers;
               localStorage.setItem('sahel_app_users', JSON.stringify(dbUsers));
             }
-            const { data: dbAnns } = await state.supabaseClient.from('price_announcements').select('*').order('id', { ascending: false });
-            if (dbAnns && dbAnns.length > 0) {
-              const savedLastId = Number(localStorage.getItem('sahel_last_seen_ann_id') || 0);
-              const newestId = Number(dbAnns[0].id);
-
-              state.announcements = dbAnns;
-              localStorage.setItem('sahel_announcements', JSON.stringify(dbAnns));
+            const { data: dbAnns, error: annErr } = await state.supabaseClient
+              .from('price_announcements')
+              .select(ANN_SELECT)
+              .order('id', { ascending: false });
+            if (!annErr && dbAnns) {
+              const mappedAnns = dbAnns.map(mapAnnouncementRow);
+              state.announcements = mappedAnns;
+              localStorage.setItem('sahel_announcements', JSON.stringify(mappedAnns));
               updateNotifBadgeUI();
 
-              // ئەگەر ئۆفەرێکی نوێ هەبوو کە ئەم مۆبایلە هێشتا نەیبینیبوو، یەکسەر نۆتیفیکەیشنی بۆ بنێرە
-              if (savedLastId > 0 && newestId > savedLastId) {
-                setTimeout(() => handleIncomingAnnouncement(dbAnns[0]), 800);
-              } else if (savedLastId === 0) {
-                localStorage.setItem('sahel_last_seen_ann_id', String(newestId));
+              if (mappedAnns.length > 0) {
+                const savedLastId = Number(localStorage.getItem('sahel_last_seen_ann_id') || 0);
+                const newestId = Number(mappedAnns[0].id);
+                if (savedLastId > 0 && newestId > savedLastId) {
+                  setTimeout(() => handleIncomingAnnouncement(mappedAnns[0]), 800);
+                } else if (savedLastId === 0) {
+                  localStorage.setItem('sahel_last_seen_ann_id', String(newestId));
+                }
               }
             }
 
             preloadAutocompleteDirectories();
             loadServicesFromSupabase();
+            
           } catch (e) {
             console.error('DB Init error:', e);
           }
@@ -2125,6 +2186,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           pFrom += 1000;
         }
         renderServicesFeed();
+        refreshAnnouncementNames();
       } catch (e) {
         console.error(e);
       }
@@ -2624,8 +2686,18 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         realtimeSub = state.supabaseClient
           .channel('sahel-live-prices')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'price_announcements' }, payload => {
-            if (payload.new && payload.new.id) {
-              handleIncomingAnnouncement(payload.new);
+            if (payload.new && payload.new.product_code) {
+              const pCode = normalizeCode(payload.new.product_code);
+              setTimeout(async () => {
+                try {
+                  const { data } = await state.supabaseClient
+                    .from('price_announcements')
+                    .select(ANN_SELECT)
+                    .eq('product_code', pCode)
+                    .maybeSingle();
+                  if (data) handleIncomingAnnouncement(mapAnnouncementRow(data));
+                } catch (e) {}
+              }, 500);
             }
           })
           .subscribe();
@@ -2637,12 +2709,12 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         try {
           const { data } = await state.supabaseClient
             .from('price_announcements')
-            .select('*')
+            .select(ANN_SELECT)
             .order('id', { ascending: false })
             .limit(3);
 
           if (data && data.length > 0) {
-            const newest = data[0];
+            const newest = mapAnnouncementRow(data[0]);
             const savedLastId = Number(localStorage.getItem('sahel_last_seen_ann_id') || 0);
             if (Number(newest.id) > savedLastId) {
               handleIncomingAnnouncement(newest);
@@ -3668,7 +3740,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       const code = normalizeCode(document.getElementById('annProdCode').value);
       const prodNameVal = document.getElementById('annProdName').value.trim();
       if (!code || !prodNameVal || prodNameVal.includes('نەناسراو')) {
-        alertModal('کۆدی بابەت هەڵەیە', 'تکایە سەرەتا کۆدێکی دروستی بەرهەم بنووسە کە لە sales_data بوونی هەبێت.');
+        alertModal('کۆدی بابەت هەڵەیە', 'تکایە سەرەتا کۆدێکی دروستی بەرهەم بنووسە کە لە داتابەیسدا بوونی هەبێت.');
         return;
       }
 
@@ -3686,51 +3758,106 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         return;
       }
 
-      const condition = document.getElementById('annCondition').value.trim() || 'بەپێی ڕێنمایی کۆمپانیا';
-      const reason = document.getElementById('annReason').value.trim() || 'نوێکردنەوەی نرخی بازاڕ';
+      const rawCondition = document.getElementById('annCondition').value.trim();
+      const rawReason = document.getElementById('annReason').value.trim();
+      const dbCondition = (!rawCondition || rawCondition === 'بەپێی ڕێنمایی کۆمپانیا') ? null : rawCondition;
+      const dbReason = (!rawReason || rawReason === 'نوێکردنەوەی نرخی بازاڕ') ? null : rawReason;
+
+      const nowId = Date.now();
+      const creatorUsername = state.currentUser ? state.currentUser.username : 'admin';
+      const creatorFullName = state.currentUser ? state.currentUser.full_name : 'ئەدمین';
+      const nowIso = new Date().toISOString();
+
+      if (state.supabaseClient) {
+        try {
+          const parentPayload = {
+            product_code: code,
+            id: nowId,
+            condition_text: dbCondition,
+            reason_text: dbReason,
+            created_by: creatorUsername,
+            created_at: nowIso
+          };
+
+          const { error: parentErr } = await state.supabaseClient
+            .from('price_announcements')
+            .upsert([parentPayload], { onConflict: 'product_code' });
+
+          if (parentErr) {
+            alertModal('هەڵە لە پاشەکەوتکردن', `نرخەکە تۆمار نەکرا:\n${parentErr.message}`);
+            return;
+          }
+
+          await state.supabaseClient
+            .from('price_announcement_tiers')
+            .delete()
+            .eq('product_code', code);
+
+          const tierRows = tiers.map((t, idx) => ({
+            product_code: code,
+            tier_label: t.label,
+            price: t.price,
+            is_special: t.isSpecial,
+            sort_order: idx + 1
+          }));
+
+          const { error: tiersErr } = await state.supabaseClient
+            .from('price_announcement_tiers')
+            .insert(tierRows);
+
+          if (tiersErr) {
+            alertModal('هەڵە لە پاشەکەوتکردنی نرخەکان', tiersErr.message);
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+          alertModal('هەڵەی پەیوەندی', e.message);
+          return;
+        }
+      }
 
       const newAnn = {
-        id: Date.now(),
+        id: nowId,
         product_code: code,
         product_name: prodNameVal,
         tiers,
-        condition_text: condition,
-        reason_text: reason,
-        created_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
-        created_by: state.currentUser ? state.currentUser.full_name : 'ئەدمین'
+        condition_text: dbCondition || 'بەپێی ڕێنمایی کۆمپانیا',
+        reason_text: dbReason || 'نوێکردنەوەی نرخی بازاڕ',
+        created_by_username: creatorUsername,
+        created_by: creatorFullName,
+        created_at: formatAnnTimestamp(nowIso)
       };
 
-      // Replace previous announcement for same product code or unshift as latest
       const existingIdx = state.announcements.findIndex(a => normalizeCode(a.product_code) === code);
       if (existingIdx !== -1) {
         state.announcements.splice(existingIdx, 1);
       }
       state.announcements.unshift(newAnn);
       localStorage.setItem('sahel_announcements', JSON.stringify(state.announcements));
-
-      if (state.supabaseClient) {
-        try {
-          await state.supabaseClient.from('price_announcements').upsert([newAnn]);
-        } catch (e) { console.error(e); }
-      }
+      localStorage.setItem('sahel_last_seen_ann_id', String(nowId));
 
       state.unreadCount += 1;
       updateNotifBadgeUI();
       renderAnnouncementsFeed();
 
-      // Trigger Mobile Haptics & Service Worker Push Notification (Issue 2)
       triggerMobileNotification(`ڕاگەیاندنی نوێ: ${prodNameVal}`, `${tiers[0].label}: ${tiers[0].price.toLocaleString()} دینار`);
-
       triggerToast(`ڕاگەیاندنی نوێ: ${prodNameVal}`, `${tiers[0].label}: ${tiers[0].price.toLocaleString()} دینار`);
     }
 
     async function deleteAnnouncementItem(id) {
       if (!canManageAnnouncements()) return;
+      const target = state.announcements.find(a => Number(a.id) === Number(id));
+      const targetCode = target ? normalizeCode(target.product_code) : null;
+
       state.announcements = state.announcements.filter(a => Number(a.id) !== Number(id));
       localStorage.setItem('sahel_announcements', JSON.stringify(state.announcements));
       if (state.supabaseClient) {
         try {
-          await state.supabaseClient.from('price_announcements').delete().eq('id', id);
+          if (targetCode) {
+            await state.supabaseClient.from('price_announcements').delete().eq('product_code', targetCode);
+          } else {
+            await state.supabaseClient.from('price_announcements').delete().eq('id', Number(id));
+          }
         } catch (err) { console.error(err); }
       }
       renderAnnouncementsFeed();
@@ -4260,7 +4387,35 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       }
       try {
         await state.supabaseClient.from('app_users').upsert(state.users, { onConflict: 'username' });
-        await state.supabaseClient.from('price_announcements').upsert(state.announcements, { onConflict: 'id' });
+
+        for (const a of state.announcements) {
+          const code = normalizeCode(a.product_code);
+          if (!code) continue;
+          const dbCond = (!a.condition_text || a.condition_text === 'بەپێی ڕێنمایی کۆمپانیا') ? null : a.condition_text;
+          const dbReas = (!a.reason_text || a.reason_text === 'نوێکردنەوەی نرخی بازاڕ') ? null : a.reason_text;
+          const matchedU = state.users.find(u => u.username === a.created_by_username || u.full_name === a.created_by);
+
+          await state.supabaseClient.from('price_announcements').upsert([{
+            product_code: code,
+            id: Number(a.id) || Date.now(),
+            condition_text: dbCond,
+            reason_text: dbReas,
+            created_by: matchedU ? matchedU.username : (a.created_by_username || a.created_by || 'admin')
+          }], { onConflict: 'product_code' });
+
+          await state.supabaseClient.from('price_announcement_tiers').delete().eq('product_code', code);
+          const tierRows = (a.tiers || []).map((t, idx) => ({
+            product_code: code,
+            tier_label: t.label || 'نرخی دیاریکراو',
+            price: Number(t.price || 0),
+            is_special: Boolean(t.isSpecial),
+            sort_order: idx + 1
+          }));
+          if (tierRows.length > 0) {
+            await state.supabaseClient.from('price_announcement_tiers').insert(tierRows);
+          }
+        }
+
         alertModal('هاوکاتکردن سەرکەوتوو بوو', 'تەواوی خشتەی بەکارهێنەران و نرخە ڕاگەیەندراوەکان لەگەڵ Supabase هاوکات کران.');
       } catch (e) {
         alertModal('کێشە لە هاوکاتکردن', e.message);
