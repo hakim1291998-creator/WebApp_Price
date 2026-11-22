@@ -2688,7 +2688,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         } catch (err) {
           console.error('Supabase query error:', err);
         }
-      }
       } else {
         matches = salesDataset
           .filter(r => (normalizeCode(r.customer_code) === rawCustInput || r.customer_name.includes(rawCustInput)) && (normalizeCode(r.product_code) === rawProdInput || r.product_name.includes(rawProdInput)) && r.carton_price > 0)
@@ -2809,6 +2808,24 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       renderMarketPortfolio();
     }
 
+    async function renderMarketPortfolio() {
+      const myReq = ++marketReqId;
+      await ensureDbReady();
+      if (myReq !== marketReqId) return;
+
+      const inputEl = document.getElementById('marketSearchInput');
+      const query = normalizeCode(inputEl.value);
+      const resolvedCode = inputEl.dataset.resolvedCode || '';
+      const container = document.getElementById('marketPortfolioResult');
+
+      container.innerHTML = `
+        <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-primary">
+          ⏳ خەریکی هێنانی کاڵاکانی مارکێتە لە خشتەی sales_data...
+        </div>
+      `;
+
+      let rows = [];
+      
     if (state.supabaseClient) {
         try {
           let targetCustCode = '';
