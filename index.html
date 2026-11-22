@@ -907,7 +907,7 @@
 
             <div data-card-perm="admin_users" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-primary text-surface-bright px-4 flex items-center justify-between">
-                <span class="font-mono text-[11px] font-bold">06 • ADMIN & SUPABASE</span>
+                <span class="font-mono text-[11px] font-bold">07 • ADMIN & SUPABASE</span>
                 <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-white/20 text-white border-white/30">تایبەت بە ئەدمین</span>
               </div>
               <div class="p-5 flex-1 flex flex-col justify-between">
@@ -1675,7 +1675,7 @@
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="services" checked class="ui-checkbox">
-                      <span class="text-xs font-bold text-ink-900">٧. بینینی خزمەتگوزارییەکان (مەندووب)</span>
+                      <span class="text-xs font-bold text-ink-900">٦. بینینی خزمەتگوزارییەکان (مەندووب)</span>
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-[8px] border border-alert-successBorder bg-alert-successBg/50 cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="manage_services" class="ui-checkbox">
@@ -1687,7 +1687,7 @@
                     </label>
                     <label class="sm:col-span-2 flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="admin_users" class="ui-checkbox">
-                      <span class="text-xs font-bold text-alert-errorText">٧. بەڕێوەبەری گشتی و داتابەیس (Admin)</span>
+                      <span class="text-xs font-bold text-alert-errorText">٩. بەڕێوەبەری گشتی و داتابەیس (Admin)</span>
                     </label>
                   </div>
                 </div>
@@ -2074,6 +2074,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
             preloadAutocompleteDirectories();
             loadServicesFromSupabase();
+            renderServicesFeed();
           } catch (e) {
             console.error('DB Init error:', e);
           }
@@ -3844,56 +3845,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         }
       }
     }
-
-    function triggerMobileNotification(title, body) {
-      // 1. Force mobile haptic vibration (Issue 2)
-      if ('vibrate' in navigator) {
-        try {
-          navigator.vibrate([200, 100, 200]);
-        } catch (e) {
-          console.warn('Vibration failed:', e);
-        }
-      }
-
-      // 2. Play lightweight audio chime
-      if (typeof playNotificationSound === 'function') {
-       // playNotificationSound();
-      }
-
-      // 3. Service Worker Push Notification (bypasses mobile restrictions on new Notification())
-      if ('serviceWorker' in navigator && 'Notification' in window) {
-        if (Notification.permission === 'granted') {
-          navigator.serviceWorker.ready.then((reg) => {
-            reg.showNotification(title, {
-              body: body,
-              icon: './icons/icon-192.png',
-              badge: './icons/icon-192.png',
-              vibrate: [200, 100, 200],
-              tag: 'sahel-announcement',
-              renotify: true
-            });
-          }).catch((err) => {
-            console.warn('ServiceWorker showNotification failed, trying fallback:', err);
-            try {
-              new Notification(title, { body: body, icon: './icons/icon-192.png' });
-            } catch (e) {}
-          });
-        } else if (Notification.permission === 'default') {
-          Notification.requestPermission().then((permission) => {
-            if (permission === 'granted' && 'serviceWorker' in navigator) {
-              navigator.serviceWorker.ready.then((reg) => {
-                reg.showNotification(title, {
-                  body: body,
-                  icon: './icons/icon-192.png',
-                  vibrate: [200, 100, 200]
-                });
-              });
-            }
-          });
-        }
-      }
-    }
-
     let toastHideTimer = null;
     function triggerToast(title, body) {
       const banner = document.getElementById('toastBanner');
