@@ -872,7 +872,7 @@
             </div>
             <div data-card-perm="services" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
-                <span class="font-mono text-[11px] font-bold text-ink-700">06 • SERVICES & RENT</span>
+                <span class="font-mono text-[11px] font-bold text-ink-700">05 • SERVICES & RENT</span>
                 <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">کرێ • خصم • کەلوپەل</span>
               </div>
               <div class="p-5 flex-1 flex flex-col justify-between">
@@ -889,7 +889,7 @@
             </div>
             <div data-card-perm="contracts" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
-                <span class="font-mono text-[11px] font-bold text-ink-700">07 • DOCUMENTS</span>
+                <span class="font-mono text-[11px] font-bold text-ink-700">06 • DOCUMENTS</span>
                 <span class="ui-chip !py-0.5 !px-2 !text-[10px]">گرێبەست و پسوڵە</span>
               </div>
               <div class="p-5 flex-1 flex flex-col justify-between">
@@ -2074,7 +2074,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
             preloadAutocompleteDirectories();
             loadServicesFromSupabase();
-            renderServicesFeed();
           } catch (e) {
             console.error('DB Init error:', e);
           }
@@ -2126,6 +2125,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           if (pData.length < 1000) break;
           pFrom += 1000;
         }
+        renderServicesFeed();
       } catch (e) {
         console.error(e);
       }
