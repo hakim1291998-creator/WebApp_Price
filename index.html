@@ -872,7 +872,7 @@
             </div>
             <div data-card-perm="services" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
-                <span class="font-mono text-[11px] font-bold text-ink-700">05 • SERVICES & RENT</span>
+                <span class="font-mono text-[11px] font-bold text-ink-700">06 • SERVICES & RENT</span>
                 <span class="ui-chip !py-0.5 !px-2 !text-[10px] bg-alert-successBg border-alert-successBorder text-alert-successText">کرێ • خصم • کەلوپەل</span>
               </div>
               <div class="p-5 flex-1 flex flex-col justify-between">
@@ -889,7 +889,7 @@
             </div>
             <div data-card-perm="contracts" class="bg-surface border border-border rounded-[16px] overflow-hidden shadow-level-2 flex flex-col justify-between hover:border-primary transition">
               <div class="h-12 bg-ink-100 border-b border-border px-4 flex items-center justify-between">
-                <span class="font-mono text-[11px] font-bold text-ink-700">05 • DOCUMENTS</span>
+                <span class="font-mono text-[11px] font-bold text-ink-700">07 • DOCUMENTS</span>
                 <span class="ui-chip !py-0.5 !px-2 !text-[10px]">گرێبەست و پسوڵە</span>
               </div>
               <div class="p-5 flex-1 flex flex-col justify-between">
@@ -1392,7 +1392,13 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-xs font-bold text-ink-900 mb-1">٢. جۆری خزمەتگوزاری (بە کۆد)</label>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="text-xs font-bold text-ink-900">٢. جۆری خزمەتگوزاری (بە کۆد)</label>
+                      <button type="button" onclick="toggleNewServiceTypePanel()" class="text-[11px] font-extrabold text-primary hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span>جۆری نوێ</span>
+                      </button>
+                    </div>
                     <select id="serviceTypeSelect" onchange="onServiceTypeChange()" class="ui-input w-full px-3 py-2.5 text-xs font-extrabold bg-surface-bright"></select>
                   </div>
 
@@ -1410,6 +1416,56 @@
                       >
                       <span id="serviceUnitBadge" class="absolute left-2.5 top-2.5 text-[11px] font-extrabold text-primary font-mono">د.ع</span>
                     </div>
+                  </div>
+                </div>
+
+                <!-- سندوقی زیادکردن و بەڕێوەبردنی جۆرەکانی خزمەتگوزاری (service_types) -->
+                <div id="newServiceTypePanel" class="hidden bg-surface-bright border-2 border-primary/40 rounded-[12px] p-3.5 space-y-3">
+                  <div class="flex items-center justify-between border-b border-border pb-2">
+                    <span class="text-xs font-extrabold text-primary flex items-center gap-1.5">
+                      <i class="fa-solid fa-sliders"></i>
+                      <span>بەڕێوەبردن و زیادکردنی جۆری خزمەتگوزاری (service_types)</span>
+                    </span>
+                    <button type="button" onclick="toggleNewServiceTypePanel()" class="text-ink-500 hover:text-ink-900 text-xs px-1">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <div class="sm:col-span-3">
+                      <label class="block text-[10px] font-bold text-ink-700 mb-1">کۆد (ژمارە)</label>
+                      <input type="number" id="newServiceTypeCode" min="1" dir="ltr" class="ui-input w-full px-2.5 py-1.5 text-xs font-mono font-extrabold text-left">
+                    </div>
+                    <div class="sm:col-span-6">
+                      <label class="block text-[10px] font-bold text-ink-700 mb-1">ناوی جۆری خزمەتگوزاری</label>
+                      <input type="text" id="newServiceTypeName" placeholder="نموونە: تابلۆی ڕیکلام یان بۆنوس" class="ui-input w-full px-2.5 py-1.5 text-xs font-bold">
+                    </div>
+                    <div class="sm:col-span-3">
+                      <label class="block text-[10px] font-bold text-ink-700 mb-1">یەکە</label>
+                      <input type="text" id="newServiceTypeUnit" list="serviceUnitOptions" value="دانە" oninput="if(this.value.trim()==='د.ع') document.getElementById('newServiceTypeIsFinancial').checked = true;" class="ui-input w-full px-2.5 py-1.5 text-xs font-bold">
+                      <datalist id="serviceUnitOptions">
+                        <option value="د.ع"></option>
+                        <option value="%"></option>
+                        <option value="دانە"></option>
+                        <option value="مەتر"></option>
+                        <option value="کارتۆن"></option>
+                      </datalist>
+                    </div>
+                  </div>
+
+                  <label class="flex items-center gap-2 text-[11px] font-bold text-ink-900 cursor-pointer">
+                    <input type="checkbox" id="newServiceTypeIsFinancial" class="ui-checkbox">
+                    <span>بڕی پارەیە و بچێتە سەر «کۆی کرێی چالاک» (is_financial)</span>
+                  </label>
+
+                  <button type="button" onclick="saveNewServiceType()" class="btn-primary w-full py-2 text-xs font-extrabold flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>زیادکردنی ئەم جۆرە بۆ داتابەیس</span>
+                  </button>
+
+                  <div class="pt-2 border-t border-border/70 space-y-1.5">
+                    <span class="block text-[10px] font-bold text-ink-500">جۆرە تۆمارکراوەکانی ئێستا:</span>
+                    <div id="existingServiceTypesList" class="flex flex-wrap gap-1.5"></div>
                   </div>
                 </div>
 
@@ -1619,7 +1675,7 @@
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="services" checked class="ui-checkbox">
-                      <span class="text-xs font-bold text-ink-900">٦. بینینی خزمەتگوزارییەکان (مەندووب)</span>
+                      <span class="text-xs font-bold text-ink-900">٧. بینینی خزمەتگوزارییەکان (مەندووب)</span>
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-[8px] border border-alert-successBorder bg-alert-successBg/50 cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="manage_services" class="ui-checkbox">
@@ -1627,7 +1683,7 @@
                     </label>
                     <label class="flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="contracts" class="ui-checkbox">
-                      <span class="text-xs font-bold text-ink-900">٦. گرێبەست و پسوڵە</span>
+                      <span class="text-xs font-bold text-ink-900">٨. گرێبەست و پسوڵە</span>
                     </label>
                     <label class="sm:col-span-2 flex items-center gap-2 p-2 rounded-[8px] border border-border bg-surface cursor-pointer hover:border-primary">
                       <input type="checkbox" name="usrPerm" value="admin_users" class="ui-checkbox">
@@ -2765,7 +2821,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         price_audit: 'ڕاپۆرتی مێژووی نرخی بەرهەم و فلتەری شوێنەکان',
         announcements: 'ڕاگەیاندنی نرخەکان و عرض خاص بۆ مەندووبەکان',
         contracts: 'ئەرشیفی گرێبەستەکان و گەڕانی پسوڵە',
-        admin_users: 'بەڕێوەبردنی بەکارهێنەران، قفڵی IMEI و داتابەیسی Supabase'
+        admin_users: 'بەڕێوەبردنی بەکارهێنەران، قفڵی IMEI و داتابەیسی Supabase',
         services: 'خزمەتگوزارییەکانی مارکێت (کرێ، خصم، بەڕاد، موجەمیدە و ڕەف)',
       };
 
@@ -4127,6 +4183,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       // If user has `manage_announcements`, automatically ensure `announcements` view tab is enabled too
       if (permissions.includes('manage_announcements') && !permissions.includes('announcements')) {
         permissions.push('announcements');
+      }
       if (permissions.includes('manage_services') && !permissions.includes('services')) {
         permissions.push('services');
       }
@@ -4176,7 +4233,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         announcements: 'بینینی نرخەکان',
         manage_announcements: '★ دانانی نرخ و عرض خاص',
         contracts: 'گرێبەستەکان',
-        admin_users: 'ئەدمین/داتابەیس'
+        admin_users: 'ئەدمین/داتابەیس',
         services: 'بینینی خزمەتگوزاری',
         manage_services: '★ تۆمارکردنی خزمەتگوزاری',
       };
@@ -4444,6 +4501,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
           selectEl.value = currentVal;
         }
         onServiceTypeChange();
+        renderExistingServiceTypesList();
       }
 
       const chipsBox = document.getElementById('serviceTypeFilterChips');
@@ -4478,6 +4536,116 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
         if (info.is_financial) valInput.placeholder = 'نموونە: 20000';
         else if (info.unit === '%') valInput.placeholder = 'نموونە: 5';
         else valInput.placeholder = 'نموونە: 2';
+      }
+    }
+    function toggleNewServiceTypePanel() {
+      const panel = document.getElementById('newServiceTypePanel');
+      if (!panel) return;
+      const willOpen = panel.classList.contains('hidden');
+      panel.classList.toggle('hidden');
+      if (willOpen) {
+        const types = state.serviceTypes.length > 0 ? state.serviceTypes : DEFAULT_SERVICE_TYPES;
+        const nextCode = types.reduce((max, t) => Math.max(max, Number(t.type_code) || 0), 0) + 1;
+        const codeInp = document.getElementById('newServiceTypeCode');
+        if (codeInp) codeInp.value = nextCode;
+        renderExistingServiceTypesList();
+        const nameInp = document.getElementById('newServiceTypeName');
+        if (nameInp) nameInp.focus();
+      }
+    }
+    function renderExistingServiceTypesList() {
+      const box = document.getElementById('existingServiceTypesList');
+      if (!box) return;
+      const types = state.serviceTypes.length > 0 ? state.serviceTypes : DEFAULT_SERVICE_TYPES;
+      box.innerHTML = types.map(t => `
+        <span class="ui-chip !py-1 !px-2.5 !text-[10px] flex items-center gap-1.5">
+          <span class="font-mono font-extrabold text-primary">[${t.type_code}]</span>
+          <span class="font-bold">${t.type_name}</span>
+          <span class="text-ink-500">(${t.unit})</span>
+          <button type="button" onclick="deleteServiceType(${t.type_code})" class="text-alert-errorText hover:opacity-70 mr-0.5" title="سڕینەوەی ئەم جۆرە">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+      `).join('');
+    }
+
+    async function saveNewServiceType() {
+      if (!canManageServices()) return;
+      await ensureDbReady();
+
+      const type_code = Number(document.getElementById('newServiceTypeCode').value);
+      const type_name = document.getElementById('newServiceTypeName').value.trim();
+      const unit = document.getElementById('newServiceTypeUnit').value.trim() || 'دانە';
+      const is_financial = document.getElementById('newServiceTypeIsFinancial').checked;
+
+      if (!type_code || type_code < 1 || !type_name) {
+        alertModal('زانیاری ناتەواو', 'تکایە کۆدێکی ژمارەیی دروست و ناوی جۆری خزمەتگوزارییەکە بنووسە.');
+        return;
+      }
+
+      const existingTypes = state.serviceTypes.length > 0 ? state.serviceTypes : DEFAULT_SERVICE_TYPES;
+      if (existingTypes.some(t => Number(t.type_code) === type_code)) {
+        alertModal('کۆدی دووبارە', `کۆدی (${type_code}) پێشتر بۆ جۆرێکی تر بەکارهاتووە، تکایە ژمارەیەکی تر دابنێ.`);
+        return;
+      }
+      if (existingTypes.some(t => t.type_name.trim() === type_name)) {
+        alertModal('ناوی دووبارە', `جۆری (${type_name}) پێشتر بوونی هەیە.`);
+        return;
+      }
+
+      const newType = { type_code, type_name, unit, is_financial };
+
+      if (state.supabaseClient) {
+        const { error } = await state.supabaseClient
+          .from('service_types')
+          .insert([newType]);
+        if (error) {
+          alertModal('هەڵە لە پاشەکەوتکردن', `نەتوانرا جۆرە نوێیەکە زیاد بکرێت:\n${error.message}`);
+          return;
+        }
+        await loadServicesFromSupabase();
+      } else {
+        state.serviceTypes.push(newType);
+        state.serviceTypes.sort((a, b) => a.type_code - b.type_code);
+        populateServiceTypeUI();
+      }
+
+      // هەڵبژاردنی ڕاستەوخۆی جۆرە نوێیەکە لەناو فۆڕمەکەدا
+      const selectEl = document.getElementById('serviceTypeSelect');
+      if (selectEl) {
+        selectEl.value = String(type_code);
+        onServiceTypeChange();
+      }
+
+      document.getElementById('newServiceTypeName').value = '';
+      document.getElementById('newServiceTypeUnit').value = 'دانە';
+      document.getElementById('newServiceTypeIsFinancial').checked = false;
+      document.getElementById('newServiceTypePanel').classList.add('hidden');
+      triggerToast('جۆری خزمەتگوزاری زیاد کرا ✓', `[${type_code}] ${type_name} (${unit})`);
+    }
+
+    async function deleteServiceType(typeCode) {
+      if (!canManageServices()) return;
+      const inUse = state.services.some(s => Number(s.type_code) === Number(typeCode));
+      if (inUse) {
+        alertModal('ناتوانرێت بسڕدرێتەوە', 'ئەم جۆرە خزمەتگوزارییە ئێستا لە تۆماری مارکێتەکاندا بەکارهاتووە؛ سەرەتا دەبێت ئەو تۆمارانە بگۆڕیت یان بسڕیتەوە.');
+        return;
+      }
+      if (!confirm(`ئایا دڵنیایت لە سڕینەوەی کۆدی جۆری خزمەتگوزاری [${typeCode}]؟`)) return;
+
+      if (state.supabaseClient) {
+        const { error } = await state.supabaseClient
+          .from('service_types')
+          .delete()
+          .eq('type_code', Number(typeCode));
+        if (error) {
+          alertModal('هەڵە لە سڕینەوە', error.message);
+          return;
+        }
+        await loadServicesFromSupabase();
+      } else {
+        state.serviceTypes = state.serviceTypes.filter(t => Number(t.type_code) !== Number(typeCode));
+        populateServiceTypeUI();
       }
     }
 
