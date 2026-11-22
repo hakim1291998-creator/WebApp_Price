@@ -1638,17 +1638,23 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       { customer_code: "9155", customer_name: "مارکێت سۆلاف کاک محمد احمد سعید", invoice_no: "89601", location: "هەولێر", product_code: "1285", product_name: "پەنیری 100گرام40عدد/کیبی", invoice_date: "2026-09-23", carton_price: 34000, qty_carton: 0.25, qty_piece: 10 }
     ];
 
+    const SALES_SELECT = '*, customers(customer_name), products(product_name)';
+
     function mapSupabaseRow(row) {
       const rawDate = String(row.invoice_date ?? row['بەرواری پسوڵە'] ?? '');
       const cleanDate = rawDate.includes('T') ? rawDate.split('T')[0] : rawDate.split(' ')[0];
       const rawPrice = Number(row.carton_price ?? row['نرخی فرۆشی یەک کارتۆن'] ?? 0);
+      const cCode = String(row.customer_code ?? row['کۆدی کریار'] ?? '').trim().replace(/\.0$/, '');
+      const pCode = String(row.product_code ?? row['کۆدی بەرهەم'] ?? '').trim().replace(/\.0$/, '');
+      const joinedCust = Array.isArray(row.customers) ? row.customers[0]?.customer_name : row.customers?.customer_name;
+      const joinedProd = Array.isArray(row.products) ? row.products[0]?.product_name : row.products?.product_name;
       return {
-        customer_code: String(row.customer_code ?? row['کۆدی کریار'] ?? '').trim().replace(/\.0$/, ''),
-        customer_name: String(row.customer_name ?? row['ناوی کریار'] ?? '').trim(),
+        customer_code: cCode,
+        customer_name: String(joinedCust ?? row.customer_name ?? row['ناوی کریار'] ?? state.customersDirectory.get(cCode) ?? '').trim(),
         invoice_no: String(row.invoice_no ?? row['ژمارەی پسوڵە'] ?? '').replace(/\.0$/, ''),
         invoice_date: cleanDate,
-        product_code: String(row.product_code ?? row['کۆدی بەرهەم'] ?? '').trim().replace(/\.0$/, ''),
-        product_name: String(row.product_name ?? row['ناوی بەرهەم'] ?? '').trim(),
+        product_code: pCode,
+        product_name: String(joinedProd ?? row.product_name ?? row['ناوی بەرهەم'] ?? state.productsDirectory.get(pCode) ?? '').trim(),
         qty_carton: Number(row.qty_carton ?? row['فرۆشی بەرهەم بە کارتۆن'] ?? 0),
         qty_piece: Number(row.qty_piece ?? row['فرۆشی بەرهەم بە دانە'] ?? 0),
         carton_price: Math.round(rawPrice),
@@ -1823,7 +1829,6 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
     }
 
     async function preloadAutocompleteDirectories() {
-      // Seed immediately from salesDataset and masterCatalog (0ms offline availability)
       salesDataset.forEach(r => {
         if (r.customer_code && r.customer_name) state.customersDirectory.set(normalizeCode(r.customer_code), r.customer_name);
         if (r.product_code && r.product_name) state.productsDirectory.set(normalizeCode(r.product_code), r.product_name);
@@ -1834,29 +1839,36 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       if (!state.supabaseClient) return;
       try {
-        const cCodeCol = col('customer_code');
-        const cNameCol = col('customer_name');
-        const pCodeCol = col('product_code');
-        const pNameCol = col('product_name');
-
-        const { data } = await state.supabaseClient
-          .from('sales_data')
-          .select(`${cCodeCol}, ${cNameCol}, ${pCodeCol}, ${pNameCol}`)
-          .limit(2500);
-
-        if (data) {
-          data.forEach(r => {
-            const cCode = String(r[cCodeCol] ?? '').trim().replace(/\.0$/, '');
-            const cName = String(r[cNameCol] ?? '').trim();
-            if (cCode && cName && !state.customersDirectory.has(cCode)) {
-              state.customersDirectory.set(cCode, cName);
-            }
-            const pCode = String(r[pCodeCol] ?? '').trim().replace(/\.0$/, '');
-            const pName = String(r[pNameCol] ?? '').trim();
-            if (pCode && pName && !state.productsDirectory.has(pCode)) {
-              state.productsDirectory.set(pCode, pName);
-            }
+        let cFrom = 0;
+        while (cFrom < 20000) {
+          const { data: cData, error: cErr } = await state.supabaseClient
+            .from('customers')
+            .select('customer_code, customer_name')
+            .range(cFrom, cFrom + 999);
+          if (cErr || !cData || cData.length === 0) break;
+          cData.forEach(r => {
+            const c = normalizeCode(r.customer_code);
+            const n = String(r.customer_name ?? '').trim();
+            if (c && n) state.customersDirectory.set(c, n);
           });
+          if (cData.length < 1000) break;
+          cFrom += 1000;
+        }
+
+        let pFrom = 0;
+        while (pFrom < 20000) {
+          const { data: pData, error: pErr } = await state.supabaseClient
+            .from('products')
+            .select('product_code, product_name')
+            .range(pFrom, pFrom + 999);
+          if (pErr || !pData || pData.length === 0) break;
+          pData.forEach(r => {
+            const p = normalizeCode(r.product_code);
+            const n = String(r.product_name ?? '').trim();
+            if (p && n) state.productsDirectory.set(p, n);
+          });
+          if (pData.length < 1000) break;
+          pFrom += 1000;
         }
       } catch (e) {
         console.error(e);
@@ -2033,7 +2045,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
             if (/^\d+$/.test(q)) {
               // یەکەم: بەدوای کۆدی تەواو هاوتادا بگەڕێ (بۆ نموونە ڕێک ژمارە 1 بۆ کۆگای یوسف)
               const { data: exactData } = await state.supabaseClient
-                .from('sales_data')
+                .from('customers')
                 .select(`${cCodeCol}, ${cNameCol}`)
                 .eq(cCodeCol, q)
                 .limit(5);
@@ -2048,7 +2060,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
               // دووەم: گەڕان بەدوای کۆدە نزیکەکان ئەگەر ستوونەکە Text بوو
               const { data: likeData } = await state.supabaseClient
-                .from('sales_data')
+                .from('customers')
                 .select(`${cCodeCol}, ${cNameCol}`)
                 .ilike(cCodeCol, `${q}%`)
                 .limit(50);
@@ -2063,7 +2075,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
             } else {
               // ئەگەر بە ناو گەڕا
               const { data: nameData } = await state.supabaseClient
-                .from('sales_data')
+                .from('customers')
                 .select(`${cCodeCol}, ${cNameCol}`)
                 .ilike(cNameCol, `%${q}%`)
                 .limit(60);
@@ -2164,7 +2176,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
             if (/^\d+$/.test(q)) {
               const { data: exactData } = await state.supabaseClient
-                .from('sales_data')
+                .from('products')
                 .select(`${pCodeCol}, ${pNameCol}`)
                 .eq(pCodeCol, q)
                 .limit(5);
@@ -2178,7 +2190,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
               }
 
               const { data: likeData } = await state.supabaseClient
-                .from('sales_data')
+                .from('products')
                 .select(`${pCodeCol}, ${pNameCol}`)
                 .ilike(pCodeCol, `${q}%`)
                 .limit(50);
@@ -2192,7 +2204,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
               }
             } else {
               const { data: nameData } = await state.supabaseClient
-                .from('sales_data')
+                .from('products')
                 .select(`${pCodeCol}, ${pNameCol}`)
                 .ilike(pNameCol, `%${q}%`)
                 .limit(60);
@@ -2632,42 +2644,51 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
 
       if (state.supabaseClient) {
         try {
-          let q = state.supabaseClient.from('sales_data').select('*').gt(col('carton_price'), 0);
-
-          if (resolvedCustCode && rawCustInput.includes(state.customersDirectory.get(resolvedCustCode) || '')) {
-            q = q.eq(col('customer_code'), resolvedCustCode);
+          let targetCustCodes = [];
+          if (resolvedCustCode && (rawCustInput === resolvedCustCode || rawCustInput.includes(state.customersDirectory.get(resolvedCustCode) || ''))) {
+            targetCustCodes = [resolvedCustCode];
           } else if (/^\d+$/.test(rawCustInput)) {
-            q = q.eq(col('customer_code'), rawCustInput);
+            targetCustCodes = [rawCustInput];
           } else {
-            q = q.eq(col('customer_name'), rawCustInput);
+            const { data: cMatch } = await state.supabaseClient
+              .from('customers')
+              .select('customer_code')
+              .ilike('customer_name', `%${rawCustInput}%`)
+              .limit(20);
+            if (cMatch) targetCustCodes = cMatch.map(x => String(x.customer_code));
           }
 
+          let targetProdCodes = [];
           if (/^\d+$/.test(rawProdInput)) {
-            q = q.eq(col('product_code'), rawProdInput);
+            targetProdCodes = [rawProdInput];
           } else {
-            q = q.ilike(col('product_name'), `%${rawProdInput}%`);
+            const { data: pMatch } = await state.supabaseClient
+              .from('products')
+              .select('product_code')
+              .ilike('product_name', `%${rawProdInput}%`)
+              .limit(20);
+            if (pMatch) targetProdCodes = pMatch.map(x => String(x.product_code));
           }
 
-          let { data, error } = await q.order(col('invoice_date'), { ascending: false }).limit(500);
+          if (targetCustCodes.length > 0 && targetProdCodes.length > 0) {
+            const { data, error } = await state.supabaseClient
+              .from('sales_data')
+              .select(SALES_SELECT)
+              .gt('carton_price', 0)
+              .in('customer_code', targetCustCodes)
+              .in('product_code', targetProdCodes)
+              .order('invoice_date', { ascending: false })
+              .limit(500);
 
-          if ((!data || data.length === 0) && !/^\d+$/.test(rawCustInput)) {
-            let q2 = state.supabaseClient.from('sales_data').select('*').gt(col('carton_price'), 0).ilike(col('customer_name'), `%${rawCustInput}%`);
-            if (/^\d+$/.test(rawProdInput)) {
-              q2 = q2.eq(col('product_code'), rawProdInput);
-            } else {
-              q2 = q2.ilike(col('product_name'), `%${rawProdInput}%`);
+            if (myReqId !== priceLookupReqId) return;
+            if (!error && data) {
+              matches = data.map(mapSupabaseRow);
             }
-            const res2 = await q2.order(col('invoice_date'), { ascending: false }).limit(500);
-            data = res2.data;
-          }
-
-          if (myReqId !== priceLookupReqId) return;
-          if (!error && data) {
-            matches = data.map(mapSupabaseRow);
           }
         } catch (err) {
           console.error('Supabase query error:', err);
         }
+      }
       } else {
         matches = salesDataset
           .filter(r => (normalizeCode(r.customer_code) === rawCustInput || r.customer_name.includes(rawCustInput)) && (normalizeCode(r.product_code) === rawProdInput || r.product_name.includes(rawProdInput)) && r.carton_price > 0)
@@ -2788,50 +2809,33 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       renderMarketPortfolio();
     }
 
-    async function renderMarketPortfolio() {
-      const myReq = ++marketReqId;
-      await ensureDbReady();
-      if (myReq !== marketReqId) return;
-
-      const inputEl = document.getElementById('marketSearchInput');
-      const query = normalizeCode(inputEl.value);
-      const resolvedCode = inputEl.dataset.resolvedCode || '';
-      const container = document.getElementById('marketPortfolioResult');
-
-      container.innerHTML = `
-        <div class="bg-surface border border-border rounded-[16px] p-6 text-center text-xs font-bold text-primary">
-          ⏳ خەریکی هێنانی کاڵاکانی مارکێتە لە خشتەی sales_data...
-        </div>
-      `;
-
-      let rows = [];
-      if (state.supabaseClient) {
+    if (state.supabaseClient) {
         try {
-          let sbQuery = state.supabaseClient.from('sales_data').select('*');
-          if (resolvedCode && query.includes(state.customersDirectory.get(resolvedCode) || '')) {
-            sbQuery = sbQuery.eq(col('customer_code'), resolvedCode);
+          let targetCustCode = '';
+          if (resolvedCode && (query === resolvedCode || query.includes(state.customersDirectory.get(resolvedCode) || ''))) {
+            targetCustCode = resolvedCode;
           } else if (query) {
             if (/^\d+$/.test(query)) {
-              sbQuery = sbQuery.eq(col('customer_code'), query);
+              targetCustCode = query;
             } else {
-              sbQuery = sbQuery.eq(col('customer_name'), query);
+              const { data: cFound } = await state.supabaseClient
+                .from('customers')
+                .select('customer_code')
+                .ilike('customer_name', `%${query}%`)
+                .limit(1);
+              if (cFound && cFound.length > 0) targetCustCode = String(cFound[0].customer_code);
             }
           }
-          let { data, error } = await sbQuery.order(col('invoice_date'), { ascending: false }).limit(600);
 
-          if ((!data || data.length === 0) && query && !/^\d+$/.test(query)) {
-            const res2 = await state.supabaseClient
-              .from('sales_data')
-              .select('*')
-              .ilike(col('customer_name'), `%${query}%`)
-              .order(col('invoice_date'), { ascending: false })
-              .limit(600);
-            data = res2.data;
-          }
+          if (!query || targetCustCode) {
+            let sbQuery = state.supabaseClient.from('sales_data').select(SALES_SELECT);
+            if (targetCustCode) sbQuery = sbQuery.eq('customer_code', targetCustCode);
+            const { data, error } = await sbQuery.order('invoice_date', { ascending: false }).limit(600);
 
-          if (myReq !== marketReqId) return;
-          if (!error && data) {
-            rows = data.map(mapSupabaseRow);
+            if (myReq !== marketReqId) return;
+            if (!error && data) {
+              rows = data.map(mapSupabaseRow);
+            }
           }
         } catch (err) {
           console.error(err);
@@ -2936,27 +2940,34 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       let fromIdx = 0;
       const step = 1000;
 
+      let targetProdCodes = null;
+      if (prodCode) {
+        if (/^\d+$/.test(prodCode)) {
+          targetProdCodes = [prodCode];
+        } else {
+          const { data: pMatch } = await state.supabaseClient
+            .from('products')
+            .select('product_code')
+            .ilike('product_name', `%${prodCode}%`)
+            .limit(30);
+          targetProdCodes = pMatch ? pMatch.map(x => String(x.product_code)) : [];
+          if (targetProdCodes.length === 0) return [];
+        }
+      }
+
       while (fromIdx < 15000) {
         let q = state.supabaseClient
           .from('sales_data')
-          .select('*')
-          .gt(col('carton_price'), 0);
+          .select(SALES_SELECT)
+          .gt('carton_price', 0);
 
-        if (prodCode) {
-          if (/^\d+$/.test(prodCode)) {
-            q = q.eq(col('product_code'), prodCode);
-          } else {
-            q = q.ilike(col('product_name'), `%${prodCode}%`);
-          }
-        }
-        if (specificPrice) {
-          q = q.eq(col('carton_price'), Number(specificPrice));
-        }
-        if (fromDate) q = q.gte(col('invoice_date'), fromDate);
-        if (toDate) q = q.lte(col('invoice_date'), toDate + ' 23:59:59');
+        if (targetProdCodes) q = q.in('product_code', targetProdCodes);
+        if (specificPrice) q = q.eq('carton_price', Number(specificPrice));
+        if (fromDate) q = q.gte('invoice_date', fromDate);
+        if (toDate) q = q.lte('invoice_date', toDate + ' 23:59:59');
 
         const { data, error } = await q
-          .order(col('invoice_date'), { ascending: false })
+          .order('invoice_date', { ascending: false })
           .range(fromIdx, fromIdx + step - 1);
 
         if (error || !data || data.length === 0) break;
@@ -3294,9 +3305,9 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       if (state.supabaseClient) {
         try {
           const { data } = await state.supabaseClient
-            .from('sales_data')
-            .select('*')
-            .eq(col('product_code'), code)
+            .from('products')
+            .select('product_code, product_name')
+            .eq('product_code', code)
             .limit(1);
           if (data && data.length > 0) {
             const mapped = mapSupabaseRow(data[0]);
@@ -4035,7 +4046,7 @@ CREATE POLICY "Allow all price_announcements" ON public.price_announcements FOR 
       let rows = [];
       if (state.supabaseClient) {
         try {
-          const { data } = await state.supabaseClient.from('sales_data').select('*').eq(col('invoice_no'), Number(val));
+          const { data } = await state.supabaseClient.from('sales_data').select(SALES_SELECT).eq(col('invoice_no'), Number(val));
           if (data) rows = data.map(mapSupabaseRow);
         } catch (err) { console.error(err); }
       } else {
